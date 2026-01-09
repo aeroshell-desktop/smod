@@ -157,7 +157,7 @@ function(build_Qt6)
         add_subdirectory(kdecoration)
     endif()
 
-    ki18n_install(po)
+    #ki18n_install(po)
 
     unset(QUERY_EXECUTABLE CACHE)
 endfunction()
