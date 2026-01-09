@@ -3,7 +3,7 @@ image: "archlinux:latest"
 stages:
   - build
 
-build-smod-linux-x64:
+build-linux-x64:
   stage: build
   before_script:
     - pacman-key --init
@@ -12,7 +12,11 @@ build-smod-linux-x64:
     - cmake -G Ninja -DBUILD_TESTING=ON -B build . 
     - cmake --build build 
     - DESTDIR=out cmake --install build
-    - cmake --install build --prefix /usr 
+    - cmake --prefix /usr --install build
+    - cd ./smodglow
+    - cmake -G Ninja -B build .
+    - cmake --build build
+    - DESTDIR=out cmake --install build
   artifacts:
     untracked: false
     when: on_success
@@ -20,21 +24,4 @@ build-smod-linux-x64:
     expire_in: 6 mos
     paths: 
       - out/
-
-build-smodglow-linux-x64:
-  stage: build
-  needs:
-    - job: build-smod-linux-x64
-  before_script:
-    - cd ./smodglow
-  script:
-    - cmake -G Ninja -B build .
-    - cmake --build build
-    - DESTDIR=outsmodglow cmake --install build
-  artifacts:
-    untracked: false
-    when: on_success
-    access: all
-    expire_in: 6 mos
-    paths:
-      - outsmodglow/
+      - smodglow/out/
