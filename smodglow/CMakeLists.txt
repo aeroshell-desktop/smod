@@ -91,7 +91,11 @@ add_library(${TARGET_NAME}-x11 SHARED ${kwin4_effect_smodglow_SOURCES})
 
 if (QT_MAJOR_VERSION STREQUAL "6")
 set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
+set_target_properties(${TARGET_NAME}-x11 PROPERTIES PREFIX "")
 endif ()
+
+set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/${TARGET_NAME})
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/x11/)
 
 target_link_directories(${TARGET_NAME}
     PRIVATE
@@ -137,7 +141,6 @@ install(
     DESTINATION
         ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins
 )
-set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/${TARGET_NAME})
 install(
     TARGETS
         ${TARGET_NAME}-x11
