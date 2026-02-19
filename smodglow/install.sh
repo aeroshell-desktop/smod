@@ -6,6 +6,8 @@ BUILD_PARAM=
 USE_NINJA=
 BUILD_COMMAND="make"
 
+SU_CMD=sudo
+
 if [[ "$*" == *"--ninja"* ]]
 then
     if [[ -z "$(command -v ninja)" ]]; then
@@ -16,6 +18,15 @@ then
         BUILD_COMMAND="ninja"
     fi
 fi
+
+if [[ -z "$(command -v $SU_CMD)" ]]; then
+    SU_CMD=doas
+    if [[ -z "$(command -v $SU_CMD)" ]]; then
+        echo "Neither sudo or doas were detected on the system."
+        exit
+    fi
+fi
+
 
 if [[ "$*" == *"--wayland"* ]]
 then

@@ -4,6 +4,8 @@ BUILD_DST="build"
 USE_NINJA=
 BUILD_COMMAND="make"
 
+SU_CMD=sudo
+
 if [[ "$*" == *"--ninja"* ]]
 then
     if [[ -z "$(command -v ninja)" ]]; then
@@ -15,10 +17,19 @@ then
     fi
 fi
 
+if [[ -z "$(command -v $SU_CMD)" ]]; then
+    SU_CMD=doas
+    if [[ -z "$(command -v $SU_CMD)" ]]; then
+        echo "Neither sudo or doas were detected on the system."
+        exit
+    fi
+fi
 
 rm -rf "$BUILD_DST"
-mkdir "$BUILD_DST"
-cd "$BUILD_DST"
-cmake -DCMAKE_INSTALL_PREFIX=/usr .. $USE_NINJA
-$BUILD_COMMAND
-sudo $BUILD_COMMAND install
+mkdir -p "$BUILD_DST"
+cmake -DCMAKE_INSTALL_PREFIX=/usr -B build $USE_NINJA .
+cmake --build "$BUILD_DST"
+$SU_CMD cmake --install "$BUILD_DST"
+
+cd smodglow
+bash install.sh $@
