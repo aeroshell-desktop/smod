@@ -123,6 +123,7 @@ public:
     inline bool isGadgetExplorer() const;
     inline bool isPersonalizeKCM() const;
     inline bool isPolkit() const;
+    inline bool isOOTB() const;
     //@}
 
 Q_SIGNALS:
@@ -267,6 +268,11 @@ bool Decoration::isPersonalizeKCM() const
     if(window()->windowClass() == QStringLiteral("systemsettings systemsettings") && window()->caption().startsWith(QStringLiteral("aerothemeplasma-personalize"))) return true;
     return false;
 }
+bool Decoration::isOOTB() const
+{
+    return window()->windowClass() == QStringLiteral("atpootb __ATPOOTB");
+}
+
 bool Decoration::isPolkit() const
 {
     const auto c = window();
@@ -275,21 +281,24 @@ bool Decoration::isPolkit() const
 }
 bool Decoration::hideIcon() const
 {
-    if(isGadgetExplorer() || isPolkit()) return true;
+    if (isPersonalizeKCM() || isGadgetExplorer() || isPolkit() || isOOTB())
+        return true;
     return m_internalSettings->hideIcon() && !window()->isShaded();
 }
 
 bool Decoration::hideCaption() const
 {
     // Personalization page
-    if(isPersonalizeKCM() || isGadgetExplorer()) return true;
+    if (isPersonalizeKCM() || isGadgetExplorer() || isOOTB())
+        return true;
     return m_internalSettings->hideCaption() && !window()->isShaded();
 }
 
 bool Decoration::hideInnerBorder() const
 {
     // Personalization page
-    if(isPersonalizeKCM() || isGadgetExplorer()) return true;
+    if (isPersonalizeKCM() || isGadgetExplorer() || isOOTB())
+        return true;
     return m_internalSettings->hideInnerBorder() && !window()->isShaded();
 }
 
