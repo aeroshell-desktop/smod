@@ -57,8 +57,11 @@ find_package(XCB REQUIRED XCB)
 find_package(epoxy REQUIRED)
 else ()
 
-find_package(KWin REQUIRED kwineffects)
-find_package(KWinX11 REQUIRED kwineffects)
+if(KWIN_BUILD_WAYLAND)
+    find_package(KWin REQUIRED kwineffects)
+else()
+    find_package(KWinX11 REQUIRED kwineffects)
+endif()
 
 endif ()
 
@@ -70,62 +73,76 @@ pkg_check_modules(smoddecoration REQUIRED IMPORTED_TARGET smoddecoration)
 
 feature_summary(WHAT ALL)
 
-set(kwin4_effect_smodglow_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin.cpp
-)
+if(KWIN_BUILD_WAYLAND)
+    set(kwin4_effect_smodglow_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow-kf6.cpp
+    )
+else()
+    set(kwin4_effect_smodglow_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src_x11/smodglow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src_x11/smodglow.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/src_x11/plugin.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src_x11/smodglow-kf6.cpp
+    )
+endif()
 
-if (QT_MAJOR_VERSION STREQUAL "5")
-list(APPEND kwin4_effect_smodglow_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow-kf5.cpp
-)
-else ()
-list(APPEND kwin4_effect_smodglow_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/smodglow-kf6.cpp
-)
-endif ()
-
-add_library(${TARGET_NAME} SHARED ${kwin4_effect_smodglow_SOURCES})
-add_library(${TARGET_NAME}-x11 SHARED ${kwin4_effect_smodglow_SOURCES})
+if(KWIN_BUILD_WAYLAND)
+    add_library(${TARGET_NAME} SHARED ${kwin4_effect_smodglow_SOURCES})
+else()
+    add_library(${TARGET_NAME}-x11 SHARED ${kwin4_effect_smodglow_SOURCES})
+endif()
 
 if (QT_MAJOR_VERSION STREQUAL "6")
-set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
-set_target_properties(${TARGET_NAME}-x11 PROPERTIES PREFIX "")
+
+if(KWIN_BUILD_WAYLAND)
+    set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
+else()
+    set_target_properties(${TARGET_NAME}-x11 PROPERTIES PREFIX "")
+endif()
+
 endif ()
 
-set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/${TARGET_NAME})
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/x11/)
+if(NOT KWIN_BUILD_WAYLAND)
+    set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/${TARGET_NAME})
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/x11/)
+endif()
 
-target_link_directories(${TARGET_NAME}
-    PRIVATE
-        ${smoddecoration_LIBRARY_DIRS})
-target_link_directories(${TARGET_NAME}-x11
-    PRIVATE
-        ${smoddecoration_LIBRARY_DIRS})
 
-target_link_libraries(${TARGET_NAME}
-    PRIVATE
-        KDecoration3::KDecoration
-        PkgConfig::smoddecoration
-        KF6::ConfigCore
-        KF6::ConfigGui
-        Qt${QT_MAJOR_VERSION}::Core
-        Qt${QT_MAJOR_VERSION}::DBus
-        KF${QT_MAJOR_VERSION}::ConfigGui
-        KWin::kwin
-)
-target_link_libraries(${TARGET_NAME}-x11
-    PRIVATE
-        KDecoration3::KDecoration
-        PkgConfig::smoddecoration
-        KF6::ConfigCore
-        KF6::ConfigGui
-        Qt${QT_MAJOR_VERSION}::Core
-        Qt${QT_MAJOR_VERSION}::DBus
-        KF${QT_MAJOR_VERSION}::ConfigGui
-        KWinX11::kwin
-)
+if(KWIN_BUILD_WAYLAND)
+    target_link_directories(${TARGET_NAME}
+        PRIVATE
+            ${smoddecoration_LIBRARY_DIRS})
+    target_link_libraries(${TARGET_NAME}
+        PRIVATE
+            KDecoration3::KDecoration
+            PkgConfig::smoddecoration
+            KF6::ConfigCore
+            KF6::ConfigGui
+            Qt${QT_MAJOR_VERSION}::Core
+            Qt${QT_MAJOR_VERSION}::DBus
+            KF${QT_MAJOR_VERSION}::ConfigGui
+            KWin::kwin
+    )
+else()
+    target_link_directories(${TARGET_NAME}-x11
+        PRIVATE
+            ${smoddecoration_LIBRARY_DIRS})
+    target_link_libraries(${TARGET_NAME}-x11
+        PRIVATE
+            KDecoration3::KDecoration
+            PkgConfig::smoddecoration
+            KF6::ConfigCore
+            KF6::ConfigGui
+            Qt${QT_MAJOR_VERSION}::Core
+            Qt${QT_MAJOR_VERSION}::DBus
+            KF${QT_MAJOR_VERSION}::ConfigGui
+            KWinX11::kwin
+    )
+endif()
+
 
 if (QT_MAJOR_VERSION STREQUAL "5")
 target_link_libraries(${TARGET_NAME}
@@ -135,15 +152,19 @@ target_link_libraries(${TARGET_NAME}
 )
 endif ()
 
-install(
-    TARGETS
-        ${TARGET_NAME}
-    DESTINATION
-        ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins
-)
-install(
-    TARGETS
-        ${TARGET_NAME}-x11
-    DESTINATION
-        ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins
-)
+if(KWIN_BUILD_WAYLAND)
+    install(
+        TARGETS
+            ${TARGET_NAME}
+        DESTINATION
+            ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins
+    )
+
+else()
+    install(
+        TARGETS
+            ${TARGET_NAME}-x11
+        DESTINATION
+            ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins
+    )
+endif()
