@@ -321,9 +321,9 @@ void SmodGlowEffect::stopAllAnimations(const EffectWindow *w)
     }
 }
 
-void SmodGlowEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
 {
-    effects->prePaintWindow(w, data, presentTime);
+    effects->prePaintWindow(view, w, data, presentTime);
 
     if(w->isUserResize())
     {
@@ -409,36 +409,35 @@ void SmodGlowEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, s
     handler->m_max_rect   = QRect(origin + handler->m_max->pos,   m_texture_maximize.get()->size());
     handler->m_close_rect = QRect(origin + handler->m_close->pos, m_texture_close.get()->size());*/
 
-    QRegion newPaint = QRegion();
-    newPaint |= handler->m_menu_rect;
-    newPaint |= handler->m_pin_rect;
-    newPaint |= handler->m_shade_rect;
-    newPaint |= handler->m_underlap_rect;
-    newPaint |= handler->m_overlap_rect;
-    newPaint |= handler->m_help_rect;
-    newPaint |= handler->m_min_rect;
-    newPaint |= handler->m_max_rect;
-    newPaint |= handler->m_close_rect;
+    Region newPaint = Region();
+    newPaint |= Rect(handler->m_menu_rect);
+    newPaint |= Rect(handler->m_pin_rect);
+    newPaint |= Rect(handler->m_shade_rect);
+    newPaint |= Rect(handler->m_underlap_rect);
+    newPaint |= Rect(handler->m_overlap_rect);
+    newPaint |= Rect(handler->m_help_rect);
+    newPaint |= Rect(handler->m_min_rect);
+    newPaint |= Rect(handler->m_max_rect);
+    newPaint |= Rect(handler->m_close_rect);
 
     if (newPaint != m_prevPaint)
     {
-        QRegion clearRegion = m_prevPaint - newPaint;
+        Region clearRegion = m_prevPaint - newPaint;
 
         if (!clearRegion.isEmpty())
         {
-            data.paint |= clearRegion;
+            data.devicePaint |= clearRegion;
         }
     }
 
-    data.paint |= newPaint;
+    data.devicePaint |= newPaint;
     m_prevPaint = newPaint;
 }
 
-void SmodGlowEffect::postPaintWindow(EffectWindow *w)
+void SmodGlowEffect::postPaintScreen()
 {
-    if (windows.contains(w))
-    {
-        GlowHandler *handler = windows.value(w);
+    for (auto it = windows.begin(); it != windows.end(); ++it) {
+        GlowHandler *handler = it.value();
 
         if (handler->m_needsRepaint)
         {
@@ -446,7 +445,7 @@ void SmodGlowEffect::postPaintWindow(EffectWindow *w)
         }
     }
 
-    effects->postPaintWindow(w);
+    effects->postPaintScreen();
 }
 
 void SmodGlowEffect::windowAdded(EffectWindow *w)
