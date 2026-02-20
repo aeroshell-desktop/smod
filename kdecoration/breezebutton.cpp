@@ -35,6 +35,8 @@ Button::Button(DecorationButtonType type, Decoration *decoration, QObject *paren
         setOpacity(value.toReal());
     });
 
+    // check if it's for gtk
+    if(QCoreApplication::applicationName() == QStringLiteral("kded6")) m_gtkButton = true;
 
     updateGeometry();
 
@@ -406,3 +408,5 @@ void Button::updateAnimationState(bool hovered)
 }
 
 } // namespace
+
+#include "breezebutton.moc"

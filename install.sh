@@ -32,4 +32,6 @@ cmake --build "$BUILD_DST"
 $SU_CMD cmake --install "$BUILD_DST"
 
 cd smodglow
-bash install.sh $@
+bash install.sh
+bash install.sh --wayland
+

@@ -102,6 +102,8 @@ void Decoration::smodPaint(QPainter *painter, const QRectF &repaintRegion)
 
 void Decoration::smodPaintGlow(QPainter *painter, const QRectF &repaintRegion)
 {
+    Q_UNUSED(repaintRegion)
+
     const auto c = window();
 
     int SIDEBAR_HEIGHT = qMax(25, (int)(size().height() / 4));
@@ -174,6 +176,7 @@ void Decoration::smodPaintOuterBorder(QPainter *painter, const QRectF &repaintRe
                      false,
                      tl_m.width, isMaximized() ? t_m.margin_top : 0,
                      p_top.width() - tl_m.width - tr_m.width, p_top.height() - (isMaximized() ? t_m.margin_top : 0));
+
     top.translate(isMaximized() ? borderLeft() : modBorderLeft, 0);
     top.render(painter);
 
@@ -278,6 +281,8 @@ void Decoration::smodPaintOuterBorder(QPainter *painter, const QRectF &repaintRe
 
 void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 {
+    Q_UNUSED(repaintRegion)
+
     if (hideTitleBar())
     {
         return;
@@ -289,22 +294,35 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
         int titleAlignment = internalSettings()->titleAlignment();
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
-        QRect captionRect(m_leftButtons->geometry().right(), 0, m_rightButtons->geometry().left() - m_leftButtons->geometry().right() - 4, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
+        const int left = m_leftButtons->geometry().right();
+        const int right = m_rightButtons->geometry().left();
+
+        QRect captionRect(m_leftButtons->geometry().right(), 0,
+                          (right == 0 ? size().width() : right) - left - 4, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
+
         QString caption = settings()->fontMetrics().elidedText(c->caption(), Qt::ElideMiddle, captionRect.width());
+
+        // remove program name
         QStringList programname = caption.split(" — ");
         caption.remove(" — " + programname.at(programname.size()-1));
-        QFontMetrics fm(settings()->font());
         QString fixedCaption = caption;
-        auto rect = fm.boundingRect(fixedCaption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"));
+
+        // replace emojis for █
+        // fixes a BUG in which the glow is shorter than the actual text when there's emojis
+        QTextOption opt;
+        opt.setFlags(QTextOption::ShowDefaultIgnorables);
+        QFontMetrics fm(settings()->font());
+        auto rect = fm.boundingRect(fixedCaption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), opt);
+
         int blurWidth = rect.width() + 30;
         int blurHeight = rect.height();
 
-        QColor shadowColor = QColor(0, 0, 0, 255);
+        // QColor shadowColor = QColor(0, 0, 0, 255);
         QColor textColor = c->color(c->isActive() ? KDecoration3::ColorGroup::Active : KDecoration3::ColorGroup::Inactive, KDecoration3::ColorRole::Foreground);
 
         captionRect.setHeight(captionRect.height() & -2);
         painter->setFont(settings()->font());
-        painter->setPen(shadowColor);
+        // painter->setPen(shadowColor);
         painter->setPen(textColor);
 
         QLabel real_label(caption);
@@ -347,21 +365,13 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
 
         int glowHeight = blurHeight*1.5;
         int glowWidth = blurWidth + 8;
-        if(glowWidth < l+r)
-        {
-            glowWidth = l+r;
-            //l -= (l+r) - glowWidth;
-        }
-        if(glowHeight < t+b)
-        {
-            glowHeight = t+b;
-            //t -= (t+b) - glowHeight;
-        }
 
+        if(glowWidth < l+r) glowWidth = l+r;
+        if(glowHeight < t+b) glowHeight = t+b;
 
         FrameTexture gl(l, r, t, b, glowWidth, glowHeight, &glow, c->isActive() ? margins.active_opacity : margins.inactive_opacity);
 
-        int leftButtonsX = (hideIcon() ? -5 : m_leftButtons->geometry().x());
+        int leftButtonsX = (hideIcon() ? -5 : (m_leftButtons->geometry().x()));
 
         if(!caption.trimmed().isEmpty())
         {
@@ -381,7 +391,7 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
             }
             else
             {
-                xpos = leftButtonsX + 2;
+                xpos = captionRect.left() - (l/2);
             }
 
             bool isRTL = caption.isRightToLeft();
@@ -399,6 +409,7 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
                     xpos += captionRect.width() - blurWidth;
                 }
             }
+
             if(!invertText)
             {
                 int alignmentOffset = 0;
@@ -449,17 +460,12 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
                 painter->setOpacity(0.7);
                 painter->drawPixmap(captionRect, text_pixmap);
                 painter->setOpacity(1.0);
-                //painter->drawPixmap(captionRect, text_pixmap);
             }
         }
     }
 
     m_leftButtons->paint(painter, repaintRegion);
     m_rightButtons->paint(painter, repaintRegion);
-
-    /*foreach (QPointer<KDecoration3::DecorationButton> button, m_rightButtons->buttons()) {
-        static_cast<Button *>(button.data())->smodPaintGlow(painter, repaintRegion);
-    }*/
 }
 
 }

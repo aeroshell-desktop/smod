@@ -7,14 +7,14 @@
 #include <QPropertyAnimation>
 
 #ifdef BUILD_KF6
-#include "window.h"
+#include "core/pixelgrid.h"
+#include "core/renderviewport.h"
 #include "effect/effecthandler.h"
 #include "effect/effectwindow.h"
-#include "opengl/glshadermanager.h"
 #include "opengl/glshader.h"
+#include "opengl/glshadermanager.h"
 #include "opengl/gltexture.h"
-#include "core/renderviewport.h"
-#include "core/pixelgrid.h"
+#include "window.h"
 #else
 #include <kwineffects.h>
 #include <kwinglutils.h>
@@ -23,18 +23,16 @@
 #include <SMOD/Decoration/BreezeDecoration>
 typedef Breeze::Decoration SmodDecoration;
 
-
 // TODO remove "+ 1.0" when I fix the textures
 #define MINMAXGLOW_SML 9.0f
 #define MINMAXGLOW_SMT 8.0f
-#define CLOSEGLOW_SML  9.0f
-#define CLOSEGLOW_SMT  8.0f
+#define CLOSEGLOW_SML 9.0f
+#define CLOSEGLOW_SMT 8.0f
 
 namespace KWin
 {
 
-enum WindowButtonsDPI
-{
+enum WindowButtonsDPI {
     DPI_100_PERCENT,
     DPI_125_PERCENT,
     DPI_150_PERCENT,
@@ -52,14 +50,14 @@ public:
     ~SmodGlowEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
-    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
+    void prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
 #ifdef BUILD_KF6
-    void paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &region, WindowPaintData &data)
-        override;
+    void
+    paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, QRegion region, WindowPaintData &data) override;
 #else
     void paintWindow(EffectWindow *w, int mask, QRegion region, WindowPaintData &data) override;
 #endif
-    void postPaintScreen() override;
+    void postPaintWindow(EffectWindow *w) override;
 
     static bool supported();
 
@@ -80,7 +78,7 @@ private Q_SLOTS:
     void windowMinimized(EffectWindow *w);
     void windowStartUserMovedResized(EffectWindow *w);
     void windowDecorationChanged(EffectWindow *w);
-    void effectWindowFullScreenChanged(EffectWindow* w);
+    void effectWindowFullScreenChanged(EffectWindow *w);
 
 private:
     void setupEffectHandlerConnections();
@@ -91,15 +89,14 @@ private:
     void stopAllAnimations(const EffectWindow *w);
     QString currentlyRegisteredPath;
 
-
     bool m_resourcesFound = false;
     bool m_active = false;
     int previousDecorationCount = 0;
     GLTexture *m_preferred_texture;
     std::unique_ptr<GLTexture> m_texture_minimize, m_texture_maximize, m_texture_close;
     std::unique_ptr<GLShader> m_shader;
-    QHash<const EffectWindow*, GlowHandler*> windows = QHash<const EffectWindow*, GlowHandler*>();
-    Region m_prevPaint = Region();
+    QHash<const EffectWindow *, GlowHandler *> windows = QHash<const EffectWindow *, GlowHandler *>();
+    QRegion m_prevPaint = QRegion();
     QMatrix4x4 colorMatrix(const float &brightness, const float &saturation) const;
 
     WindowButtonsDPI m_current_dpi = DPI_100_PERCENT, m_next_dpi = DPI_100_PERCENT;
@@ -112,22 +109,21 @@ class GlowAnimationHandler : public QObject
     Q_PROPERTY(qreal hoverProgress READ hoverProgress WRITE setHoverProgress);
 
 public:
-    GlowAnimationHandler(QObject *parent = nullptr) : QObject(parent), m_hoverProgress(0.0) {};
+    GlowAnimationHandler(QObject *parent = nullptr)
+        : QObject(parent)
+        , m_hoverProgress(0.0) { };
 
     void startHoverAnimation(qreal endValue)
     {
         QPropertyAnimation *hoverAnimation = m_hoverAnimation.data();
 
-        if (hoverAnimation)
-        {
-            if (hoverAnimation->endValue() == endValue)
-            {
+        if (hoverAnimation) {
+            if (hoverAnimation->endValue() == endValue) {
                 return;
             }
 
             hoverAnimation->stop();
-        } else if (m_hoverProgress != endValue)
-        {
+        } else if (m_hoverProgress != endValue) {
             hoverAnimation = new QPropertyAnimation(this, "hoverProgress");
             m_hoverAnimation = hoverAnimation;
 
@@ -139,14 +135,14 @@ public:
         hoverAnimation->setEasingCurve(QEasingCurve::OutQuad);
         hoverAnimation->setStartValue(m_hoverProgress);
         hoverAnimation->setEndValue(endValue);
-        //hoverAnimation->setDuration(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue)));
+        // hoverAnimation->setDuration(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue)));
         hoverAnimation->setDuration( //(int)std::chrono::milliseconds(
 #ifdef BUILD_KF6
             (int)(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue))) * effects->animationTimeFactor()
 #else
             (int)SmodGlowEffect::animationTime(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue)))
 #endif
-        //)
+            //)
         );
 
         hoverAnimation->start();
@@ -157,11 +153,10 @@ public:
     {
         QPropertyAnimation *hoverAnimation = m_hoverAnimation.data();
 
-        if (hoverAnimation)
-        {
+        if (hoverAnimation) {
             hoverAnimation->stop();
             setHoverProgress(0.0);
-            //Q_EMIT animFinished();
+            // Q_EMIT animFinished();
         }
     }
 
@@ -172,14 +167,13 @@ public:
 
     void setHoverProgress(qreal hoverProgress)
     {
-        if (m_hoverProgress != hoverProgress)
-        {
+        if (m_hoverProgress != hoverProgress) {
             m_hoverProgress = hoverProgress;
         }
     }
     ~GlowAnimationHandler()
     {
-        if(!m_hoverAnimation.isNull())
+        if (!m_hoverAnimation.isNull())
             delete m_hoverAnimation;
     }
 
@@ -199,18 +193,19 @@ class GlowHandler : public QObject
     Q_OBJECT
 
 public:
-    GlowHandler(QObject *parent = nullptr) : QObject(parent)
+    GlowHandler(QObject *parent = nullptr)
+        : QObject(parent)
     {
-        m_menu  = new GlowAnimationHandler(this);
-        m_pin  = new GlowAnimationHandler(this);
+        m_menu = new GlowAnimationHandler(this);
+        m_pin = new GlowAnimationHandler(this);
 
-        m_shade  = new GlowAnimationHandler(this);
-        m_underlap  = new GlowAnimationHandler(this);
-        m_overlap  = new GlowAnimationHandler(this);
+        m_shade = new GlowAnimationHandler(this);
+        m_underlap = new GlowAnimationHandler(this);
+        m_overlap = new GlowAnimationHandler(this);
 
-        m_help  = new GlowAnimationHandler(this);
-        m_min   = new GlowAnimationHandler(this);
-        m_max   = new GlowAnimationHandler(this);
+        m_help = new GlowAnimationHandler(this);
+        m_min = new GlowAnimationHandler(this);
+        m_max = new GlowAnimationHandler(this);
         m_close = new GlowAnimationHandler(this);
 
         QObject::connect(m_menu, &GlowAnimationHandler::animStarted, this, &GlowHandler::animStarted, Qt::UniqueConnection);
@@ -272,9 +267,9 @@ public:
     QRect m_shade_rect = QRect(), m_underlap_rect = QRect(), m_overlap_rect = QRect();
     QRect m_help_rect = QRect(), m_min_rect = QRect(), m_max_rect = QRect(), m_close_rect = QRect();
 
-    Region m_minimizePaintRegion = Region();
-    Region m_maximizePaintRegion = Region();
-    Region m_closePaintRegion = Region();
+    QRegion m_minimizePaintRegion = QRegion();
+    QRegion m_maximizePaintRegion = QRegion();
+    QRegion m_closePaintRegion = QRegion();
 
     QMetaObject::Connection m_decoration_connection = QMetaObject::Connection();
     bool m_needsRepaint = false;
@@ -288,31 +283,19 @@ public Q_SLOTS:
     void animFinished()
     {
         // TODO redo this
-        if (
-            (m_menu->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_pin->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_shade->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_underlap->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_overlap->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_help->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_min->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_max->m_hoverProgress == 0.0 ) //|| m_max->m_hoverProgress == 1.0)
-            &&
-            (m_close->m_hoverProgress == 0.0 ) //|| m_close->m_hoverProgress == 1.0)
-        )
-        {
+        if ((m_menu->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_pin->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_shade->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_underlap->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_overlap->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_help->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_min->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_max->m_hoverProgress == 0.0) //|| m_max->m_hoverProgress == 1.0)
+            && (m_close->m_hoverProgress == 0.0) //|| m_close->m_hoverProgress == 1.0)
+        ) {
             m_needsRepaint = false;
         }
     }
 };
-
-
 
 }
