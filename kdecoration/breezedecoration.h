@@ -31,6 +31,15 @@
 #  define MYSHAREDLIB_EXPORT Q_DECL_IMPORT
 #endif
 
+#define PS_EXPLORER QStringLiteral("plasmashell_explorer")
+#define PLASMASHELL_WM_X11 QStringLiteral("plasmashell plasmashell")
+#define PLASMASHELL_WM_WL QStringLiteral("plasmashell org.kde.plasmashell")
+#define SETTINGS_WM QStringLiteral("systemsettings systemsettings")
+#define AS_KCM QStringLiteral("aeroshell-personalize")
+#define OOTB_WM QStringLiteral("atpootb __ATPOOTB")
+#define UAC_WM_X11 QStringLiteral("uac-polkit-agent polkit-kde-authentication-agent-1")
+#define UAC_WM_WL QStringLiteral(" org.kde.polkit-kde-authentication-agent-1")
+
 namespace KDecoration3
 {
 class DecorationButton;
@@ -260,23 +269,26 @@ bool Decoration::hideTitleBar() const
 bool Decoration::isGadgetExplorer() const
 {
     const auto c = window();
-    if(c->caption() == QStringLiteral("plasmashell_explorer") && (c->windowClass() == QStringLiteral("plasmashell plasmashell") || c->windowClass() == QStringLiteral("plasmashell org.kde.plasmashell"))) return true;
+    if (c->caption() == PS_EXPLORER && (c->windowClass() == PLASMASHELL_WM_X11 || c->windowClass() == PLASMASHELL_WM_WL))
+        return true;
     return false;
 }
 bool Decoration::isPersonalizeKCM() const
 {
-    if(window()->windowClass() == QStringLiteral("systemsettings systemsettings") && window()->caption().startsWith(QStringLiteral("aerothemeplasma-personalize"))) return true;
+    if (window()->windowClass() == SETTINGS_WM && window()->caption().startsWith(AS_KCM))
+        return true;
     return false;
 }
 bool Decoration::isOOTB() const
 {
-    return window()->windowClass() == QStringLiteral("atpootb __ATPOOTB");
+    return window()->windowClass() == OOTB_WM;
 }
 
 bool Decoration::isPolkit() const
 {
     const auto c = window();
-    if((c->windowClass() == QStringLiteral("polkit-kde-authentication-agent-1 polkit-kde-authentication-agent-1")) || c->windowClass() == QStringLiteral("polkit-kde-manager polkit-kde-manager") || c->windowClass() == QStringLiteral(" org.kde.polkit-kde-authentication-agent-1")) return true;
+    if ((c->windowClass() == UAC_WM_X11) || c->windowClass() == UAC_WM_WL)
+        return true;
     return false;
 }
 bool Decoration::hideIcon() const
