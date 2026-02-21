@@ -39,6 +39,7 @@
 #define OOTB_WM QStringLiteral("atpootb __ATPOOTB")
 #define UAC_WM_X11 QStringLiteral("uac-polkit-agent polkit-kde-authentication-agent-1")
 #define UAC_WM_WL QStringLiteral(" org.kde.polkit-kde-authentication-agent-1")
+#define AS_KCM_WM QStringLiteral("aeroshell-kcmloader aeroshell-kcmloader")
 
 namespace KDecoration3
 {
@@ -275,7 +276,7 @@ bool Decoration::isGadgetExplorer() const
 }
 bool Decoration::isPersonalizeKCM() const
 {
-    if (window()->windowClass() == SETTINGS_WM && window()->caption().startsWith(AS_KCM))
+    if ((window()->windowClass() == SETTINGS_WM || window()->windowClass() == AS_KCM_WM) && window()->caption().startsWith(AS_KCM))
         return true;
     return false;
 }
