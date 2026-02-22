@@ -32,6 +32,9 @@ cmake --build "$BUILD_DST"
 $SU_CMD cmake --install "$BUILD_DST"
 
 cd smodglow
-bash install.sh
+if [[ ! "$*" == *"--skip-x11"* ]]
+then
+    bash install.sh
+fi
 bash install.sh --wayland
 
