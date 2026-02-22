@@ -17,6 +17,7 @@
 #include <QDBusMessage>
 #include <QFontDatabase>
 #include <QRegularExpression>
+#include <QStandardPaths>
 
 namespace Breeze
 {
@@ -74,15 +75,15 @@ void ConfigWidget::load()
 
     m_ui.hideWidget->setVisible(false);
     // fill list
-    QDir system_dir(SMOD::SYSTEM_PATH);
-    QDir local_dir(SMOD::LOCAL_PATH);
+    QStringList decoration_dirpaths = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, SMOD::DECORATIONS_PATH, QStandardPaths::LocateDirectory);
+    QStringList all_files;
 
-    QStringList system_files = system_dir.entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-    QStringList local_files = local_dir.entryList(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    for (const QString decoration_dirpath : decoration_dirpaths) {
+        QDir decoration_dir(decoration_dirpath);
+        all_files += decoration_dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    }
 
-    QStringList all_files = system_files + local_files;
     all_files.removeDuplicates();
-
     all_files.erase(std::remove_if(all_files.begin(), all_files.end(), [](const QString &a) { return !a.endsWith(".smod.rcc"); }), all_files.end());
     all_files.replaceInStrings(QRegularExpression("\\.smod\\.rcc$"), "");
 
