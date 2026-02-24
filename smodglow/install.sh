@@ -43,4 +43,4 @@ echo "Building ${BUILD_PLATFORM} effect..."
 cmake ../ -DCMAKE_INSTALL_PREFIX=/usr $BUILD_PARAM $USE_NINJA
 
 $BUILD_COMMAND
-sudo $BUILD_COMMAND install
+$SU_CMD $BUILD_COMMAND install
