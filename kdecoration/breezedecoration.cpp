@@ -463,38 +463,41 @@ QRect Decoration::buttonRect(KDecoration3::DecorationButtonType button) const
     int width = 0;
     switch (button)
     {
-        case KDecoration3::DecorationButtonType::ApplicationMenu:
-            intendedWidth = g_sizingmargins.menuSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::OnAllDesktops:
-            intendedWidth = g_sizingmargins.pinSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::Shade:
-            intendedWidth = g_sizingmargins.shadeSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::KeepAbove:
-            intendedWidth = g_sizingmargins.overlapSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::KeepBelow:
-            intendedWidth = g_sizingmargins.underlapSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::ContextHelp:
-            intendedWidth = g_sizingmargins.helpSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::Minimize:
-            intendedWidth = g_sizingmargins.minimizeSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::Maximize:
-            intendedWidth = g_sizingmargins.maximizeSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::Close:
-            intendedWidth = g_sizingmargins.closeSizing().width;
-            break;
-        case KDecoration3::DecorationButtonType::Menu:
-            height = titlebarHeight();
-            break;
-        default:
-            break;
+    case KDecoration3::DecorationButtonType::ExcludeFromCapture:
+        intendedWidth = g_sizingmargins.captureExcludeSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::ApplicationMenu:
+        intendedWidth = g_sizingmargins.menuSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::OnAllDesktops:
+        intendedWidth = g_sizingmargins.pinSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::Shade:
+        intendedWidth = g_sizingmargins.shadeSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::KeepAbove:
+        intendedWidth = g_sizingmargins.overlapSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::KeepBelow:
+        intendedWidth = g_sizingmargins.underlapSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::ContextHelp:
+        intendedWidth = g_sizingmargins.helpSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::Minimize:
+        intendedWidth = g_sizingmargins.minimizeSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::Maximize:
+        intendedWidth = g_sizingmargins.maximizeSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::Close:
+        intendedWidth = g_sizingmargins.closeSizing().width;
+        break;
+    case KDecoration3::DecorationButtonType::Menu:
+        height = titlebarHeight();
+        break;
+    default:
+        break;
     }
     if(button == KDecoration3::DecorationButtonType::Menu) width = 16;
     else if(button == KDecoration3::DecorationButtonType::Spacer) width = 8;

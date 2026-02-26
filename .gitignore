@@ -1,4 +1,6 @@
 build
+smodglow/build
+smodglow/build-wl
 .clang-format
 /compile_commands.json
 .clangd

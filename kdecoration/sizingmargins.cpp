@@ -41,157 +41,167 @@ void SizingMargins::loadSizingMargins()
 
 
     // CloseSizing
-    m_closeSizing.width                 = settings.value("Close/width",              49).toInt();
-    m_closeSizing.margin_left           = settings.value("Close/margin_left",        20).toInt();
-    m_closeSizing.margin_top            = settings.value("Close/margin_top",          6).toInt();
-    m_closeSizing.margin_right          = settings.value("Close/margin_right",       20).toInt();
-    m_closeSizing.margin_bottom         = settings.value("Close/margin_bottom",       8).toInt();
-    m_closeSizing.content_left          = settings.value("Close/content_left",        1).toInt() - 1;
-    m_closeSizing.content_right         = settings.value("Close/content_right",       2).toInt() - 1;
-    m_closeSizing.content_top           = settings.value("Close/content_top",         2).toInt() - 1;
-    m_closeSizing.content_bottom        = settings.value("Close/content_bottom",      4).toInt() - 1;
+    m_closeSizing.width = settings.value("Close/width", 49).toInt();
+    m_closeSizing.margin_left = settings.value("Close/margin_left", 20).toInt();
+    m_closeSizing.margin_top = settings.value("Close/margin_top", 6).toInt();
+    m_closeSizing.margin_right = settings.value("Close/margin_right", 20).toInt();
+    m_closeSizing.margin_bottom = settings.value("Close/margin_bottom", 8).toInt();
+    m_closeSizing.content_left = settings.value("Close/content_left", 1).toInt() - 1;
+    m_closeSizing.content_right = settings.value("Close/content_right", 2).toInt() - 1;
+    m_closeSizing.content_top = settings.value("Close/content_top", 2).toInt() - 1;
+    m_closeSizing.content_bottom = settings.value("Close/content_bottom", 4).toInt() - 1;
 
     // CloseLoneSizing
-    m_closeLoneSizing.width             = settings.value("CloseLone/width",          49).toInt();
-    m_closeLoneSizing.margin_left       = settings.value("CloseLone/margin_left",    20).toInt();
-    m_closeLoneSizing.margin_top        = settings.value("CloseLone/margin_top",      6).toInt();
-    m_closeLoneSizing.margin_right      = settings.value("CloseLone/margin_right",   20).toInt();
-    m_closeLoneSizing.margin_bottom     = settings.value("CloseLone/margin_bottom",   8).toInt();
-    m_closeLoneSizing.content_left      = settings.value("CloseLone/content_left",    2).toInt() - 1;
-    m_closeLoneSizing.content_right     = settings.value("CloseLone/content_right",   1).toInt() - 1;
-    m_closeLoneSizing.content_top       = settings.value("CloseLone/content_top",     2).toInt() - 1;
-    m_closeLoneSizing.content_bottom    = settings.value("CloseLone/content_bottom",  4).toInt() - 1;
+    m_closeLoneSizing.width = settings.value("CloseLone/width", 49).toInt();
+    m_closeLoneSizing.margin_left = settings.value("CloseLone/margin_left", 20).toInt();
+    m_closeLoneSizing.margin_top = settings.value("CloseLone/margin_top", 6).toInt();
+    m_closeLoneSizing.margin_right = settings.value("CloseLone/margin_right", 20).toInt();
+    m_closeLoneSizing.margin_bottom = settings.value("CloseLone/margin_bottom", 8).toInt();
+    m_closeLoneSizing.content_left = settings.value("CloseLone/content_left", 2).toInt() - 1;
+    m_closeLoneSizing.content_right = settings.value("CloseLone/content_right", 1).toInt() - 1;
+    m_closeLoneSizing.content_top = settings.value("CloseLone/content_top", 2).toInt() - 1;
+    m_closeLoneSizing.content_bottom = settings.value("CloseLone/content_bottom", 4).toInt() - 1;
 
     // MaximizeSizing
-    m_maximizeSizing.width              = settings.value("Maximize/width",           27).toInt();
-    m_maximizeSizing.margin_left        = settings.value("Maximize/margin_left",     12).toInt();
-    m_maximizeSizing.margin_top         = settings.value("Maximize/margin_top",       6).toInt();
-    m_maximizeSizing.margin_right       = settings.value("Maximize/margin_right",    12).toInt();
-    m_maximizeSizing.margin_bottom      = settings.value("Maximize/margin_bottom",    8).toInt();
-    m_maximizeSizing.content_left       = settings.value("Maximize/content_left",     2).toInt() - 1;
-    m_maximizeSizing.content_right      = settings.value("Maximize/content_right",    3).toInt() - 1;
-    m_maximizeSizing.content_top        = settings.value("Maximize/content_top",      2).toInt() - 1;
-    m_maximizeSizing.content_bottom     = settings.value("Maximize/content_bottom",   4).toInt() - 1;
+    m_maximizeSizing.width = settings.value("Maximize/width", 27).toInt();
+    m_maximizeSizing.margin_left = settings.value("Maximize/margin_left", 12).toInt();
+    m_maximizeSizing.margin_top = settings.value("Maximize/margin_top", 6).toInt();
+    m_maximizeSizing.margin_right = settings.value("Maximize/margin_right", 12).toInt();
+    m_maximizeSizing.margin_bottom = settings.value("Maximize/margin_bottom", 8).toInt();
+    m_maximizeSizing.content_left = settings.value("Maximize/content_left", 2).toInt() - 1;
+    m_maximizeSizing.content_right = settings.value("Maximize/content_right", 3).toInt() - 1;
+    m_maximizeSizing.content_top = settings.value("Maximize/content_top", 2).toInt() - 1;
+    m_maximizeSizing.content_bottom = settings.value("Maximize/content_bottom", 4).toInt() - 1;
 
     // MinimizeSizing
-    m_minimizeSizing.width              = settings.value("Minimize/width",           29).toInt();
-    m_minimizeSizing.margin_left        = settings.value("Minimize/margin_left",     12).toInt();
-    m_minimizeSizing.margin_top         = settings.value("Minimize/margin_top",       6).toInt();
-    m_minimizeSizing.margin_right       = settings.value("Minimize/margin_right",    12).toInt();
-    m_minimizeSizing.margin_bottom      = settings.value("Minimize/margin_bottom",    8).toInt();
-    m_minimizeSizing.content_left       = settings.value("Minimize/content_left",     3).toInt() - 1;
-    m_minimizeSizing.content_right      = settings.value("Minimize/content_right",    1).toInt() - 1;
-    m_minimizeSizing.content_top        = settings.value("Minimize/content_top",      2).toInt() - 1;
-    m_minimizeSizing.content_bottom     = settings.value("Minimize/content_bottom",   4).toInt() - 1;
+    m_minimizeSizing.width = settings.value("Minimize/width", 29).toInt();
+    m_minimizeSizing.margin_left = settings.value("Minimize/margin_left", 12).toInt();
+    m_minimizeSizing.margin_top = settings.value("Minimize/margin_top", 6).toInt();
+    m_minimizeSizing.margin_right = settings.value("Minimize/margin_right", 12).toInt();
+    m_minimizeSizing.margin_bottom = settings.value("Minimize/margin_bottom", 8).toInt();
+    m_minimizeSizing.content_left = settings.value("Minimize/content_left", 3).toInt() - 1;
+    m_minimizeSizing.content_right = settings.value("Minimize/content_right", 1).toInt() - 1;
+    m_minimizeSizing.content_top = settings.value("Minimize/content_top", 2).toInt() - 1;
+    m_minimizeSizing.content_bottom = settings.value("Minimize/content_bottom", 4).toInt() - 1;
 
     // These next 5 buttons will just use the minimize button
     // sizing margins, except for the content parts.
 
     // HelpSizing
-    m_helpSizing.width                  = settings.value("Help/width",               29).toInt();
-    m_helpSizing.margin_left            = m_minimizeSizing.margin_left;
-    m_helpSizing.margin_top             = m_minimizeSizing.margin_top;
-    m_helpSizing.margin_right           = m_minimizeSizing.margin_right;
-    m_helpSizing.margin_bottom          = m_minimizeSizing.margin_bottom;
-    m_helpSizing.content_left           = settings.value("Help/content_left",         3).toInt() - 1;
-    m_helpSizing.content_right          = settings.value("Help/content_right",        1).toInt() - 1;
-    m_helpSizing.content_top            = settings.value("Help/content_top",          2).toInt() - 1;
-    m_helpSizing.content_bottom         = settings.value("Help/content_bottom",       4).toInt() - 1;
+    m_helpSizing.width = settings.value("Help/width", 29).toInt();
+    m_helpSizing.margin_left = m_minimizeSizing.margin_left;
+    m_helpSizing.margin_top = m_minimizeSizing.margin_top;
+    m_helpSizing.margin_right = m_minimizeSizing.margin_right;
+    m_helpSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_helpSizing.content_left = settings.value("Help/content_left", 3).toInt() - 1;
+    m_helpSizing.content_right = settings.value("Help/content_right", 1).toInt() - 1;
+    m_helpSizing.content_top = settings.value("Help/content_top", 2).toInt() - 1;
+    m_helpSizing.content_bottom = settings.value("Help/content_bottom", 4).toInt() - 1;
 
     // OverlapSizing
-    m_overlapSizing.width               = settings.value("Overlap/width",            29).toInt();
-    m_overlapSizing.margin_left         = m_minimizeSizing.margin_left;
-    m_overlapSizing.margin_top          = m_minimizeSizing.margin_top;
-    m_overlapSizing.margin_right        = m_minimizeSizing.margin_right;
-    m_overlapSizing.margin_bottom       = m_minimizeSizing.margin_bottom;
-    m_overlapSizing.content_left        = settings.value("Shade/content_left",        3).toInt() - 1;
-    m_overlapSizing.content_right       = settings.value("Shade/content_right",       1).toInt() - 1;
-    m_overlapSizing.content_top         = settings.value("Shade/content_top",         2).toInt() - 1;
-    m_overlapSizing.content_bottom      = settings.value("Shade/content_bottom",      4).toInt() - 1;
+    m_overlapSizing.width = settings.value("Overlap/width", 29).toInt();
+    m_overlapSizing.margin_left = m_minimizeSizing.margin_left;
+    m_overlapSizing.margin_top = m_minimizeSizing.margin_top;
+    m_overlapSizing.margin_right = m_minimizeSizing.margin_right;
+    m_overlapSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_overlapSizing.content_left = settings.value("Shade/content_left", 3).toInt() - 1;
+    m_overlapSizing.content_right = settings.value("Shade/content_right", 1).toInt() - 1;
+    m_overlapSizing.content_top = settings.value("Shade/content_top", 2).toInt() - 1;
+    m_overlapSizing.content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
 
     // UnderlapSizing
-    m_underlapSizing.width              = settings.value("Underlap/width",           29).toInt();
-    m_underlapSizing.margin_left        = m_minimizeSizing.margin_left;
-    m_underlapSizing.margin_top         = m_minimizeSizing.margin_top;
-    m_underlapSizing.margin_right       = m_minimizeSizing.margin_right;
-    m_underlapSizing.margin_bottom      = m_minimizeSizing.margin_bottom;
-    m_underlapSizing.content_left       = settings.value("Shade/content_left",        3).toInt() - 1;
-    m_underlapSizing.content_right      = settings.value("Shade/content_right",       1).toInt() - 1;
-    m_underlapSizing.content_top        = settings.value("Shade/content_top",         2).toInt() - 1;
-    m_underlapSizing.content_bottom     = settings.value("Shade/content_bottom",      4).toInt() - 1;
+    m_underlapSizing.width = settings.value("Underlap/width", 29).toInt();
+    m_underlapSizing.margin_left = m_minimizeSizing.margin_left;
+    m_underlapSizing.margin_top = m_minimizeSizing.margin_top;
+    m_underlapSizing.margin_right = m_minimizeSizing.margin_right;
+    m_underlapSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_underlapSizing.content_left = settings.value("Shade/content_left", 3).toInt() - 1;
+    m_underlapSizing.content_right = settings.value("Shade/content_right", 1).toInt() - 1;
+    m_underlapSizing.content_top = settings.value("Shade/content_top", 2).toInt() - 1;
+    m_underlapSizing.content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
 
     // ShadeSizing
-    m_shadeSizing.width                 = settings.value("Shade/width",              29).toInt();
-    m_shadeSizing.margin_left           = m_minimizeSizing.margin_left;
-    m_shadeSizing.margin_top            = m_minimizeSizing.margin_top;
-    m_shadeSizing.margin_right          = m_minimizeSizing.margin_right;
-    m_shadeSizing.margin_bottom         = m_minimizeSizing.margin_bottom;
-    m_shadeSizing.content_left          = settings.value("Shade/content_left",        3).toInt() - 1;
-    m_shadeSizing.content_right         = settings.value("Shade/content_right",       1).toInt() - 1;
-    m_shadeSizing.content_top           = settings.value("Shade/content_top",         2).toInt() - 1;
-    m_shadeSizing.content_bottom        = settings.value("Shade/content_bottom",      4).toInt() - 1;
+    m_shadeSizing.width = settings.value("Shade/width", 29).toInt();
+    m_shadeSizing.margin_left = m_minimizeSizing.margin_left;
+    m_shadeSizing.margin_top = m_minimizeSizing.margin_top;
+    m_shadeSizing.margin_right = m_minimizeSizing.margin_right;
+    m_shadeSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_shadeSizing.content_left = settings.value("Shade/content_left", 3).toInt() - 1;
+    m_shadeSizing.content_right = settings.value("Shade/content_right", 1).toInt() - 1;
+    m_shadeSizing.content_top = settings.value("Shade/content_top", 2).toInt() - 1;
+    m_shadeSizing.content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
 
     // PinSizing
-    m_pinSizing.width                   = settings.value("Pin/width",                29).toInt();
-    m_pinSizing.margin_left             = m_minimizeSizing.margin_left;
-    m_pinSizing.margin_top              = m_minimizeSizing.margin_top;
-    m_pinSizing.margin_right            = m_minimizeSizing.margin_right;
-    m_pinSizing.margin_bottom           = m_minimizeSizing.margin_bottom;
-    m_pinSizing.content_left            = settings.value("Pin/content_left",          3).toInt() - 1;
-    m_pinSizing.content_right           = settings.value("Pin/content_right",         1).toInt() - 1;
-    m_pinSizing.content_top             = settings.value("Pin/content_top",           2).toInt() - 1;
-    m_pinSizing.content_bottom          = settings.value("Pin/content_bottom",        4).toInt() - 1;
+    m_pinSizing.width = settings.value("Pin/width", 29).toInt();
+    m_pinSizing.margin_left = m_minimizeSizing.margin_left;
+    m_pinSizing.margin_top = m_minimizeSizing.margin_top;
+    m_pinSizing.margin_right = m_minimizeSizing.margin_right;
+    m_pinSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_pinSizing.content_left = settings.value("Pin/content_left", 3).toInt() - 1;
+    m_pinSizing.content_right = settings.value("Pin/content_right", 1).toInt() - 1;
+    m_pinSizing.content_top = settings.value("Pin/content_top", 2).toInt() - 1;
+    m_pinSizing.content_bottom = settings.value("Pin/content_bottom", 4).toInt() - 1;
 
     // MenuSizing
-    m_menuSizing.width                  = settings.value("Menu/width",               29).toInt();
-    m_menuSizing.margin_left            = m_minimizeSizing.margin_left;
-    m_menuSizing.margin_top             = m_minimizeSizing.margin_top;
-    m_menuSizing.margin_right           = m_minimizeSizing.margin_right;
-    m_menuSizing.margin_bottom          = m_minimizeSizing.margin_bottom;
-    m_menuSizing.content_left           = settings.value("Menu/content_left",         3).toInt() - 1;
-    m_menuSizing.content_right          = settings.value("Menu/content_right",        1).toInt() - 1;
-    m_menuSizing.content_top            = settings.value("Menu/content_top",          2).toInt() - 1;
-    m_menuSizing.content_bottom         = settings.value("Menu/content_bottom",       4).toInt() - 1;
+    m_menuSizing.width = settings.value("Menu/width", 29).toInt();
+    m_menuSizing.margin_left = m_minimizeSizing.margin_left;
+    m_menuSizing.margin_top = m_minimizeSizing.margin_top;
+    m_menuSizing.margin_right = m_minimizeSizing.margin_right;
+    m_menuSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_menuSizing.content_left = settings.value("Menu/content_left", 3).toInt() - 1;
+    m_menuSizing.content_right = settings.value("Menu/content_right", 1).toInt() - 1;
+    m_menuSizing.content_top = settings.value("Menu/content_top", 2).toInt() - 1;
+    m_menuSizing.content_bottom = settings.value("Menu/content_bottom", 4).toInt() - 1;
 
+    // CaptureExcludeSizing
+    m_captureExcludeSizing.width = settings.value("CaptureExclude/width", 29).toInt();
+    m_captureExcludeSizing.margin_left = m_minimizeSizing.margin_left;
+    m_captureExcludeSizing.margin_top = m_minimizeSizing.margin_top;
+    m_captureExcludeSizing.margin_right = m_minimizeSizing.margin_right;
+    m_captureExcludeSizing.margin_bottom = m_minimizeSizing.margin_bottom;
+    m_captureExcludeSizing.content_left = settings.value("CaptureExclude/content_left", 3).toInt() - 1;
+    m_captureExcludeSizing.content_right = settings.value("CaptureExclude/content_right", 1).toInt() - 1;
+    m_captureExcludeSizing.content_top = settings.value("CaptureExclude/content_top", 2).toInt() - 1;
+    m_captureExcludeSizing.content_bottom = settings.value("CaptureExclude/content_bottom", 4).toInt() - 1;
 
-    m_frameLeftSizing.width             = settings.value("FrameLeft/width",           8).toInt();
-    m_frameLeftSizing.inset             = settings.value("FrameLeft/inset",           2).toInt();
-    m_frameRightSizing.width            = settings.value("FrameRight/width",          8).toInt();
-    m_frameRightSizing.inset            = settings.value("FrameRight/inset",          2).toInt();
-    m_frameBottomSizing.height          = settings.value("FrameBottom/height",        8).toInt();
+    m_frameLeftSizing.width = settings.value("FrameLeft/width", 8).toInt();
+    m_frameLeftSizing.inset = settings.value("FrameLeft/inset", 2).toInt();
+    m_frameRightSizing.width = settings.value("FrameRight/width", 8).toInt();
+    m_frameRightSizing.inset = settings.value("FrameRight/inset", 2).toInt();
+    m_frameBottomSizing.height = settings.value("FrameBottom/height", 8).toInt();
 
-    m_topLeftCorner.width               = settings.value("TopLeft/width",             9).toInt();
-    m_topLeftCorner.margin_left         = settings.value("TopLeft/margin_left",       6).toInt();
-    m_topLeftCorner.margin_right        = settings.value("TopLeft/margin_right",      2).toInt();
-    m_topLeftCorner.margin_top          = settings.value("TopLeft/margin_top",        6).toInt();
-    m_topLeftCorner.margin_bottom       = settings.value("TopLeft/margin_bottom",     2).toInt();
+    m_topLeftCorner.width = settings.value("TopLeft/width", 9).toInt();
+    m_topLeftCorner.margin_left = settings.value("TopLeft/margin_left", 6).toInt();
+    m_topLeftCorner.margin_right = settings.value("TopLeft/margin_right", 2).toInt();
+    m_topLeftCorner.margin_top = settings.value("TopLeft/margin_top", 6).toInt();
+    m_topLeftCorner.margin_bottom = settings.value("TopLeft/margin_bottom", 2).toInt();
 
-    m_topRightCorner.width              = settings.value("TopRight/width",            9).toInt();
-    m_topRightCorner.margin_left        = settings.value("TopRight/margin_left",      2).toInt();
-    m_topRightCorner.margin_right       = settings.value("TopRight/margin_right",     6).toInt();
-    m_topRightCorner.margin_top         = settings.value("TopRight/margin_top",       6).toInt();
-    m_topRightCorner.margin_bottom      = settings.value("TopRight/margin_bottom",    2).toInt();
+    m_topRightCorner.width = settings.value("TopRight/width", 9).toInt();
+    m_topRightCorner.margin_left = settings.value("TopRight/margin_left", 2).toInt();
+    m_topRightCorner.margin_right = settings.value("TopRight/margin_right", 6).toInt();
+    m_topRightCorner.margin_top = settings.value("TopRight/margin_top", 6).toInt();
+    m_topRightCorner.margin_bottom = settings.value("TopRight/margin_bottom", 2).toInt();
 
-    m_bottomLeftCorner.width            = settings.value("BottomLeft/width",          9).toInt();
-    m_bottomLeftCorner.margin_left      = settings.value("BottomLeft/margin_left",    6).toInt();
-    m_bottomLeftCorner.margin_right     = settings.value("BottomLeft/margin_right",   2).toInt();
-    m_bottomLeftCorner.margin_top       = settings.value("BottomLeft/margin_top",     2).toInt();
-    m_bottomLeftCorner.margin_bottom    = settings.value("BottomLeft/margin_bottom",  6).toInt();
+    m_bottomLeftCorner.width = settings.value("BottomLeft/width", 9).toInt();
+    m_bottomLeftCorner.margin_left = settings.value("BottomLeft/margin_left", 6).toInt();
+    m_bottomLeftCorner.margin_right = settings.value("BottomLeft/margin_right", 2).toInt();
+    m_bottomLeftCorner.margin_top = settings.value("BottomLeft/margin_top", 2).toInt();
+    m_bottomLeftCorner.margin_bottom = settings.value("BottomLeft/margin_bottom", 6).toInt();
 
-    m_bottomRightCorner.width           = settings.value("BottomRight/width",         9).toInt();
-    m_bottomRightCorner.margin_left     = settings.value("BottomRight/margin_left",   2).toInt();
-    m_bottomRightCorner.margin_right    = settings.value("BottomRight/margin_right",  6).toInt();
-    m_bottomRightCorner.margin_top      = settings.value("BottomRight/margin_top",    2).toInt();
-    m_bottomRightCorner.margin_bottom   = settings.value("BottomRight/margin_bottom", 6).toInt();
+    m_bottomRightCorner.width = settings.value("BottomRight/width", 9).toInt();
+    m_bottomRightCorner.margin_left = settings.value("BottomRight/margin_left", 2).toInt();
+    m_bottomRightCorner.margin_right = settings.value("BottomRight/margin_right", 6).toInt();
+    m_bottomRightCorner.margin_top = settings.value("BottomRight/margin_top", 2).toInt();
+    m_bottomRightCorner.margin_bottom = settings.value("BottomRight/margin_bottom", 6).toInt();
 
-    m_leftSide.margin_left              = settings.value("Left/margin_left",          2).toInt();
-    m_leftSide.margin_right             = settings.value("Left/margin_right",         6).toInt();
-    m_rightSide.margin_left             = settings.value("Right/margin_left",         6).toInt();
-    m_rightSide.margin_right            = settings.value("Right/margin_right",        2).toInt();
-    m_topSide.margin_top                = settings.value("Top/margin_top",            6).toInt();
-    m_topSide.margin_bottom             = settings.value("Top/margin_bottom",         2).toInt();
-    m_bottomSide.margin_top             = settings.value("Bottom/margin_top",         2).toInt();
-    m_bottomSide.margin_bottom          = settings.value("Bottom/margin_bottom",      6).toInt();
+    m_leftSide.margin_left = settings.value("Left/margin_left", 2).toInt();
+    m_leftSide.margin_right = settings.value("Left/margin_right", 6).toInt();
+    m_rightSide.margin_left = settings.value("Right/margin_left", 6).toInt();
+    m_rightSide.margin_right = settings.value("Right/margin_right", 2).toInt();
+    m_topSide.margin_top = settings.value("Top/margin_top", 6).toInt();
+    m_topSide.margin_bottom = settings.value("Top/margin_bottom", 2).toInt();
+    m_bottomSide.margin_top = settings.value("Bottom/margin_top", 2).toInt();
+    m_bottomSide.margin_bottom = settings.value("Bottom/margin_bottom", 6).toInt();
 
     m_loaded = true;
 
@@ -212,9 +222,14 @@ CommonSizing SizingMargins::commonSizing() const
 {
     return m_commonSizing;
 }
+
+ButtonSizingMargins SizingMargins::captureExcludeSizing() const
+{
+    return m_captureExcludeSizing;
+}
 ButtonSizingMargins SizingMargins::menuSizing() const
 {
-    return m_pinSizing;
+    return m_menuSizing;
 }
 ButtonSizingMargins SizingMargins::pinSizing() const
 {

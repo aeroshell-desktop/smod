@@ -215,48 +215,54 @@ namespace Breeze
                 }
                 default: {
                     switch(type()) {
-                        case DecorationButtonType::ApplicationMenu:
-                            m_isToggled = d->window()->isApplicationMenuActive();
-                            glyphType = "menu";
-                            buttonMargins = margins.menuSizing();
-                            break;
+                    case DecorationButtonType::ExcludeFromCapture:
+                        m_isToggled = d->window()->isExcludedFromCapture();
+                        glyphType = "captureExclude";
+                        buttonMargins = margins.captureExcludeSizing();
+                        break;
 
-                        case DecorationButtonType::OnAllDesktops:
-                            m_isToggled = d->window()->isOnAllDesktops();
-                            glyphType = "pin";
-                            buttonMargins = margins.pinSizing();
-                            break;
+                    case DecorationButtonType::ApplicationMenu:
+                        m_isToggled = d->window()->isApplicationMenuActive();
+                        glyphType = "menu";
+                        buttonMargins = margins.menuSizing();
+                        break;
 
-                        case DecorationButtonType::Shade:
-                            m_isToggled = d->window()->isShaded();
-                            glyphType = "shade";
-                            buttonMargins = margins.shadeSizing();
-                            break;
+                    case DecorationButtonType::OnAllDesktops:
+                        m_isToggled = d->window()->isOnAllDesktops();
+                        glyphType = "pin";
+                        buttonMargins = margins.pinSizing();
+                        break;
 
-                        case DecorationButtonType::KeepAbove:
-                            m_isToggled = d->window()->isKeepAbove();
-                            glyphType = "overlap";
-                            buttonMargins = margins.overlapSizing();
-                            break;
+                    case DecorationButtonType::Shade:
+                        m_isToggled = d->window()->isShaded();
+                        glyphType = "shade";
+                        buttonMargins = margins.shadeSizing();
+                        break;
 
-                        case DecorationButtonType::KeepBelow:
-                            m_isToggled = d->window()->isKeepBelow();
-                            glyphType = "underlap";
-                            buttonMargins = margins.underlapSizing();
-                            break;
+                    case DecorationButtonType::KeepAbove:
+                        m_isToggled = d->window()->isKeepAbove();
+                        glyphType = "overlap";
+                        buttonMargins = margins.overlapSizing();
+                        break;
 
-                        case DecorationButtonType::ContextHelp:
-                            glyphType = "help";
-                            buttonMargins = margins.helpSizing();
-                            break;
+                    case DecorationButtonType::KeepBelow:
+                        m_isToggled = d->window()->isKeepBelow();
+                        glyphType = "underlap";
+                        buttonMargins = margins.underlapSizing();
+                        break;
 
-                        case DecorationButtonType::Minimize:
-                            glyphType = "minimize";
-                            buttonMargins = margins.minimizeSizing();
-                            break;
+                    case DecorationButtonType::ContextHelp:
+                        glyphType = "help";
+                        buttonMargins = margins.helpSizing();
+                        break;
 
-                        default:
-                            break;
+                    case DecorationButtonType::Minimize:
+                        glyphType = "minimize";
+                        buttonMargins = margins.minimizeSizing();
+                        break;
+
+                    default:
+                        break;
                     }
 
                     buttonMargins = minimizeMargins;

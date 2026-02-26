@@ -151,6 +151,19 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 
         switch (button)
         {
+        case KDecoration3::DecorationButtonType::ExcludeFromCapture: {
+            anim = this->windows.value(w)->m_captureExclude;
+
+#if RIGHT_SIDE_ORIGIN
+            anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+#else
+            anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+#endif
+            anim->m_isFlipped = isFlipped;
+            anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
+
+            break;
+        }
             case KDecoration3::DecorationButtonType::ApplicationMenu:
             {
                 anim = this->windows.value(w)->m_menu;
@@ -370,6 +383,7 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
     /*qDebug() << "Min texture: " << m_texture_minimize.get()->size();
     qDebug() << "Max texture: " << m_texture_maximize.get()->size();
     qDebug() << "Close texture: " << m_texture_close.get()->size();*/
+    QSize captureExclude_size = smoddecoration->buttonRect(KDecoration3::DecorationButtonType::ExcludeFromCapture).size();
     QSize menu_size = smoddecoration->buttonRect(KDecoration3::DecorationButtonType::ApplicationMenu).size();
     QSize pin_size = smoddecoration->buttonRect(KDecoration3::DecorationButtonType::OnAllDesktops).size();
     QSize shade_size = smoddecoration->buttonRect(KDecoration3::DecorationButtonType::Shade).size();
@@ -383,6 +397,7 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
     qDebug() << "Max button: " << max_size;
     qDebug() << "Close button: " << close_size;*/
 
+    captureExclude_size += QSize(MINMAXGLOW_SML * 2 + 1, MINMAXGLOW_SMT * 2);
     menu_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
     pin_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
     shade_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
@@ -395,9 +410,10 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
     /*qDebug() << "Min size: " << min_size;
     qDebug() << "Max size: " << max_size;
     qDebug() << "Close size: " << close_size;*/
-    handler->m_menu_rect  = QRect(origin + handler->m_menu->pos,  underlap_size);
-    handler->m_pin_rect  = QRect(origin + handler->m_pin->pos,  underlap_size);
-    handler->m_shade_rect  = QRect(origin + handler->m_shade->pos,  underlap_size);
+    handler->m_captureExclude_rect = QRect(origin + handler->m_captureExclude->pos, captureExclude_size);
+    handler->m_menu_rect = QRect(origin + handler->m_menu->pos, menu_size);
+    handler->m_pin_rect = QRect(origin + handler->m_pin->pos, pin_size);
+    handler->m_shade_rect = QRect(origin + handler->m_shade->pos, shade_size);
     handler->m_underlap_rect  = QRect(origin + handler->m_underlap->pos,  underlap_size);
     handler->m_overlap_rect  = QRect(origin + handler->m_overlap->pos,  overlap_size);
     handler->m_help_rect  = QRect(origin + handler->m_help->pos,  help_size);
@@ -410,6 +426,7 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
     handler->m_close_rect = QRect(origin + handler->m_close->pos, m_texture_close.get()->size());*/
 
     Region newPaint = Region();
+    newPaint |= Rect(handler->m_captureExclude_rect);
     newPaint |= Rect(handler->m_menu_rect);
     newPaint |= Rect(handler->m_pin_rect);
     newPaint |= Rect(handler->m_shade_rect);

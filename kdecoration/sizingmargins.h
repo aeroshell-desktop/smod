@@ -80,6 +80,7 @@ public:
     ShadowSizing shadowSizing() const;
     CommonSizing commonSizing() const;
 
+    ButtonSizingMargins captureExcludeSizing() const;
     ButtonSizingMargins menuSizing() const;
     ButtonSizingMargins pinSizing() const;
     ButtonSizingMargins shadeSizing() const;
@@ -113,6 +114,7 @@ private:
     ShadowSizing m_shadowSizing;
     CommonSizing m_commonSizing;
 
+    ButtonSizingMargins m_captureExcludeSizing;
     ButtonSizingMargins m_menuSizing;
     ButtonSizingMargins m_pinSizing;
     ButtonSizingMargins m_shadeSizing;
