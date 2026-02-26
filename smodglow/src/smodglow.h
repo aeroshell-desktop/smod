@@ -201,18 +201,20 @@ class GlowHandler : public QObject
 public:
     GlowHandler(QObject *parent = nullptr) : QObject(parent)
     {
-        m_menu  = new GlowAnimationHandler(this);
-        m_pin  = new GlowAnimationHandler(this);
+        m_captureExclude = new GlowAnimationHandler(this);
+        m_menu = new GlowAnimationHandler(this);
+        m_pin = new GlowAnimationHandler(this);
 
-        m_shade  = new GlowAnimationHandler(this);
+        m_shade = new GlowAnimationHandler(this);
         m_underlap  = new GlowAnimationHandler(this);
-        m_overlap  = new GlowAnimationHandler(this);
+        m_overlap = new GlowAnimationHandler(this);
 
         m_help  = new GlowAnimationHandler(this);
         m_min   = new GlowAnimationHandler(this);
         m_max   = new GlowAnimationHandler(this);
         m_close = new GlowAnimationHandler(this);
 
+        QObject::connect(m_captureExclude, &GlowAnimationHandler::animStarted, this, &GlowHandler::animStarted, Qt::UniqueConnection);
         QObject::connect(m_menu, &GlowAnimationHandler::animStarted, this, &GlowHandler::animStarted, Qt::UniqueConnection);
         QObject::connect(m_pin, &GlowAnimationHandler::animStarted, this, &GlowHandler::animStarted, Qt::UniqueConnection);
 
@@ -236,6 +238,7 @@ public:
 
     ~GlowHandler()
     {
+        delete m_captureExclude;
         delete m_menu;
         delete m_pin;
 
@@ -251,6 +254,7 @@ public:
 
     void stopAll()
     {
+        m_captureExclude->stopHoverAnimation();
         m_menu->stopHoverAnimation();
         m_pin->stopHoverAnimation();
 
@@ -264,11 +268,11 @@ public:
         m_close->stopHoverAnimation();
     }
 
-    GlowAnimationHandler *m_pin = nullptr, *m_menu = nullptr;
+    GlowAnimationHandler *m_captureExclude = nullptr, *m_pin = nullptr, *m_menu = nullptr;
     GlowAnimationHandler *m_shade = nullptr, *m_underlap = nullptr, *m_overlap = nullptr;
     GlowAnimationHandler *m_help = nullptr, *m_min = nullptr, *m_max = nullptr, *m_close = nullptr;
 
-    QRect m_pin_rect = QRect(), m_menu_rect = QRect();
+    QRect m_captureExclude_rect = QRect(), m_pin_rect = QRect(), m_menu_rect = QRect();
     QRect m_shade_rect = QRect(), m_underlap_rect = QRect(), m_overlap_rect = QRect();
     QRect m_help_rect = QRect(), m_min_rect = QRect(), m_max_rect = QRect(), m_close_rect = QRect();
 
@@ -288,26 +292,17 @@ public Q_SLOTS:
     void animFinished()
     {
         // TODO redo this
-        if (
-            (m_menu->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_pin->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_shade->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_underlap->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_overlap->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_help->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_min->m_hoverProgress == 0.0 ) //|| m_min->m_hoverProgress == 1.0)
-            &&
-            (m_max->m_hoverProgress == 0.0 ) //|| m_max->m_hoverProgress == 1.0)
-            &&
-            (m_close->m_hoverProgress == 0.0 ) //|| m_close->m_hoverProgress == 1.0)
-        )
-        {
+        if ((m_captureExclude->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_menu->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_pin->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_shade->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_underlap->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_overlap->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_help->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_min->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_max->m_hoverProgress == 0.0) //|| m_max->m_hoverProgress == 1.0)
+            && (m_close->m_hoverProgress == 0.0) //|| m_close->m_hoverProgress == 1.0)
+        ) {
             m_needsRepaint = false;
         }
     }
