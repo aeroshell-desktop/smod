@@ -105,11 +105,6 @@ endif()
 
 endif ()
 
-if(NOT KWIN_BUILD_WAYLAND)
-    set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/${TARGET_NAME})
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/x11/)
-endif()
-
 
 if(KWIN_BUILD_WAYLAND)
     target_link_directories(${TARGET_NAME}
