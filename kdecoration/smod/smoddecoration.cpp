@@ -339,7 +339,6 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
         real_label.setPalette(palette);
         auto f = settings()->font();
         f.setKerning(false);
-        if(invertText) f.setWeight(QFont::DemiBold);
         real_label.setFont(f);
         real_label.setFixedWidth(captionRect.width());
         real_label.setFixedHeight(captionRect.height());
