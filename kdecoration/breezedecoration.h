@@ -163,7 +163,6 @@ private:
     void smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegion);
     void updateShadow(bool reconfigured = false);
     std::shared_ptr<KDecoration3::DecorationShadow> smodCreateShadow(bool active);
-    void setScaledCornerRadius();
 
     //*@name border size
     //@{

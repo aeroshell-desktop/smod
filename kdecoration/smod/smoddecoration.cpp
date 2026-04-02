@@ -281,12 +281,8 @@ void Decoration::smodPaintOuterBorder(QPainter *painter, const QRectF &repaintRe
 
 void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 {
-    Q_UNUSED(repaintRegion)
-
     if (hideTitleBar())
-    {
         return;
-    }
 
     if (!hideCaption())
     {
@@ -294,168 +290,117 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
         int titleAlignment = internalSettings()->titleAlignment();
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
-        const int left = m_leftButtons->geometry().right();
-        const int right = m_rightButtons->geometry().left();
+        const int left = m_leftButtons->geometry().right() + (hideIcon() ? 2 : 7);
+        const int right = m_rightButtons->geometry().left() - 7;
 
-        QRect captionRect(m_leftButtons->geometry().right(), 0,
-                          (right == 0 ? size().width() : right) - left - 4, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
+        QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
 
         QString caption = settings()->fontMetrics().elidedText(c->caption(), Qt::ElideMiddle, captionRect.width());
-
         // remove program name
-        QStringList programname = caption.split(" — ");
-        caption.remove(" — " + programname.at(programname.size()-1));
-        QString fixedCaption = caption;
+        caption.remove(QRegularExpression(" —.+"));
 
         // replace emojis for █
         // fixes a BUG in which the glow is shorter than the actual text when there's emojis
         QTextOption opt;
         opt.setFlags(QTextOption::ShowDefaultIgnorables);
         QFontMetrics fm(settings()->font());
-        auto rect = fm.boundingRect(fixedCaption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), opt);
+        auto rect =
+            fm.boundingRect(caption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), opt);
 
-        int blurWidth = rect.width() + 30;
-        int blurHeight = rect.height();
+        QColor textColor = c->color(KDecoration3::ColorGroup::Active, KDecoration3::ColorRole::Foreground);
+        if (!c->isActive()) {
+            (void)textColor.darker(105);
+        }
 
-        // QColor shadowColor = QColor(0, 0, 0, 255);
-        QColor textColor = c->color(c->isActive() ? KDecoration3::ColorGroup::Active : KDecoration3::ColorGroup::Inactive, KDecoration3::ColorRole::Foreground);
-
-        captionRect.setHeight(captionRect.height() & -2);
+        captionRect.setHeight(captionRect.height() - 3);
         painter->setFont(settings()->font());
-        // painter->setPen(shadowColor);
         painter->setPen(textColor);
 
-        QLabel real_label(caption);
-        QPalette palette = real_label.palette();
-        if(invertText)
-        {
-            textColor.setRed(255-textColor.red());
-            textColor.setGreen(255-textColor.green());
-            textColor.setBlue(255-textColor.blue());
-        }
-        palette.setColor(real_label.backgroundRole(), textColor);
-        palette.setColor(real_label.foregroundRole(), textColor);
-        real_label.setStyleSheet("QLabel { background: #00aaaaaa; }");
-        real_label.setPalette(palette);
-        auto f = settings()->font();
-        f.setKerning(false);
-        real_label.setFont(f);
-        real_label.setFixedWidth(captionRect.width());
-        real_label.setFixedHeight(captionRect.height());
+        QLabel label(caption);
+        QPalette palette = label.palette();
 
-        if(titleAlignment == InternalSettings::AlignRight)
-            real_label.setAlignment(Qt::AlignRight);
-        else if(titleAlignment == InternalSettings::AlignCenter)
-            real_label.setAlignment(Qt::AlignHCenter);
-        else if(titleAlignment == InternalSettings::AlignCenterFullWidth)
-        {
-            real_label.setFixedWidth(size().width());
-            real_label.setAlignment(Qt::AlignHCenter);
+        if (invertText) {
+            textColor.setRed(255);
+            textColor.setGreen(255);
+            textColor.setBlue(255);
         }
 
-        QPixmap glow(":/smod/decoration/glow");
-        auto margins = sizingMargins().glowSizing();
-        int l = margins.margin_left;
-        int r = margins.margin_right;
-        int t = margins.margin_top;
-        int b = margins.margin_bottom;
+        palette.setColor(label.backgroundRole(), textColor);
+        palette.setColor(label.foregroundRole(), textColor);
+        label.setStyleSheet("QLabel { background: #00aaaaaa; }");
+        label.setPalette(palette);
+
+        auto font = settings()->font();
+        font.setKerning(false);
+        label.setFont(font);
+
+        if (titleAlignment == InternalSettings::AlignRight) {
+            label.setAlignment(Qt::AlignRight);
+        } else if (titleAlignment == InternalSettings::AlignCenter) {
+            label.setAlignment(Qt::AlignHCenter);
+        } else if (titleAlignment == InternalSettings::AlignCenterFullWidth) {
+            captionRect.setX(0);
+            captionRect.setWidth(size().width());
+            label.setAlignment(Qt::AlignHCenter);
+        }
+
+        label.setFixedWidth(captionRect.width());
+        label.setFixedHeight(captionRect.height());
+
+        QPixmap glowPixmap(":/smod/decoration/glow");
+
+        auto glowMargins = sizingMargins().glowSizing();
+        int l = glowMargins.margin_left;
+        int r = glowMargins.margin_right;
+        int t = glowMargins.margin_top;
+        int b = glowMargins.margin_bottom;
+        qreal opacity = c->isActive() ? glowMargins.active_opacity : glowMargins.inactive_opacity;
+
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
-        int glowHeight = blurHeight*1.5;
-        int glowWidth = blurWidth + 8;
+        int glowWidth = rect.width() + 32;
+        int glowHeight = rect.height() * 1.2;
 
-        if(glowWidth < l+r) glowWidth = l+r;
-        if(glowHeight < t+b) glowHeight = t+b;
+        if (glowWidth < l + r) {
+            glowWidth = l + r;
+        }
 
-        FrameTexture gl(l, r, t, b, glowWidth, glowHeight, &glow, c->isActive() ? margins.active_opacity : margins.inactive_opacity);
+        if (glowHeight < t + b) {
+            glowHeight = t + b;
+        }
 
-        int leftButtonsX = (hideIcon() ? -5 : (m_leftButtons->geometry().x()));
+        FrameTexture glow(l, r, t, b, glowWidth, glowHeight, &glowPixmap, opacity);
 
-        if(!caption.trimmed().isEmpty())
-        {
-            if(titleAlignment == InternalSettings::AlignCenterFullWidth)
-            {
-                captionRect.setX(0);
-                captionRect.setWidth(size().width());
-            }
-            float xpos = captionRect.x();
-            if(titleAlignment == InternalSettings::AlignRight)
-            {
-                xpos += captionRect.width() - blurWidth;
-            }
-            else if(titleAlignment == InternalSettings::AlignCenter || titleAlignment == InternalSettings::AlignCenterFullWidth)
-            {
-                xpos += captionRect.width()/2 - blurWidth/2;
-            }
-            else
-            {
-                xpos = captionRect.left() - (l/2);
-            }
+        // only render if necessary
+        if (!caption.trimmed().isEmpty()) {
+            if (!invertText) {
+                int x = 0;
 
-            bool isRTL = caption.isRightToLeft();
-            auto fixedAlignment = titleAlignment;
-            if(isRTL)
-            {
-                if(fixedAlignment == InternalSettings::AlignRight)
-                {
-                    fixedAlignment = InternalSettings::AlignLeft;
-                    xpos = leftButtonsX + 2;
-                }
-                else if(fixedAlignment == InternalSettings::AlignLeft)
-                {
-                    fixedAlignment = InternalSettings::AlignRight;
-                    xpos += captionRect.width() - blurWidth;
-                }
-            }
-
-            if(!invertText)
-            {
-                int alignmentOffset = 0;
-                if(fixedAlignment == InternalSettings::AlignCenter || fixedAlignment == InternalSettings::AlignCenterFullWidth)
-                {
-                    alignmentOffset = -4;
-                    if(m_rightButtons->geometry().intersects(QRect(xpos + alignmentOffset, captionRect.height() / 2 - blurHeight - 2, glowWidth, glowHeight)))
-                    {
-                        captionRect.setX(leftButtonsX);
-                        captionRect.setWidth(size().width() - m_rightButtons->geometry().width());
-                        real_label.setFixedWidth(captionRect.width());
-                        xpos = captionRect.x();
-                        xpos += captionRect.width()/2 - blurWidth/2;
-                    }
-                }
-                else if(fixedAlignment == InternalSettings::AlignRight)
-                {
-                    alignmentOffset = -2;
+                switch (titleAlignment) {
+                case InternalSettings::AlignLeft:
+                    x = captionRect.x() + floor(rect.width() / 2) - floor(glowWidth / 2);
+                    break;
+                case InternalSettings::AlignRight:
+                    // QT-BUG: QRect::right() is off by one
+                    x = ((captionRect.x() + captionRect.width()) - floor(rect.width() / 2)) - floor(glowWidth / 2);
+                    break;
+                case InternalSettings::AlignCenter:
+                    x = captionRect.center().x() - glowWidth / 2;
+                    break;
+                case InternalSettings::AlignCenterFullWidth:
+                    x = (size().width() / 2) - (glowWidth / 2);
+                    break;
                 }
 
-                if(isRTL && titleAlignment == InternalSettings::AlignLeft)
-                {
-                    alignmentOffset += 16;
-                }
+                glow.translate(x, captionRect.center().y() - floor(glowHeight / 2.3));
+                glow.render(painter);
+            }
 
-                painter->translate(xpos + alignmentOffset, (captionRect.height() - glowHeight) / 2);
-                gl.render(painter);
-                painter->translate(-xpos - alignmentOffset, (-captionRect.height() + glowHeight) / 2);
-
-            }
-            QPixmap text_pixmap = real_label.grab();
-
-            if(fixedAlignment == InternalSettings::AlignRight)
-            {
-                captionRect.translate(-12, -1);
-            }
-            else if(fixedAlignment == InternalSettings::AlignLeft)
-            {
-                captionRect.translate(5, -1);
-            }
-            else if(fixedAlignment == InternalSettings::AlignCenterFullWidth || fixedAlignment == InternalSettings::AlignCenter)
-            {
-                captionRect.translate(1, -1);
-            }
+            QPixmap text_pixmap = label.grab();
             painter->drawPixmap(captionRect, text_pixmap);
-            if(invertText)
-            {
+
+            if (invertText) {
                 painter->setOpacity(0.7);
                 painter->drawPixmap(captionRect, text_pixmap);
                 painter->setOpacity(1.0);
@@ -466,5 +411,4 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
     m_leftButtons->paint(painter, repaintRegion);
     m_rightButtons->paint(painter, repaintRegion);
 }
-
 }

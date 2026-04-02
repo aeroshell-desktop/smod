@@ -43,9 +43,7 @@ using KDecoration3::ColorRole;
 
 static SizingMargins g_sizingmargins;
 static QString g_themeName = "Aero";
-// static int g_shadowStrength = 255;
 static QColor g_shadowColor = Qt::black;
-// static int g_lastBorderSize;
 
 //________________________________________________________________
 void Decoration::setOpacity(qreal value)
@@ -274,18 +272,9 @@ void Decoration::reconfigure()
 
     SMOD::registerResource(m_internalSettings->decorationTheme());
     g_sizingmargins.loadSizingMargins();
-    setScaledCornerRadius();
 
     KSharedConfig::Ptr config = KSharedConfig::openConfig();
     const KConfigGroup cg(config, QStringLiteral("KDE"));
-
-    m_animation->setDuration(0);
-    // Syncing anis between client and decoration is troublesome, so we're not using
-    // any animations right now.
-    // m_animation->setDuration( cg.readEntry("AnimationDurationFactor", 1.0f) * 100.0f );
-
-    // But the shadow is fine to animate like this!
-    m_shadowAnimation->setDuration(cg.readEntry("AnimationDurationFactor", 1.0f) * 100.0f);
 
     // borders
     recalculateBorders();
@@ -469,7 +458,7 @@ QRect Decoration::buttonRect(KDecoration3::DecorationButtonType button) const
         break;
     }
 
-    if (button != KDecoration3::DecorationButtonType::Menu || button != KDecoration3::DecorationButtonType::Spacer) {
+    if (button != KDecoration3::DecorationButtonType::Menu && button != KDecoration3::DecorationButtonType::Spacer) {
         width = (int)((float)titlebarHeight() * ((float)intendedWidth / 21.0) + 0.5f);
     }
 
@@ -561,11 +550,6 @@ QPair<QRect, Qt::Alignment> Decoration::captionRect() const
         }
         }
     }
-}
-
-void Decoration::setScaledCornerRadius()
-{
-    m_scaledCornerRadius = Metrics::Frame_FrameRadius * settings()->smallSpacing();
 }
 } // namespace
 
