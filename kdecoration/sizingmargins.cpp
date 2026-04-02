@@ -2,9 +2,13 @@
 
 namespace Breeze {
 
-SizingMargins::SizingMargins() {}
+SizingMargins::SizingMargins()
+{
+}
 
-SizingMargins::~SizingMargins() {}
+SizingMargins::~SizingMargins()
+{
+}
 
 void SizingMargins::loadSizingMargins()
 {
@@ -39,130 +43,129 @@ void SizingMargins::loadSizingMargins()
     m_commonSizing.caption_button_align_vcenter = settings.value("Common/caption_button_align_vcenter", false).toBool();
     m_commonSizing.group_buttons                = settings.value("Common/group_buttons",                false).toBool();
 
+    // CloseLoneSizing
+    m_buttonSizingMargins[SMOD::CloseLone].width = settings.value("CloseLone/width", 49).toInt();
+    m_buttonSizingMargins[SMOD::CloseLone].margin_left = settings.value("CloseLone/margin_left", 20).toInt();
+    m_buttonSizingMargins[SMOD::CloseLone].margin_top = settings.value("CloseLone/margin_top", 6).toInt();
+    m_buttonSizingMargins[SMOD::CloseLone].margin_right = settings.value("CloseLone/margin_right", 20).toInt();
+    m_buttonSizingMargins[SMOD::CloseLone].margin_bottom = settings.value("CloseLone/margin_bottom", 8).toInt();
+    m_buttonSizingMargins[SMOD::CloseLone].content_left = settings.value("CloseLone/content_left", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::CloseLone].content_right = settings.value("CloseLone/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::CloseLone].content_top = settings.value("CloseLone/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::CloseLone].content_bottom = settings.value("CloseLone/content_bottom", 4).toInt() - 1;
 
     // CloseSizing
-    m_closeSizing.width = settings.value("Close/width", 49).toInt();
-    m_closeSizing.margin_left = settings.value("Close/margin_left", 20).toInt();
-    m_closeSizing.margin_top = settings.value("Close/margin_top", 6).toInt();
-    m_closeSizing.margin_right = settings.value("Close/margin_right", 20).toInt();
-    m_closeSizing.margin_bottom = settings.value("Close/margin_bottom", 8).toInt();
-    m_closeSizing.content_left = settings.value("Close/content_left", 1).toInt() - 1;
-    m_closeSizing.content_right = settings.value("Close/content_right", 2).toInt() - 1;
-    m_closeSizing.content_top = settings.value("Close/content_top", 2).toInt() - 1;
-    m_closeSizing.content_bottom = settings.value("Close/content_bottom", 4).toInt() - 1;
-
-    // CloseLoneSizing
-    m_closeLoneSizing.width = settings.value("CloseLone/width", 49).toInt();
-    m_closeLoneSizing.margin_left = settings.value("CloseLone/margin_left", 20).toInt();
-    m_closeLoneSizing.margin_top = settings.value("CloseLone/margin_top", 6).toInt();
-    m_closeLoneSizing.margin_right = settings.value("CloseLone/margin_right", 20).toInt();
-    m_closeLoneSizing.margin_bottom = settings.value("CloseLone/margin_bottom", 8).toInt();
-    m_closeLoneSizing.content_left = settings.value("CloseLone/content_left", 2).toInt() - 1;
-    m_closeLoneSizing.content_right = settings.value("CloseLone/content_right", 1).toInt() - 1;
-    m_closeLoneSizing.content_top = settings.value("CloseLone/content_top", 2).toInt() - 1;
-    m_closeLoneSizing.content_bottom = settings.value("CloseLone/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Close].width = settings.value("Close/width", 49).toInt();
+    m_buttonSizingMargins[SMOD::Close].margin_left = settings.value("Close/margin_left", 20).toInt();
+    m_buttonSizingMargins[SMOD::Close].margin_top = settings.value("Close/margin_top", 6).toInt();
+    m_buttonSizingMargins[SMOD::Close].margin_right = settings.value("Close/margin_right", 20).toInt();
+    m_buttonSizingMargins[SMOD::Close].margin_bottom = settings.value("Close/margin_bottom", 8).toInt();
+    m_buttonSizingMargins[SMOD::Close].content_left = settings.value("Close/content_left", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Close].content_right = settings.value("Close/content_right", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Close].content_top = settings.value("Close/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Close].content_bottom = settings.value("Close/content_bottom", 4).toInt() - 1;
 
     // MaximizeSizing
-    m_maximizeSizing.width = settings.value("Maximize/width", 27).toInt();
-    m_maximizeSizing.margin_left = settings.value("Maximize/margin_left", 12).toInt();
-    m_maximizeSizing.margin_top = settings.value("Maximize/margin_top", 6).toInt();
-    m_maximizeSizing.margin_right = settings.value("Maximize/margin_right", 12).toInt();
-    m_maximizeSizing.margin_bottom = settings.value("Maximize/margin_bottom", 8).toInt();
-    m_maximizeSizing.content_left = settings.value("Maximize/content_left", 2).toInt() - 1;
-    m_maximizeSizing.content_right = settings.value("Maximize/content_right", 3).toInt() - 1;
-    m_maximizeSizing.content_top = settings.value("Maximize/content_top", 2).toInt() - 1;
-    m_maximizeSizing.content_bottom = settings.value("Maximize/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Maximize].width = settings.value("Maximize/width", 27).toInt();
+    m_buttonSizingMargins[SMOD::Maximize].margin_left = settings.value("Maximize/margin_left", 12).toInt();
+    m_buttonSizingMargins[SMOD::Maximize].margin_top = settings.value("Maximize/margin_top", 6).toInt();
+    m_buttonSizingMargins[SMOD::Maximize].margin_right = settings.value("Maximize/margin_right", 12).toInt();
+    m_buttonSizingMargins[SMOD::Maximize].margin_bottom = settings.value("Maximize/margin_bottom", 8).toInt();
+    m_buttonSizingMargins[SMOD::Maximize].content_left = settings.value("Maximize/content_left", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Maximize].content_right = settings.value("Maximize/content_right", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Maximize].content_top = settings.value("Maximize/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Maximize].content_bottom = settings.value("Maximize/content_bottom", 4).toInt() - 1;
 
     // MinimizeSizing
-    m_minimizeSizing.width = settings.value("Minimize/width", 29).toInt();
-    m_minimizeSizing.margin_left = settings.value("Minimize/margin_left", 12).toInt();
-    m_minimizeSizing.margin_top = settings.value("Minimize/margin_top", 6).toInt();
-    m_minimizeSizing.margin_right = settings.value("Minimize/margin_right", 12).toInt();
-    m_minimizeSizing.margin_bottom = settings.value("Minimize/margin_bottom", 8).toInt();
-    m_minimizeSizing.content_left = settings.value("Minimize/content_left", 3).toInt() - 1;
-    m_minimizeSizing.content_right = settings.value("Minimize/content_right", 1).toInt() - 1;
-    m_minimizeSizing.content_top = settings.value("Minimize/content_top", 2).toInt() - 1;
-    m_minimizeSizing.content_bottom = settings.value("Minimize/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Minimize].width = settings.value("Minimize/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::Minimize].margin_left = settings.value("Minimize/margin_left", 12).toInt();
+    m_buttonSizingMargins[SMOD::Minimize].margin_top = settings.value("Minimize/margin_top", 6).toInt();
+    m_buttonSizingMargins[SMOD::Minimize].margin_right = settings.value("Minimize/margin_right", 12).toInt();
+    m_buttonSizingMargins[SMOD::Minimize].margin_bottom = settings.value("Minimize/margin_bottom", 8).toInt();
+    m_buttonSizingMargins[SMOD::Minimize].content_left = settings.value("Minimize/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Minimize].content_right = settings.value("Minimize/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Minimize].content_top = settings.value("Minimize/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Minimize].content_bottom = settings.value("Minimize/content_bottom", 4).toInt() - 1;
 
     // These next 5 buttons will just use the minimize button
     // sizing margins, except for the content parts.
 
     // HelpSizing
-    m_helpSizing.width = settings.value("Help/width", 29).toInt();
-    m_helpSizing.margin_left = m_minimizeSizing.margin_left;
-    m_helpSizing.margin_top = m_minimizeSizing.margin_top;
-    m_helpSizing.margin_right = m_minimizeSizing.margin_right;
-    m_helpSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_helpSizing.content_left = settings.value("Help/content_left", 3).toInt() - 1;
-    m_helpSizing.content_right = settings.value("Help/content_right", 1).toInt() - 1;
-    m_helpSizing.content_top = settings.value("Help/content_top", 2).toInt() - 1;
-    m_helpSizing.content_bottom = settings.value("Help/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ContextHelp].width = settings.value("Help/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::ContextHelp].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::ContextHelp].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::ContextHelp].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::ContextHelp].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::ContextHelp].content_left = settings.value("Help/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ContextHelp].content_right = settings.value("Help/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ContextHelp].content_top = settings.value("Help/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ContextHelp].content_bottom = settings.value("Help/content_bottom", 4).toInt() - 1;
 
     // OverlapSizing
-    m_overlapSizing.width = settings.value("Overlap/width", 29).toInt();
-    m_overlapSizing.margin_left = m_minimizeSizing.margin_left;
-    m_overlapSizing.margin_top = m_minimizeSizing.margin_top;
-    m_overlapSizing.margin_right = m_minimizeSizing.margin_right;
-    m_overlapSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_overlapSizing.content_left = settings.value("Shade/content_left", 3).toInt() - 1;
-    m_overlapSizing.content_right = settings.value("Shade/content_right", 1).toInt() - 1;
-    m_overlapSizing.content_top = settings.value("Shade/content_top", 2).toInt() - 1;
-    m_overlapSizing.content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepAbove].width = settings.value("Overlap/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::KeepAbove].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::KeepAbove].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::KeepAbove].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::KeepAbove].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::KeepAbove].content_left = settings.value("Shade/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepAbove].content_right = settings.value("Shade/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepAbove].content_top = settings.value("Shade/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepAbove].content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
 
     // UnderlapSizing
-    m_underlapSizing.width = settings.value("Underlap/width", 29).toInt();
-    m_underlapSizing.margin_left = m_minimizeSizing.margin_left;
-    m_underlapSizing.margin_top = m_minimizeSizing.margin_top;
-    m_underlapSizing.margin_right = m_minimizeSizing.margin_right;
-    m_underlapSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_underlapSizing.content_left = settings.value("Shade/content_left", 3).toInt() - 1;
-    m_underlapSizing.content_right = settings.value("Shade/content_right", 1).toInt() - 1;
-    m_underlapSizing.content_top = settings.value("Shade/content_top", 2).toInt() - 1;
-    m_underlapSizing.content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepBelow].width = settings.value("Underlap/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::KeepBelow].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::KeepBelow].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::KeepBelow].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::KeepBelow].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::KeepBelow].content_left = settings.value("Shade/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepBelow].content_right = settings.value("Shade/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepBelow].content_top = settings.value("Shade/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::KeepBelow].content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
 
     // ShadeSizing
-    m_shadeSizing.width = settings.value("Shade/width", 29).toInt();
-    m_shadeSizing.margin_left = m_minimizeSizing.margin_left;
-    m_shadeSizing.margin_top = m_minimizeSizing.margin_top;
-    m_shadeSizing.margin_right = m_minimizeSizing.margin_right;
-    m_shadeSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_shadeSizing.content_left = settings.value("Shade/content_left", 3).toInt() - 1;
-    m_shadeSizing.content_right = settings.value("Shade/content_right", 1).toInt() - 1;
-    m_shadeSizing.content_top = settings.value("Shade/content_top", 2).toInt() - 1;
-    m_shadeSizing.content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Shade].width = settings.value("Shade/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::Shade].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::Shade].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::Shade].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::Shade].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::Shade].content_left = settings.value("Shade/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Shade].content_right = settings.value("Shade/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Shade].content_top = settings.value("Shade/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::Shade].content_bottom = settings.value("Shade/content_bottom", 4).toInt() - 1;
 
     // PinSizing
-    m_pinSizing.width = settings.value("Pin/width", 29).toInt();
-    m_pinSizing.margin_left = m_minimizeSizing.margin_left;
-    m_pinSizing.margin_top = m_minimizeSizing.margin_top;
-    m_pinSizing.margin_right = m_minimizeSizing.margin_right;
-    m_pinSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_pinSizing.content_left = settings.value("Pin/content_left", 3).toInt() - 1;
-    m_pinSizing.content_right = settings.value("Pin/content_right", 1).toInt() - 1;
-    m_pinSizing.content_top = settings.value("Pin/content_top", 2).toInt() - 1;
-    m_pinSizing.content_bottom = settings.value("Pin/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].width = settings.value("Pin/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::OnAllDesktops].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].content_left = settings.value("Pin/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].content_right = settings.value("Pin/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].content_top = settings.value("Pin/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::OnAllDesktops].content_bottom = settings.value("Pin/content_bottom", 4).toInt() - 1;
 
     // MenuSizing
-    m_menuSizing.width = settings.value("Menu/width", 29).toInt();
-    m_menuSizing.margin_left = m_minimizeSizing.margin_left;
-    m_menuSizing.margin_top = m_minimizeSizing.margin_top;
-    m_menuSizing.margin_right = m_minimizeSizing.margin_right;
-    m_menuSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_menuSizing.content_left = settings.value("Menu/content_left", 3).toInt() - 1;
-    m_menuSizing.content_right = settings.value("Menu/content_right", 1).toInt() - 1;
-    m_menuSizing.content_top = settings.value("Menu/content_top", 2).toInt() - 1;
-    m_menuSizing.content_bottom = settings.value("Menu/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].width = settings.value("Menu/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::ApplicationMenu].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].content_left = settings.value("Menu/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].content_right = settings.value("Menu/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].content_top = settings.value("Menu/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ApplicationMenu].content_bottom = settings.value("Menu/content_bottom", 4).toInt() - 1;
 
     // CaptureExcludeSizing
-    m_captureExcludeSizing.width = settings.value("CaptureExclude/width", 29).toInt();
-    m_captureExcludeSizing.margin_left = m_minimizeSizing.margin_left;
-    m_captureExcludeSizing.margin_top = m_minimizeSizing.margin_top;
-    m_captureExcludeSizing.margin_right = m_minimizeSizing.margin_right;
-    m_captureExcludeSizing.margin_bottom = m_minimizeSizing.margin_bottom;
-    m_captureExcludeSizing.content_left = settings.value("CaptureExclude/content_left", 3).toInt() - 1;
-    m_captureExcludeSizing.content_right = settings.value("CaptureExclude/content_right", 1).toInt() - 1;
-    m_captureExcludeSizing.content_top = settings.value("CaptureExclude/content_top", 2).toInt() - 1;
-    m_captureExcludeSizing.content_bottom = settings.value("CaptureExclude/content_bottom", 4).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].width = settings.value("CaptureExclude/width", 29).toInt();
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].margin_left = m_buttonSizingMargins[SMOD::Minimize].margin_left;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].margin_top = m_buttonSizingMargins[SMOD::Minimize].margin_top;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].margin_right = m_buttonSizingMargins[SMOD::Minimize].margin_right;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].margin_bottom = m_buttonSizingMargins[SMOD::Minimize].margin_bottom;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].content_left = settings.value("CaptureExclude/content_left", 3).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].content_right = settings.value("CaptureExclude/content_right", 1).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].content_top = settings.value("CaptureExclude/content_top", 2).toInt() - 1;
+    m_buttonSizingMargins[SMOD::ExcludeFromCapture].content_bottom = settings.value("CaptureExclude/content_bottom", 4).toInt() - 1;
 
     m_frameLeftSizing.width = settings.value("FrameLeft/width", 8).toInt();
     m_frameLeftSizing.inset = settings.value("FrameLeft/inset", 2).toInt();
@@ -206,75 +209,37 @@ void SizingMargins::loadSizingMargins()
     m_loaded = true;
 
 }
-bool SizingMargins::loaded() const
-{
-    return m_loaded;
-}
+
 GlowSizing SizingMargins::glowSizing() const
 {
     return m_glowSizing;
 }
+
 ShadowSizing SizingMargins::shadowSizing() const
 {
     return m_shadowSizing;
 }
+
 CommonSizing SizingMargins::commonSizing() const
 {
     return m_commonSizing;
 }
 
-ButtonSizingMargins SizingMargins::captureExcludeSizing() const
+ButtonSizingMargins SizingMargins::buttonSizingFor(SMOD::ButtonTypes type) const
 {
-    return m_captureExcludeSizing;
+    return m_buttonSizingMargins.value(type);
 }
-ButtonSizingMargins SizingMargins::menuSizing() const
-{
-    return m_menuSizing;
-}
-ButtonSizingMargins SizingMargins::pinSizing() const
-{
-    return m_pinSizing;
-}
-ButtonSizingMargins SizingMargins::shadeSizing() const
-{
-    return m_shadeSizing;
-}
-ButtonSizingMargins SizingMargins::overlapSizing() const
-{
-    return m_overlapSizing;
-}
-ButtonSizingMargins SizingMargins::underlapSizing() const
-{
-    return m_underlapSizing;
-}
-ButtonSizingMargins SizingMargins::helpSizing() const
-{
-    return m_helpSizing;
-}
-ButtonSizingMargins SizingMargins::maximizeSizing() const
-{
-    return m_maximizeSizing;
-}
-ButtonSizingMargins SizingMargins::minimizeSizing() const
-{
-    return m_minimizeSizing;
-}
-ButtonSizingMargins SizingMargins::closeSizing() const
-{
-    return m_closeSizing;
-}
-ButtonSizingMargins SizingMargins::closeLoneSizing() const
-{
-    return m_closeLoneSizing;
-}
+
 BorderFrame SizingMargins::frameLeftSizing() const
 {
     return m_frameLeftSizing;
 }
+
 BorderFrame SizingMargins::frameRightSizing() const
 {
     return m_frameRightSizing;
 }
+
 BorderFrame SizingMargins::frameBottomSizing() const
 {
     return m_frameBottomSizing;
@@ -284,32 +249,44 @@ FrameMargins SizingMargins::topLeftCorner() const
 {
     return m_topLeftCorner;
 }
+
 FrameMargins SizingMargins::topRightCorner() const
 {
     return m_topRightCorner;
 }
+
 FrameMargins SizingMargins::bottomLeftCorner() const
 {
     return m_bottomLeftCorner;
 }
+
 FrameMargins SizingMargins::bottomRightCorner() const
 {
     return m_bottomRightCorner;
 }
+
 FrameMargins SizingMargins::leftSide() const
 {
     return m_leftSide;
 }
+
 FrameMargins SizingMargins::rightSide() const
 {
     return m_rightSide;
 }
+
 FrameMargins SizingMargins::topSide() const
 {
     return m_topSide;
 }
+
 FrameMargins SizingMargins::bottomSide() const
 {
     return m_bottomSide;
+}
+
+bool SizingMargins::loaded() const
+{
+    return m_loaded;
 }
 }

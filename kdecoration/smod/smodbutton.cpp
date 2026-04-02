@@ -67,6 +67,24 @@ namespace Breeze
             painter->translate(0, m_offset.y());
         }
 
+        // QRect g = geometry().toRect();
+        // if (deco->window()){
+        //     qreal scale = deco->window()->scale();
+        //
+        //     qDebug() << scale;
+        //
+        //     QRect scaledTargetRect = g;
+        //     scaledTargetRect.setWidth(scaledTargetRect.width() * scale);
+        //     scaledTargetRect.setHeight(scaledTargetRect.height() * scale);
+        //     scaledTargetRect.setX(scaledTargetRect.x() * scale);
+        //     scaledTargetRect.setY(scaledTargetRect.y() * scale);
+        //
+        //     g = scaledTargetRect;
+        //
+        //     qreal scaleFactor = 1.0/scale;
+        //     painter->scale(scaleFactor, scaleFactor);
+        // }
+
         if (!m_iconSize.isValid() || isStandAlone())
         {
             m_iconSize = geometry().size().toSize();
@@ -80,7 +98,6 @@ namespace Breeze
             const int vPadding = c->isMaximized() ? 1 : (decoration()->settings()->smallSpacing() * Metrics::TitleBar_TopMargin)-1;
             const int hPadding = c->isMaximized() ? -2 : 0;
 
-            painter->save();
             painter->translate(QPointF(hPadding, vPadding));
 
             iconRect.translate(0, (titlebarHeight - m_iconSize.height())/2);
@@ -91,7 +108,7 @@ namespace Breeze
             return;
 
         } else if(type() != DecorationButtonType::Spacer) {
-            QRectF g = geometry();
+            QRect g = geometry().toRect();
             qreal w = g.width();
             qreal h = g.height();
 
@@ -190,21 +207,21 @@ namespace Breeze
             bool isSingleClose = !(c->isMinimizeable() || c->isMaximizeable() || c->providesContextHelp()) || (!buttonAfter && !buttonBefore);
 
             // BEGIN BUTTON
-            minimizeMargins = margins.minimizeSizing();
-            maximizeMargins = margins.maximizeSizing();
+            minimizeMargins = margins.buttonSizingFor(SMOD::Minimize);
+            maximizeMargins = margins.buttonSizingFor(SMOD::Maximize);
+
+            buttonMargins = margins.buttonSizingFor((SMOD::ButtonTypes)type());
 
             switch (type())
             {
-                case DecorationButtonType::Maximize: {
-                    buttonMargins = maximizeMargins;
+            case DecorationButtonType::Maximize: {
+                glyphType = c->isMaximized() ? "restore" : "maximize";
+                m_textureType = "maximize";
 
-                    glyphType = c->isMaximized() ? "restore" : "maximize";
-                    m_textureType = "maximize";
-
-                    break;
-                }
+                break;
+            }
                 case DecorationButtonType::Close: {
-                    buttonMargins = isSingleClose ? margins.closeLoneSizing() : margins.closeSizing();
+                    buttonMargins = isSingleClose ? margins.buttonSizingFor(SMOD::CloseLone) : margins.buttonSizingFor(SMOD::Close);
 
                     glyphType = "close";
 
@@ -218,54 +235,44 @@ namespace Breeze
                     case DecorationButtonType::ExcludeFromCapture:
                         m_isToggled = d->window()->isExcludedFromCapture();
                         glyphType = "captureExclude";
-                        buttonMargins = margins.captureExcludeSizing();
                         break;
 
                     case DecorationButtonType::ApplicationMenu:
                         m_isToggled = d->window()->isApplicationMenuActive();
                         glyphType = "menu";
-                        buttonMargins = margins.menuSizing();
                         break;
 
                     case DecorationButtonType::OnAllDesktops:
                         m_isToggled = d->window()->isOnAllDesktops();
                         glyphType = "pin";
-                        buttonMargins = margins.pinSizing();
                         break;
 
                     case DecorationButtonType::Shade:
                         m_isToggled = d->window()->isShaded();
                         glyphType = "shade";
-                        buttonMargins = margins.shadeSizing();
                         break;
 
                     case DecorationButtonType::KeepAbove:
                         m_isToggled = d->window()->isKeepAbove();
                         glyphType = "overlap";
-                        buttonMargins = margins.overlapSizing();
                         break;
 
                     case DecorationButtonType::KeepBelow:
                         m_isToggled = d->window()->isKeepBelow();
                         glyphType = "underlap";
-                        buttonMargins = margins.underlapSizing();
                         break;
 
                     case DecorationButtonType::ContextHelp:
                         glyphType = "help";
-                        buttonMargins = margins.helpSizing();
                         break;
 
                     case DecorationButtonType::Minimize:
                         glyphType = "minimize";
-                        buttonMargins = margins.minimizeSizing();
                         break;
 
                     default:
                         break;
                     }
-
-                    buttonMargins = minimizeMargins;
 
                     m_textureType = "minimize";
 
@@ -567,18 +574,8 @@ namespace Breeze
             }
             else
             {
-                if(!imageL.isNull() && !imageR.isNull()) {
-                    normalL.convertFromImage(aImageL);
-                    normalR.convertFromImage(aImageR);
-
-                    btnL.render(painter);
-                    btnR.translate(floor(w/2), 0);
-                    btnR.render(painter);
-                } else {
-                    normal.convertFromImage(aImage);
-
-                    btn.render(painter);
-                }
+                normal.convertFromImage(aImage);
+                btn.render(painter);
                 painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), glyph.width(), glyph.height(), glyphActive);
             }
 

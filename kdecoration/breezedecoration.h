@@ -140,11 +140,7 @@ Q_SIGNALS:
     void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool isFlipped, QString textureType, bool hovered, QPoint pos);
 
 public Q_SLOTS:
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool init() override;
-#else
-    void init() override;
-#endif
 
 private Q_SLOTS:
     void reconfigure();

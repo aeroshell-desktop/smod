@@ -92,7 +92,6 @@ QString Decoration::getButtonGroupStr(Button *button) const
     return "";
 }
 
-//________________________________________________________________
 QColor Decoration::titleBarColor() const
 {
     return QColor(Qt::transparent);
@@ -106,7 +105,6 @@ QColor Decoration::titleBarColor() const
         return c->color(c->isActive() ? ColorGroup::Active : ColorGroup::Inactive, ColorRole::TitleBar);
     }
 }
-
 //________________________________________________________________
 QColor Decoration::fontColor() const
 {
@@ -119,11 +117,7 @@ QColor Decoration::fontColor() const
 }
 
 //________________________________________________________________
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool Decoration::init()
-#else
-void Decoration::init()
-#endif
 {
     reconfigure();
     SMOD::registerResource(m_internalSettings->decorationTheme());
@@ -457,53 +451,31 @@ SizingMargins Decoration::sizingMargins() const
 
 QRect Decoration::buttonRect(KDecoration3::DecorationButtonType button) const
 {
-
-    int height = titlebarHeight()-1;
-    int intendedWidth = g_sizingmargins.maximizeSizing().width;
     int width = 0;
-    switch (button)
-    {
-    case KDecoration3::DecorationButtonType::ExcludeFromCapture:
-        intendedWidth = g_sizingmargins.captureExcludeSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::ApplicationMenu:
-        intendedWidth = g_sizingmargins.menuSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::OnAllDesktops:
-        intendedWidth = g_sizingmargins.pinSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::Shade:
-        intendedWidth = g_sizingmargins.shadeSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::KeepAbove:
-        intendedWidth = g_sizingmargins.overlapSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::KeepBelow:
-        intendedWidth = g_sizingmargins.underlapSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::ContextHelp:
-        intendedWidth = g_sizingmargins.helpSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::Minimize:
-        intendedWidth = g_sizingmargins.minimizeSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::Maximize:
-        intendedWidth = g_sizingmargins.maximizeSizing().width;
-        break;
-    case KDecoration3::DecorationButtonType::Close:
-        intendedWidth = g_sizingmargins.closeSizing().width;
-        break;
+    int intendedWidth = g_sizingmargins.buttonSizingFor(SMOD::Maximize).width;
+    int height = titlebarHeight() - 1;
+
+    switch (button) {
     case KDecoration3::DecorationButtonType::Menu:
+        width = 16;
         height = titlebarHeight();
         break;
+    case KDecoration3::DecorationButtonType::Spacer:
+        width = 8;
+        break;
+
     default:
+        intendedWidth = g_sizingmargins.buttonSizingFor((SMOD::ButtonTypes)button).width;
         break;
     }
-    if(button == KDecoration3::DecorationButtonType::Menu) width = 16;
-    else if(button == KDecoration3::DecorationButtonType::Spacer) width = 8;
-    else width = (int)((float)titlebarHeight() * ((float)intendedWidth / 21.0) + 0.5f);
+
+    if (button != KDecoration3::DecorationButtonType::Menu || button != KDecoration3::DecorationButtonType::Spacer) {
+        width = (int)((float)titlebarHeight() * ((float)intendedWidth / 21.0) + 0.5f);
+    }
+
     return QRect(0, 0, width, height);
 }
+
 int Decoration::titlebarHeight() const
 {
     return internalSettings()->titlebarSize();

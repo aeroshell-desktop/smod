@@ -17,6 +17,27 @@ namespace SMOD
     static QString currentlyRegisteredResource = "";
     static QString currentlyRegisteredPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + "Aero" + SMOD_EXTENSION);
 
+    // because we DecorationButton::Type doesn't have a type for a single close button
+    // order has to stay the same as DecorationButton::Type
+    // our buttons use negative integers
+    enum ButtonTypes {
+        // main
+        CloseLone = -1, // to make converting easier
+        Menu = 0,
+        ApplicationMenu,
+        OnAllDesktops,
+        Minimize,
+        Maximize,
+        Close,
+        ContextHelp,
+        Shade,
+        KeepBelow,
+        KeepAbove,
+        Custom,
+        Spacer,
+        ExcludeFromCapture,
+    };
+
     inline void registerResource(const QString &name)
     {
         if(currentlyRegisteredResource != "")
