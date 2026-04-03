@@ -328,7 +328,11 @@ void Decoration::recalculateSizes()
 {
     recalculateTitleBar();
     recalculateBorders();
-    updateButtonsGeometry();
+
+    if (m_leftButtons && m_rightButtons) {
+        updateButtonsGeometry();
+    }
+
     updateBlur();
     update();
 }
