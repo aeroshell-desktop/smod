@@ -112,6 +112,11 @@ public:
     //@{
     QColor titleBarColor() const;
     QColor fontColor() const;
+
+    QColor titleColor(bool active) const
+    {
+        return active ? m_activeFontColor : m_inactiveFontColor;
+    }
     //@}
 
     //*@name maximization modes
@@ -194,6 +199,9 @@ private:
     qreal m_scaledCornerRadius = 3;
 
     bool m_tabletMode = false;
+
+    QColor m_activeFontColor;
+    QColor m_inactiveFontColor;
 };
 
 bool Decoration::hasBorders() const
