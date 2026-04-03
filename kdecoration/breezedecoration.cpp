@@ -88,16 +88,6 @@ InternalSettingsPtr Decoration::internalSettings() const
     return m_internalSettings;
 }
 
-int Decoration::titlebarHeight() const
-{
-    return internalSettings()->titlebarSize();
-}
-
-int Decoration::captionHeight() const
-{
-    return hideTitleBar() ? borderTop() : borderTop() - settings()->smallSpacing() * (Metrics::TitleBar_BottomMargin + Metrics::TitleBar_TopMargin) - 1;
-}
-
 QString Decoration::getButtonGroupStr(Button *button) const
 {
     if(!m_leftButtons || !m_rightButtons) {
@@ -109,6 +99,16 @@ QString Decoration::getButtonGroupStr(Button *button) const
     else if(m_rightButtons->buttons().indexOf(button) != -1) return "right";
 
     return "";
+}
+
+int Decoration::titlebarHeight() const
+{
+    return internalSettings()->titlebarSize();
+}
+
+int Decoration::captionHeight() const
+{
+    return hideTitleBar() ? borderTop() : borderTop() - settings()->smallSpacing() * (Metrics::TitleBar_BottomMargin + Metrics::TitleBar_TopMargin) - 1;
 }
 
 QString Decoration::themeName()
@@ -156,6 +156,7 @@ QRect Decoration::buttonRect(KDecoration3::DecorationButtonType button) const
         width = 16;
         height = titlebarHeight();
         break;
+    // TODO: make the spacer size changeable
     case KDecoration3::DecorationButtonType::Spacer:
         width = 8;
         break;
@@ -260,13 +261,12 @@ void Decoration::recalculateBorders()
     QRect bounds = fm.boundingRect(testString);
     CommonSizing commonSizing = sizingMargins().commonSizing();
 
-    int minHeight = qMax(titlebarHeight(), bounds.height());
     int topPadding = commonSizing.titlebar_padding_normal;
     if (isMaximized()) {
         topPadding = commonSizing.titlebar_padding_maximized;
     }
 
-    int top = minHeight + topPadding + 1;
+    int top = qMax(titlebarHeight(), bounds.height()) + topPadding + 1;
     if (hideTitleBar()) {
         top = bottom;
     }
@@ -341,42 +341,46 @@ void Decoration::updateButtonsGeometry()
 {
     const auto s = settings();
 
+    const int vPadding = isMaximized() ? -1 : 1;
+
     // left buttons positioning
-    if (!m_leftButtons->buttons().isEmpty()) {
-        const int vPadding = isMaximized() ? -1 : 1;
-        const int lessPadding = g_sizingmargins.frameLeftSizing().inset;
-        auto r_m = sizingMargins().leftSide();
-        m_leftButtons->setPos(QPointF(
-            borderLeft() + (isMaximized() ? 4 : 0) - lessPadding + ((hideInnerBorder() && !isMaximized()) ? r_m.margin_left : 0), vPadding));
-
+    // TODO: get a 7 VM and look if this is accurate behavior later
+    //       my damn Vista VM hates custom msstyles bro
+    if (m_leftButtons) {
         m_leftButtons->setSpacing(g_sizingmargins.commonSizing().caption_button_spacing);
-    }
-    foreach (QPointer<KDecoration3::DecorationButton> button, m_leftButtons->buttons()) {
-        static_cast<Button *>(button.data())->updateGeometry();
-    }
 
-    if (g_sizingmargins.commonSizing().caption_button_align_vcenter) {
-        auto p = m_leftButtons->pos();
-        m_leftButtons->setPos(QPointF(p.x(), borderTop() / 2.0f - m_leftButtons->geometry().height() / 2.0f));
+        const int startingX = borderLeft();
+
+        if (!g_sizingmargins.commonSizing().caption_button_align_vcenter) {
+            m_leftButtons->setPos(QPointF(startingX + (isMaximized() ? 4 : 0) - g_sizingmargins.frameLeftSizing().inset, vPadding));
+        } else {
+            m_leftButtons->setPos(QPointF(startingX, borderTop() / 2.0f - m_leftButtons->geometry().height() / 2.0f));
+        }
+
+        if (!m_leftButtons->buttons().isEmpty()) {
+            for (QPointer<KDecoration3::DecorationButton> button : m_leftButtons->buttons()) {
+                static_cast<Button *>(button.data())->updateGeometry();
+            }
+        }
     }
 
     // right buttons positioning
-    if (!m_rightButtons->buttons().isEmpty()) {
-        const int vPadding = isMaximized() ? -1 : 1;
-        const int lessPadding = g_sizingmargins.frameRightSizing().inset;
-        auto r_m = sizingMargins().rightSide();
-        m_rightButtons->setPos(QPointF(
-            size().width() - m_rightButtons->geometry().width() - borderRight() - (isMaximized() ? 2 : 0) + lessPadding - ((hideInnerBorder() && !isMaximized()) ? r_m.margin_left : 0), vPadding));
-
+    if (m_rightButtons) {
         m_rightButtons->setSpacing(g_sizingmargins.commonSizing().caption_button_spacing);
-    }
-    foreach (QPointer<KDecoration3::DecorationButton> button, m_rightButtons->buttons()) {
-        static_cast<Button *>(button.data())->updateGeometry();
-    }
 
-    if (g_sizingmargins.commonSizing().caption_button_align_vcenter) {
-        auto p = m_rightButtons->pos();
-        m_rightButtons->setPos(QPointF(p.x(), borderTop() / 2.0f - m_rightButtons->geometry().height() / 2.0f));
+        const int startingX = size().width() - borderRight() - m_rightButtons->geometry().width();
+
+        if (!g_sizingmargins.commonSizing().caption_button_align_vcenter) {
+            m_rightButtons->setPos(QPointF(startingX - (isMaximized() ? 2 : 0) + g_sizingmargins.frameRightSizing().inset, vPadding));
+        } else {
+            m_rightButtons->setPos(QPointF(startingX, borderTop() / 2.0f - m_rightButtons->geometry().height() / 2.0f));
+        }
+
+        if (!m_rightButtons->buttons().isEmpty()) {
+            for (QPointer<KDecoration3::DecorationButton> button : m_rightButtons->buttons()) {
+                static_cast<Button *>(button.data())->updateGeometry();
+            }
+        }
     }
 }
 
@@ -443,25 +447,24 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
     QString s_left(":/smod/decoration/left");
     QString s_right(":/smod/decoration/right");
     QString s_bottom(":/smod/decoration/bottom");
-    QString unfocus("_unfocus");
-    QString noshadow("_noshadow");
-    QString noinner("_noinner");
 
     if (!internalSettings()->enableShadow()) {
-        s_top += noshadow;
-        s_bottom += noshadow;
+        s_top += QString("_noshadow");
+        s_bottom += QString("_noshadow");
     }
+
     if (!active) {
-        s_top += unfocus;
-        s_bottom += unfocus;
-        s_left += unfocus;
-        s_right += unfocus;
+        s_top += QString("_unfocus");
+        s_bottom += QString("_unfocus");
+        s_left += QString("_unfocus");
+        s_right += QString("_unfocus");
     }
+
     if (hideInnerBorder()) {
-        s_top += noinner;
-        s_bottom += noinner;
-        s_left += noinner;
-        s_right += noinner;
+        s_top += QString("_noinner");
+        s_bottom += QString("_noinner");
+        s_left += QString("_noinner");
+        s_right += QString("_noinner");
     }
 
     // Render the top side, which is always visible
@@ -586,6 +589,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
         left.translate(0, modBorderTop);
         right.translate(size().width() - modBorderRight, modBorderTop);
         bottom.translate(modBorderLeft, size().height() - modBorderBottom);
+
         // Render them all
         topleft.render(painter);
         topright.render(painter);
@@ -608,8 +612,9 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         int titleAlignment = internalSettings()->titleAlignment();
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
-        const int left = m_leftButtons->geometry().right() + (hideIcon() ? 2 : 7);
-        const int right = m_rightButtons->geometry().left() - 7;
+        // TODO: also test for accurate behavior here
+        const int left = m_leftButtons->geometry().right() + g_sizingmargins.frameLeftSizing().inset;
+        const int right = m_rightButtons->geometry().left() - g_sizingmargins.frameRightSizing().inset;
 
         QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
 
@@ -708,7 +713,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
                     break;
                 }
 
-                glow.translate(x, captionRect.center().y() - floor(glowHeight / 2.3));
+                glow.translate(x, captionRect.center().y() - floor(glowHeight / 2) + 1);
                 glow.render(painter);
             }
 

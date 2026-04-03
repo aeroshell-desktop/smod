@@ -7,7 +7,10 @@
 
 #pragma once
 
+#include "smod/smod.h"
+
 #include "breezedecoration.h"
+
 #include <KDecoration3/DecorationButton>
 
 #include <QObject>
@@ -121,9 +124,6 @@ private Q_SLOTS:
     //* apply configuration changes
     void reconfigure();
 
-    //* animation state
-    void updateAnimationState(bool);
-
 private:
     //* private constructor
     explicit Button(KDecoration3::DecorationButtonType type, Decoration *decoration, QObject *parent = nullptr);
@@ -148,6 +148,8 @@ private:
     bool m_isFlipped{false};
     QString m_textureType{};
     bool m_gtkButton{false};
+
+    SMOD::ButtonData m_data;
 
     //* active state change opacity
     qreal m_opacity = 0;

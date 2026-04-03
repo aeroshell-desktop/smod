@@ -4,10 +4,11 @@
  * Generic reusable code for SMOD
  */
 
-#include <QStandardPaths>
-#include <QResource>
-#include <QString>
 #include <QFileInfo>
+#include <QHash>
+#include <QResource>
+#include <QStandardPaths>
+#include <QString>
 
 namespace SMOD
 {
@@ -17,12 +18,11 @@ namespace SMOD
     static QString currentlyRegisteredResource = "";
     static QString currentlyRegisteredPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + "Aero" + SMOD_EXTENSION);
 
-    // because we DecorationButton::Type doesn't have a type for a single close button
-    // order has to stay the same as DecorationButton::Type
-    // our buttons use negative integers
+    // Because DecorationButton::Type doesn't have a type for a single close button
+    // the order has to stay the same as DecorationButton::Type.
+    // Our buttons use negative integers.
     enum ButtonTypes {
-        // main
-        CloseLone = -1, // to make converting easier
+        CloseLone = -1,
         Menu = 0,
         ApplicationMenu,
         OnAllDesktops,
@@ -37,6 +37,24 @@ namespace SMOD
         Spacer,
         ExcludeFromCapture,
     };
+
+    struct ButtonData {
+        QString glyphName;
+        QString alternativeGlyphName;
+        QString textureName;
+    };
+
+    static QHash<ButtonTypes, ButtonData> buttonData{{Close, ButtonData{"close", "", "close"}},
+                                                     {CloseLone, ButtonData{"close", "", "close-single"}},
+                                                     {Maximize, ButtonData{"maximize", "restore", "maximize"}},
+                                                     {Minimize, ButtonData{"minimize", "", "minimize"}},
+                                                     {ContextHelp, ButtonData{"help", "", ""}},
+                                                     {KeepBelow, ButtonData{"underlap", "", ""}},
+                                                     {KeepAbove, ButtonData{"overlap", "", ""}},
+                                                     {Shade, ButtonData{"shade", "", ""}},
+                                                     {OnAllDesktops, ButtonData{"pin", "", ""}},
+                                                     {ApplicationMenu, ButtonData{"menu", "", ""}},
+                                                     {ExcludeFromCapture, ButtonData{"captureExclude", "", ""}}};
 
     inline void registerResource(const QString &name)
     {

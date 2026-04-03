@@ -7,3 +7,4 @@ smodglow/build-wl
 .idea
 /cmake-build*
 .cache
+.kateproject.build

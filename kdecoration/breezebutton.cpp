@@ -16,11 +16,12 @@
 
 namespace Breeze
 {
+
 using KDecoration3::ColorGroup;
 using KDecoration3::ColorRole;
 using KDecoration3::DecorationButtonType;
 
-//__________________________________________________________________
+// real constructor
 Button::Button(DecorationButtonType type, Decoration *decoration, QObject *parent)
     : DecorationButton(type, decoration, parent)
     , m_animation(new QVariantAnimation(this))
@@ -36,28 +37,34 @@ Button::Button(DecorationButtonType type, Decoration *decoration, QObject *paren
     });
 
     // check if it's for gtk
-    if(QCoreApplication::applicationName() == QStringLiteral("kded6")) m_gtkButton = true;
+    if (QCoreApplication::applicationName() == QStringLiteral("kded6")) {
+        m_gtkButton = true;
+    }
 
-    updateGeometry();
+    if (SMOD::buttonData.contains((SMOD::ButtonTypes)type)) {
+        m_data = SMOD::buttonData.value((SMOD::ButtonTypes)type);
+    }
 
     // connections
     connect(decoration->window(), SIGNAL(iconChanged(QIcon)), this, SLOT(update()));
     connect(decoration->settings().get(), &KDecoration3::DecorationSettings::reconfigured, this, &Button::reconfigure);
-    connect(this, &KDecoration3::DecorationButton::hoveredChanged, this, &Button::updateAnimationState);
 
     connect(this, &Button::buttonHoverStatus, decoration, &Decoration::buttonHoverStatus);
 
     reconfigure();
 }
+
 void Button::updateGeometry()
 {
     auto d = qobject_cast<Decoration *>(decoration());
+
     QRect buttonRect = d->buttonRect(type());
+
     setGeometry(buttonRect);
     setIconSize(buttonRect.size());
 }
 
-//__________________________________________________________________
+// for plugin registration only
 Button::Button(QObject *parent, const QVariantList &args)
     : Button(args.at(0).value<DecorationButtonType>(), args.at(1).value<Decoration *>(), parent)
 {
@@ -65,11 +72,6 @@ Button::Button(QObject *parent, const QVariantList &args)
     //! icon size must return to !valid because it was altered from the default constructor,
     //! in Standalone mode the button is not using the decoration metrics but its geometry
     m_iconSize = QSize(-1, -1);
-}
-
-void Button::smodPaintGlow(QPainter *painter, const QRectF &repaintArea)
-{
-    return;
 }
 
 //__________________________________________________________________
@@ -80,43 +82,33 @@ Button *Button::create(DecorationButtonType type, KDecoration3::Decoration *deco
         const auto c = d->window();
         switch (type) {
         case DecorationButtonType::Close:
-            //b->setVisible(c->isCloseable());
-            //QObject::connect(c, &KDecoration3::DecoratedWindow::closeableChanged, b, &Breeze::Button::setVisible);
             b->setVisible(true);
             break;
 
         case DecorationButtonType::Maximize:
             b->setVisible(c->isMaximizeable() || c->isMinimizeable());
             b->setEnabled(c->isMaximizeable());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::maximizeableChanged, b,
-            [b](bool maximizeable) {
+            QObject::connect(c, &KDecoration3::DecoratedWindow::maximizeableChanged, b, [b](bool maximizeable) {
                 auto d = qobject_cast<Decoration *>(b->decoration());
                 const auto c = d->window();
 
-                if (!c)
-                {
+                if (!c) {
                     return;
                 }
 
                 b->setVisible(c->isMaximizeable() || c->isMinimizeable());
                 b->setEnabled(maximizeable);
             });
-            //b->setVisible(c->isMaximizeable());
-            //QObject::connect(c, &KDecoration3::DecoratedWindow::maximizeableChanged, b, &Breeze::Button::setVisible);
             break;
 
         case DecorationButtonType::Minimize:
-            //b->setVisible(c->isMinimizeable());
-            //QObject::connect(c, &KDecoration3::DecoratedWindow::minimizeableChanged, b, &Breeze::Button::setVisible);
             b->setVisible(c->isMinimizeable() || c->isMaximizeable());
             b->setEnabled(c->isMinimizeable());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::minimizeableChanged, b,
-            [b](bool minimizeable) {
+            QObject::connect(c, &KDecoration3::DecoratedWindow::minimizeableChanged, b, [b](bool minimizeable) {
                 auto d = qobject_cast<Decoration *>(b->decoration());
                 const auto c = d->window();
 
-                if (!c)
-                {
+                if (!c) {
                     return;
                 }
 
@@ -131,12 +123,18 @@ Button *Button::create(DecorationButtonType type, KDecoration3::Decoration *deco
             break;
 
         case DecorationButtonType::Shade:
+            b->setEnabled(c->isShadeable());
+            QObject::connect(c, &KDecoration3::DecoratedWindow::shadeableChanged, b, &Breeze::Button::setEnabled);
+            break;
+
+        case DecorationButtonType::KeepAbove:
             b->setVisible(c->isShadeable());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::shadeableChanged, b, &Breeze::Button::setVisible);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::shadeableChanged, b, &Breeze::Button::setEnabled);
             break;
 
         case DecorationButtonType::Menu:
-            QObject::connect(c, &KDecoration3::DecoratedWindow::iconChanged, b, [b]() {
+            b->setVisible(!d->hideIcon());
+            QObject::connect(c, &KDecoration3::DecoratedWindow::iconChanged, b, [b] {
                 b->update();
             });
             break;
@@ -151,32 +149,22 @@ Button *Button::create(DecorationButtonType type, KDecoration3::Decoration *deco
     return nullptr;
 }
 
-//__________________________________________________________________
 void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 {
     smodPaint(painter, repaintRegion);
     return;
 }
 
-//________________________________________________________________
 void Button::reconfigure()
 {
-    // animation
-    auto d = qobject_cast<Decoration *>(decoration());
-    if (d) {
-        m_animation->setDuration(0);
+    auto deco = static_cast<Decoration *>(decoration());
+    if (deco && type() == DecorationButtonType::Menu) {
+        setVisible(!deco->hideIcon());
     }
 
-    if (type() == DecorationButtonType::Menu)
-    {
-        setVisible(!d->hideIcon());
+    if (isVisible()) {
+        updateGeometry();
     }
-}
-
-//__________________________________________________________________
-void Button::updateAnimationState(bool hovered)
-{
-    return;
 }
 
 } // namespace
