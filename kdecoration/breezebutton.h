@@ -128,17 +128,8 @@ private:
     //* private constructor
     explicit Button(KDecoration3::DecorationButtonType type, Decoration *decoration, QObject *parent = nullptr);
 
-    //* draw button icon
-    void drawIcon(QPainter *) const;
-
     void startHoverAnimation(qreal endValue);
     void smodPaint(QPainter *painter, const QRectF &repaintRegion);
-
-    //*@name colors
-    //@{
-    QColor foregroundColor() const;
-    QColor backgroundColor() const;
-    //@}
 
     Flag m_flag = FlagNone;
 

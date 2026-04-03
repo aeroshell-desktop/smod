@@ -67,55 +67,22 @@ public:
     void paint(QPainter *painter, const QRectF &repaintRegion) override;
 
     SizingMargins sizingMargins() const;
-
-    //* internal settings
-    InternalSettingsPtr internalSettings() const
-    {
-        return m_internalSettings;
-    }
-
-    qreal animationsDuration() const
-    {
-        return m_animation->duration();
-    }
-
-    //* caption height
-    int captionHeight() const;
-
-    //* button height
-    int buttonHeight() const;
+    InternalSettingsPtr internalSettings() const;
 
     QString getButtonGroupStr(Button *button) const;
 
     int titlebarHeight() const;
+    int captionHeight() const;
+
     static QString themeName();
-    static QPixmap minimize_glow();
-    static QPixmap maximize_glow();
     static QPixmap close_glow();
+    static QPixmap maximize_glow();
+    static QPixmap minimize_glow();
     static int decorationCount();
     static bool glowEnabled();
 
     QRect buttonRect(KDecoration3::DecorationButtonType button) const;
 
-    //*@name active state change animation
-    //@{
-    void setOpacity(qreal);
-
-    qreal opacity() const
-    {
-        return m_opacity;
-    }
-
-    //@}
-
-    //*@name colors
-    //@{
-    QColor titleBarColor() const;
-    QColor fontColor() const;
-    //@}
-
-    //*@name maximization modes
-    //@{
     inline bool isMaximized() const;
     inline bool isMaximizedHorizontally() const;
     inline bool isMaximizedVertically() const;
@@ -134,7 +101,6 @@ public:
     inline bool isPersonalizeKCM() const;
     inline bool isPolkit() const;
     inline bool isOOTB() const;
-    //@}
 
 Q_SIGNALS:
     void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool isFlipped, QString textureType, bool hovered, QPoint pos);
@@ -145,24 +111,21 @@ public Q_SLOTS:
 private Q_SLOTS:
     void reconfigure();
     void recalculateBorders();
+    void recalculateTitleBar();
+    void recalculateSizes();
     void updateButtonsGeometry();
     void updateButtonsGeometryDelayed();
-    void updateTitleBar();
-    void updateAnimationState();
     void updateBlur();
-    void onTabletModeChanged(bool mode);
 
 private:
-    //* return the rect in which caption will be drawn
-    QPair<QRect, Qt::Alignment> captionRect() const;
-
     void createButtons();
-    void smodPaint(QPainter *painter, const QRectF &repaintRegion);
-    void smodPaintGlow(QPainter *painter, const QRectF &repaintRegion);
-    void smodPaintOuterBorder(QPainter *painter, const QRectF &repaintRegion);
-    void smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegion);
+
+    void paintSideHighlights(QPainter *painter, const QRectF &repaintRegion);
+    void paintOuterBorder(QPainter *painter, const QRectF &repaintRegion);
+    void paintTitleBar(QPainter *painter, const QRectF &repaintRegion);
+
+    std::shared_ptr<KDecoration3::DecorationShadow> createShadow(bool active);
     void updateShadow(bool reconfigured = false);
-    std::shared_ptr<KDecoration3::DecorationShadow> smodCreateShadow(bool active);
 
     //*@name border size
     //@{
@@ -177,18 +140,8 @@ private:
     KDecoration3::DecorationButtonGroup *m_leftButtons = nullptr;
     KDecoration3::DecorationButtonGroup *m_rightButtons = nullptr;
 
-    //* active state change animation
-    QVariantAnimation *m_animation;
-    QVariantAnimation *m_shadowAnimation;
-
-    //* active state change opacity
-    qreal m_opacity = 0;
-    qreal m_shadowOpacity = 0;
-
     //*frame corner radius, scaled according to DPI
     qreal m_scaledCornerRadius = 3;
-
-    bool m_tabletMode = false;
 };
 
 bool Decoration::hasBorders() const

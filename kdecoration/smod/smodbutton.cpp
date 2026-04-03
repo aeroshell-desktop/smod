@@ -91,7 +91,7 @@ namespace Breeze
         }
 
         // menu button
-        if(type() == DecorationButtonType::Menu) {
+        if (type() == DecorationButtonType::Menu) {
             const auto c = deco->window();
             QRectF iconRect(geometry().topLeft(), m_iconSize);
 
@@ -103,11 +103,7 @@ namespace Breeze
             iconRect.translate(0, (titlebarHeight - m_iconSize.height())/2);
             c->icon().paint(painter, iconRect.toRect());
 
-            painter->restore();
-
-            return;
-
-        } else if(type() != DecorationButtonType::Spacer) {
+        } else if (type() != DecorationButtonType::Spacer) {
             QRect g = geometry().toRect();
             qreal w = g.width();
             qreal h = g.height();
@@ -578,12 +574,7 @@ namespace Breeze
                 btn.render(painter);
                 painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), glyph.width(), glyph.height(), glyphActive);
             }
-
-            painter->restore();
-            return;
         }
-
-        drawIcon(painter);
 
         painter->restore();
     }

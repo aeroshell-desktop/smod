@@ -14,7 +14,6 @@ set(breezedecoration_SRCS
     frametexture.cpp
     sizingmargins.cpp
     smod/smodbutton.cpp
-    smod/smoddecoration.cpp
 )
 
 ### build library
