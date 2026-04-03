@@ -285,6 +285,11 @@ void Decoration::reconfigure()
     KSharedConfig::Ptr config = KSharedConfig::openConfig();
     const KConfigGroup cg(config, QStringLiteral("KDE"));
 
+    const KConfigGroup wmConfig(KSharedConfig::openConfig(QStringLiteral("kdeglobals")), QStringLiteral("WM"));
+
+    m_activeFontColor = wmConfig.readEntry("activeForeground", QColor(0, 0, 0, 255));
+    m_inactiveFontColor = wmConfig.readEntry("inactiveForeground", QColor(20, 19, 18, 255));
+
     m_animation->setDuration(0);
     // Syncing anis between client and decoration is troublesome, so we're not using
     // any animations right now.

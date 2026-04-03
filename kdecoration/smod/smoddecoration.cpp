@@ -318,7 +318,7 @@ void Decoration::smodPaintTitleBar(QPainter *painter, const QRectF &repaintRegio
         int blurHeight = rect.height();
 
         // QColor shadowColor = QColor(0, 0, 0, 255);
-        QColor textColor = c->color(c->isActive() ? KDecoration3::ColorGroup::Active : KDecoration3::ColorGroup::Inactive, KDecoration3::ColorRole::Foreground);
+        QColor textColor = titleColor(c->isActive());
 
         captionRect.setHeight(captionRect.height() & -2);
         painter->setFont(settings()->font());
