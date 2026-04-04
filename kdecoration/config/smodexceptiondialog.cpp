@@ -7,11 +7,12 @@
 // SPDX-License-Identifier: MIT
 //////////////////////////////////////////////////////////////////////////////
 
-#include "breezeexceptiondialog.h"
-#include "breezedetectwidget.h"
+#include "smodexceptiondialog.h"
+#include "smoddetectwidget.h"
 
-namespace Breeze
+namespace SMOD
 {
+
 //___________________________________________
 ExceptionDialog::ExceptionDialog(QWidget *parent)
     : QDialog(parent)

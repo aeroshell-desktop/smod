@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include "breeze.h"
-#include "breezedecoration.h"
-#include "breezesettings.h"
+#include "smod.h"
+#include "smoddecoration.h"
+#include "smodsettings.h"
 
 #include <KSharedConfig>
 
 #include <QObject>
 
-namespace Breeze
+namespace SMOD
 {
 class SettingsProvider : public QObject
 {

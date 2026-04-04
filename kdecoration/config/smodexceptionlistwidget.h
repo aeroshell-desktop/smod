@@ -9,11 +9,11 @@
 
 #pragma once
 
-#include "breezeexceptionmodel.h"
-#include "ui_breezeexceptionlistwidget.h"
+#include "smodexceptionmodel.h"
+#include "ui_smodexceptionlistwidget.h"
 
 //* QDialog used to commit selected files
-namespace Breeze
+namespace SMOD
 {
 class ExceptionListWidget : public QWidget
 {
@@ -96,7 +96,7 @@ private:
     ExceptionModel m_model;
 
     //* ui
-    Ui_BreezeExceptionListWidget m_ui;
+    Ui_SMODExceptionListWidget m_ui;
 
     //* changed state
     bool m_changed = false;

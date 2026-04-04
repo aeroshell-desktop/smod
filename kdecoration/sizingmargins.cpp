@@ -1,6 +1,7 @@
 #include "sizingmargins.h"
 
-namespace Breeze {
+namespace SMOD
+{
 
 SizingMargins::SizingMargins()
 {

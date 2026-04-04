@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BreezeConfigurationUI</class>
- <widget class="QWidget" name="BreezeConfigurationUI">
+ <class>SMODConfigurationUI</class>
+ <widget class="QWidget" name="SMODConfigurationUI">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -43,80 +43,6 @@
              <height>0</height>
             </size>
            </property>
-           <widget class="QCheckBox" name="outlineCloseButton">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>20</y>
-              <width>202</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Draw a circle around close button</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="drawBackgroundGradient">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>50</y>
-              <width>206</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Draw titlebar background gradient</string>
-            </property>
-           </widget>
-           <widget class="QComboBox" name="buttonSize">
-            <property name="geometry">
-             <rect>
-              <x>90</x>
-              <y>80</y>
-              <width>249</width>
-              <height>22</height>
-             </rect>
-            </property>
-            <item>
-             <property name="text">
-              <string>Tiny</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string comment="@item:inlistbox Button size:">Small</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string comment="@item:inlistbox Button size:">Medium</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string comment="@item:inlistbox Button size:">Large</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string comment="@item:inlistbox Button size:">Very Large</string>
-             </property>
-            </item>
-           </widget>
-           <widget class="QCheckBox" name="drawBorderOnMaximizedWindows">
-            <property name="geometry">
-             <rect>
-              <x>220</x>
-              <y>40</y>
-              <width>383</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Draw border on maximized and tiled windows</string>
-            </property>
-           </widget>
           </widget>
          </item>
         </layout>
@@ -279,7 +205,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="Breeze::ExceptionListWidget" name="exceptions" native="true">
+        <widget class="SMOD::ExceptionListWidget" name="exceptions" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -296,9 +222,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>Breeze::ExceptionListWidget</class>
+   <class>SMOD::ExceptionListWidget</class>
    <extends>QWidget</extends>
-   <header>config/breezeexceptionlistwidget.h</header>
+   <header>config/smodexceptionlistwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

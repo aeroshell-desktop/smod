@@ -1,12 +1,12 @@
 #pragma once
 
-#include "smod/smod.h"
+#include "smod.h"
 
 #include <QFile>
 #include <QString>
 #include <QSettings>
 
-namespace Breeze
+namespace SMOD
 {
 
 struct ButtonSizingMargins

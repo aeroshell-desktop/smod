@@ -7,11 +7,11 @@
 // SPDX-License-Identifier: MIT
 //////////////////////////////////////////////////////////////////////////////
 
-#include "breezeexceptionmodel.h"
+#include "smodexceptionmodel.h"
 
 #include <KLocalizedString>
 
-namespace Breeze
+namespace SMOD
 {
 //_______________________________________________
 const QString ExceptionModel::m_columnTitles[ExceptionModel::nColumns] = {QStringLiteral(""), i18n("Exception Type"), i18n("Regular Expression")};

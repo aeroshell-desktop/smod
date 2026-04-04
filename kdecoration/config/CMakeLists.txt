@@ -1,20 +1,20 @@
-set(breezedecoration_config_SRCS
-    ../breezeexceptionlist.cpp
-    breezeconfigwidget.cpp
-    breezedetectwidget.cpp
-    breezeexceptiondialog.cpp
-    breezeexceptionlistwidget.cpp
-    breezeexceptionmodel.cpp
-    breezeitemmodel.cpp
+set(smoddecoration_config_SRCS
+    ../smodexceptionlist.cpp
+    smodconfigwidget.cpp
+    smoddetectwidget.cpp
+    smodexceptiondialog.cpp
+    smodexceptionlistwidget.cpp
+    smodexceptionmodel.cpp
+    smoditemmodel.cpp
 )
-ki18n_wrap_ui(breezedecoration_config_SRCS
-   ui/breezeconfigurationui.ui
-   ui/breezeexceptiondialog.ui
-   ui/breezeexceptionlistwidget.ui
+ki18n_wrap_ui(smoddecoration_config_SRCS
+   ui/smodconfigurationui.ui
+   ui/smodexceptiondialog.ui
+   ui/smodexceptionlistwidget.ui
 )
 
-kcoreaddons_add_plugin(kcm_smoddecoration SOURCES kcm_breezedecoration.cpp ${breezedecoration_config_SRCS} INSTALL_NAMESPACE "${KDECORATION_KCM_PLUGIN_DIR}")
-kconfig_add_kcfg_files(kcm_smoddecoration ../breezesettings.kcfgc)
+kcoreaddons_add_plugin(kcm_smoddecoration SOURCES kcm_smoddecoration.cpp ${smoddecoration_config_SRCS} INSTALL_NAMESPACE "${KDECORATION_KCM_PLUGIN_DIR}")
+kconfig_add_kcfg_files(kcm_smoddecoration ../smodsettings.kcfgc)
 target_include_directories(kcm_smoddecoration PRIVATE ${CMAKE_SOURCE_DIR}/kdecoration ${CMAKE_BINARY_DIR}/kdecoration/)
 target_link_libraries(kcm_smoddecoration
     PUBLIC

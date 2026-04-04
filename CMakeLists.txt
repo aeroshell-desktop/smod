@@ -150,8 +150,6 @@ function(build_Qt6)
         add_library(Qt::PlatformModuleInternal ALIAS Qt6::PlatformModuleInternal)
     endif()
 
-    add_subdirectory(libbreezecommon libbreezecommon6)
-
     if(WITH_DECORATIONS)
         find_package(KDecoration3 REQUIRED)
         add_subdirectory(kdecoration)

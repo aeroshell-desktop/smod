@@ -9,13 +9,13 @@
 
 #pragma once
 
-#include "breeze.h"
-#include "ui_breezeexceptiondialog.h"
+#include "smod.h"
+#include "ui_smodexceptiondialog.h"
 
 #include <QCheckBox>
 #include <QMap>
 
-namespace Breeze
+namespace SMOD
 {
 class DetectDialog;
 
@@ -75,7 +75,7 @@ private:
     //* map mask and checkbox
     using CheckBoxMap = QMap<ExceptionMask, QCheckBox *>;
 
-    Ui::BreezeExceptionDialog m_ui;
+    Ui::SMODExceptionDialog m_ui;
 
     //* map mask and checkbox
     CheckBoxMap m_checkboxes;

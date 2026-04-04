@@ -8,24 +8,23 @@
 #pragma once
 
 #include "sizingmargins.h"
-#include "smod/smod.h"
+#include "smod.h"
 
-#include "breezedecoration.h"
+#include "smoddecoration.h"
 
 #include <KDecoration3/DecorationButton>
 
-#include <QObject>
 #include <QHash>
-#include <QImage>
 #include <QHoverEvent>
-#include <QPropertyAnimation>
-#include <QPixmap>
+#include <QImage>
+#include <QObject>
 #include <QPainter>
-
+#include <QPixmap>
+#include <QPropertyAnimation>
 
 class QVariantAnimation;
 
-namespace Breeze
+namespace SMOD
 {
 
 class Button : public KDecoration3::DecorationButton

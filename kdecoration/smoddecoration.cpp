@@ -7,11 +7,10 @@
  * SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
  */
 
-#include "breezedecoration.h"
+#include "smoddecoration.h"
 
-#include "breezeboxshadowrenderer.h"
-#include "breezebutton.h"
-#include "breezesettingsprovider.h"
+#include "smodbutton.h"
+#include "smodsettingsprovider.h"
 
 #include "frametexture.h"
 
@@ -34,11 +33,9 @@
 #include <QTextStream>
 #include <QTimer>
 
-#include "smod/smod.h"
+K_PLUGIN_FACTORY_WITH_JSON(SMODDecoFactory, "smod.json", registerPlugin<SMOD::Decoration>(); registerPlugin<SMOD::Button>();)
 
-K_PLUGIN_FACTORY_WITH_JSON(BreezeDecoFactory, "smod.json", registerPlugin<Breeze::Decoration>(); registerPlugin<Breeze::Button>();)
-
-namespace Breeze
+namespace SMOD
 {
 
 using KDecoration3::ColorGroup;
@@ -90,13 +87,15 @@ InternalSettingsPtr Decoration::internalSettings() const
 
 QString Decoration::getButtonGroupStr(Button *button) const
 {
-    if(!m_leftButtons || !m_rightButtons) {
+    if (!m_leftButtons || !m_rightButtons) {
         qWarning() << "smod: button groups not initialized (how was this even called), returning...";
         return "";
     }
 
-    if(m_leftButtons->buttons().indexOf(button) != -1) return "left";
-    else if(m_rightButtons->buttons().indexOf(button) != -1) return "right";
+    if (m_leftButtons->buttons().indexOf(button) != -1)
+        return "left";
+    else if (m_rightButtons->buttons().indexOf(button) != -1)
+        return "right";
 
     return "";
 }
@@ -108,7 +107,7 @@ int Decoration::titlebarHeight() const
 
 int Decoration::captionHeight() const
 {
-    return hideTitleBar() ? borderTop() : borderTop() - settings()->smallSpacing() * (Metrics::TitleBar_BottomMargin + Metrics::TitleBar_TopMargin) - 1;
+    return hideTitleBar() ? borderTop() : borderTop() - settings()->smallSpacing() * 4 - 1;
 }
 
 QString Decoration::themeName()
@@ -286,9 +285,9 @@ void Decoration::recalculateBorders()
         }
     }
 
-    left   = qMax(0, left);
-    right  = qMax(0, right);
-    top    = qMax(0, top);
+    left = qMax(0, left);
+    right = qMax(0, right);
+    top = qMax(0, top);
     bottom = qMax(0, bottom);
     setBorders(QMargins(left, top, right, bottom));
 
@@ -786,4 +785,4 @@ void Decoration::updateShadow(bool reconfigured)
 
 } // namespace
 
-#include "breezedecoration.moc"
+#include "smoddecoration.moc"

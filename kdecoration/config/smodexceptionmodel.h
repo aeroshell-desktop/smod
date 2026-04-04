@@ -9,18 +9,20 @@
 
 #pragma once
 
-#include "breeze.h"
-#include "breezelistmodel.h"
-#include "breezesettings.h"
+#include "smod.h"
+#include "smodlistmodel.h"
+#include "smodsettings.h"
 
-namespace Breeze
+namespace SMOD
 {
 //* qlistview for object counters
 class ExceptionModel : public ListModel<InternalSettingsPtr>
 {
 public:
     //* number of columns
-    enum { nColumns = 3 };
+    enum {
+        nColumns = 3
+    };
 
     //* column type enumeration
     enum ColumnType {

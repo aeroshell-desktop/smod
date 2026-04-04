@@ -9,10 +9,10 @@
 
 #pragma once
 
-#include "breeze.h"
-#include "breezeexceptionlistwidget.h"
-#include "breezesettings.h"
-#include "ui_breezeconfigurationui.h"
+#include "smod.h"
+#include "smodexceptionlistwidget.h"
+#include "smodsettings.h"
+#include "ui_smodconfigurationui.h"
 
 #include <KCModule>
 #include <KSharedConfig>
@@ -21,16 +21,16 @@
 #include <QWidget>
 
 #include <QDir>
-#include <QListWidget>
 #include <QFileInfo>
 #include <QFileInfoList>
-#include <algorithm>
-#include <QObject>
-#include <QStringListModel>
 #include <QItemSelection>
 #include <QList>
+#include <QListWidget>
+#include <QObject>
+#include <QStringListModel>
+#include <algorithm>
 
-namespace Breeze
+namespace SMOD
 {
 
 //_____________________________________________
@@ -63,7 +63,7 @@ protected Q_SLOTS:
 
 private:
     //* ui
-    Ui_BreezeConfigurationUI m_ui;
+    Ui_SMODConfigurationUI m_ui;
 
     //* kconfiguration object
     KSharedConfig::Ptr m_configuration;
@@ -74,7 +74,6 @@ private:
     //* changed state
     bool m_changed;
     bool m_themeChanged;
-
 };
 
 }

@@ -4,7 +4,7 @@
  *
  * SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
  */
-#include "breezebutton.h"
+#include "smodbutton.h"
 
 #include "frametexture.h"
 
@@ -16,7 +16,7 @@
 #include <QPainterPath>
 #include <QVariantAnimation>
 
-namespace Breeze
+namespace SMOD
 {
 
 static QImage hoverImage(const QImage &image, const QImage &hoverImage, qreal hoverProgress)
@@ -101,36 +101,36 @@ Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::De
             break;
         case KDecoration3::DecorationButtonType::ContextHelp:
             b->setVisible(c->providesContextHelp());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::providesContextHelpChanged, b, &Breeze::Button::setVisible);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::providesContextHelpChanged, b, &SMOD::Button::setVisible);
             break;
 
         case KDecoration3::DecorationButtonType::Shade:
             b->setEnabled(c->isShadeable());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::shadedChanged, b, &Breeze::Button::setToggled);
-            QObject::connect(c, &KDecoration3::DecoratedWindow::shadeableChanged, b, &Breeze::Button::setEnabled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::shadedChanged, b, &SMOD::Button::setToggled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::shadeableChanged, b, &SMOD::Button::setEnabled);
             break;
         case KDecoration3::DecorationButtonType::KeepBelow:
             b->setToggled(c->isKeepBelow());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::keepBelowChanged, b, &Breeze::Button::setToggled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::keepBelowChanged, b, &SMOD::Button::setToggled);
             break;
         case KDecoration3::DecorationButtonType::KeepAbove:
             b->setToggled(c->isKeepAbove());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::keepAboveChanged, b, &Breeze::Button::setToggled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::keepAboveChanged, b, &SMOD::Button::setToggled);
             break;
 
         case KDecoration3::DecorationButtonType::OnAllDesktops:
             b->setToggled(c->isOnAllDesktops());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::onAllDesktopsChanged, b, &Breeze::Button::setToggled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::onAllDesktopsChanged, b, &SMOD::Button::setToggled);
             break;
 
         case KDecoration3::DecorationButtonType::ApplicationMenu:
             b->setEnabled(c->hasApplicationMenu());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::hasApplicationMenuChanged, b, &Breeze::Button::setEnabled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::hasApplicationMenuChanged, b, &SMOD::Button::setEnabled);
             break;
 
         case KDecoration3::DecorationButtonType::ExcludeFromCapture:
             b->setToggled(c->isExcludedFromCapture());
-            QObject::connect(c, &KDecoration3::DecoratedWindow::excludeFromCaptureChanged, b, &Breeze::Button::setToggled);
+            QObject::connect(c, &KDecoration3::DecoratedWindow::excludeFromCaptureChanged, b, &SMOD::Button::setToggled);
             break;
 
         case KDecoration3::DecorationButtonType::Menu:
@@ -449,5 +449,3 @@ void Button::startHoverAnimation(qreal endValue)
 }
 
 } // namespace
-
-#include "breezebutton.moc"

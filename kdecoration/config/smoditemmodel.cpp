@@ -7,9 +7,9 @@
 // SPDX-License-Identifier: MIT
 //////////////////////////////////////////////////////////////////////////////
 
-#include "breezeitemmodel.h"
+#include "smoditemmodel.h"
 
-namespace Breeze
+namespace SMOD
 {
 //_______________________________________________________________
 ItemModel::ItemModel(QObject *parent)

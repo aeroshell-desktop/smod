@@ -8,10 +8,11 @@
 // SPDX-License-Identifier: MIT
 //////////////////////////////////////////////////////////////////////////////
 
-#include "breezeexceptionlist.h"
+#include "smodexceptionlist.h"
 
-namespace Breeze
+namespace SMOD
 {
+
 //______________________________________________________________
 void ExceptionList::readConfig(KSharedConfig::Ptr config)
 {
@@ -76,7 +77,8 @@ QString ExceptionList::exceptionGroupName(int index)
 void ExceptionList::writeConfig(KCoreConfigSkeleton *skeleton, KConfig *config, const QString &groupName)
 {
     // list of items to be written
-    const QStringList keys = {"Enabled", "ExceptionPattern", "ExceptionType", "HideTitleBar", "HideIcon", "HideCaption", "HideInnerBorder", "Mask", "BorderSize"};
+    const QStringList keys =
+        {"Enabled", "ExceptionPattern", "ExceptionType", "HideTitleBar", "HideIcon", "HideCaption", "HideInnerBorder", "Mask", "BorderSize"};
 
     // write all items
     for (auto key : keys) {

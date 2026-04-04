@@ -16,8 +16,9 @@
 #include <QObject>
 #include <QVariantMap>
 
-namespace Breeze
+namespace SMOD
 {
+
 class DetectDialog : public QObject
 {
     Q_OBJECT

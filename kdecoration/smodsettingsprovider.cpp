@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
  */
 
-#include "breezesettingsprovider.h"
+#include "smodsettingsprovider.h"
 
-#include "breezeexceptionlist.h"
+#include "smodexceptionlist.h"
 
 #include <QRegularExpression>
 #include <QTextStream>
 
-namespace Breeze
+namespace SMOD
 {
 SettingsProvider *SettingsProvider::s_self = nullptr;
 

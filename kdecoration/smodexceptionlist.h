@@ -10,14 +10,15 @@
 
 #pragma once
 
-#include "breeze.h"
-#include "breezesettings.h"
+#include "smod.h"
+#include "smodsettings.h"
 
 #include <KSharedConfig>
 
-namespace Breeze
+namespace SMOD
 {
-//! breeze exceptions list
+
+//! SMOD exceptions list
 class ExceptionList
 {
 public:

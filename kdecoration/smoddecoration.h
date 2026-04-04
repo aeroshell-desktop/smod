@@ -7,26 +7,26 @@
 
 #pragma once
 
-#include "breeze.h"
-#include "breezesettings.h"
 #include "sizingmargins.h"
+#include "smod.h"
+#include "smodsettings.h"
 
 #include <KDecoration3/DecoratedWindow>
 #include <KDecoration3/Decoration>
 #include <KDecoration3/DecorationSettings>
 
+#include <QByteArray>
 #include <QPalette>
 #include <QVariant>
 #include <QVariantAnimation>
-#include <QByteArray>
 
 // This is absolutely needed in Qt6
 // even though it absolutely wasn't needed in Qt5
 // funny
 #if defined(MYSHAREDLIB_LIBRARY)
-#  define MYSHAREDLIB_EXPORT Q_DECL_EXPORT
+#define MYSHAREDLIB_EXPORT Q_DECL_EXPORT
 #else
-#  define MYSHAREDLIB_EXPORT Q_DECL_IMPORT
+#define MYSHAREDLIB_EXPORT Q_DECL_IMPORT
 #endif
 
 #define PS_EXPLORER QStringLiteral("plasmashell_explorer")
@@ -45,7 +45,7 @@ class DecorationButton;
 class DecorationButtonGroup;
 }
 
-namespace Breeze
+namespace SMOD
 {
 
 class Button;
@@ -132,8 +132,6 @@ private:
     inline bool hasNoSideBorders() const;
     //@}
 
-    inline bool outlinesEnabled() const;
-
     InternalSettingsPtr m_internalSettings;
     KDecoration3::DecorationButtonGroup *m_leftButtons = nullptr;
     KDecoration3::DecorationButtonGroup *m_rightButtons = nullptr;
@@ -171,41 +169,17 @@ bool Decoration::hasNoSideBorders() const
 
 bool Decoration::isMaximized() const
 {
-    return window()->isMaximized() && !m_internalSettings->drawBorderOnMaximizedWindows();
+    return window()->isMaximized();
 }
 
 bool Decoration::isMaximizedHorizontally() const
 {
-    return window()->isMaximizedHorizontally() && !m_internalSettings->drawBorderOnMaximizedWindows();
+    return window()->isMaximizedHorizontally();
 }
 
 bool Decoration::isMaximizedVertically() const
 {
-    return window()->isMaximizedVertically() && !m_internalSettings->drawBorderOnMaximizedWindows();
-}
-
-bool Decoration::isLeftEdge() const
-{
-    const auto c = window();
-    return (c->isMaximizedHorizontally() || c->adjacentScreenEdges().testFlag(Qt::LeftEdge)) && !m_internalSettings->drawBorderOnMaximizedWindows();
-}
-
-bool Decoration::isRightEdge() const
-{
-    const auto c = window();
-    return (c->isMaximizedHorizontally() || c->adjacentScreenEdges().testFlag(Qt::RightEdge)) && !m_internalSettings->drawBorderOnMaximizedWindows();
-}
-
-bool Decoration::isTopEdge() const
-{
-    const auto c = window();
-    return (c->isMaximizedVertically() || c->adjacentScreenEdges().testFlag(Qt::TopEdge)) && !m_internalSettings->drawBorderOnMaximizedWindows();
-}
-
-bool Decoration::isBottomEdge() const
-{
-    const auto c = window();
-    return (c->isMaximizedVertically() || c->adjacentScreenEdges().testFlag(Qt::BottomEdge)) && !m_internalSettings->drawBorderOnMaximizedWindows();
+    return window()->isMaximizedVertically();
 }
 
 bool Decoration::hideTitleBar() const
@@ -261,8 +235,4 @@ bool Decoration::hideInnerBorder() const
     return m_internalSettings->hideInnerBorder() && !window()->isShaded();
 }
 
-bool Decoration::outlinesEnabled() const
-{
-    return true;
-}
 }

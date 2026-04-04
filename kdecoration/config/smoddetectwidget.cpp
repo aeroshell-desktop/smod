@@ -1,4 +1,3 @@
-
 //////////////////////////////////////////////////////////////////////////////
 // breezedetectwidget.cpp
 // Note: this class is a stripped down version of
@@ -11,15 +10,16 @@
 // SPDX-License-Identifier: MIT
 //////////////////////////////////////////////////////////////////////////////
 
-#include "breezedetectwidget.h"
+#include "smoddetectwidget.h"
 
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 
-namespace Breeze
+namespace SMOD
 {
+
 //_________________________________________________________
 DetectDialog::DetectDialog(QObject *parent)
     : QObject(parent)

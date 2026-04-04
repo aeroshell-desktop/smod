@@ -9,14 +9,14 @@
 
 #pragma once
 
-#include "breezeitemmodel.h"
+#include "smoditemmodel.h"
 
 #include <QList>
 #include <QSet>
 
 #include <algorithm>
 
-namespace Breeze
+namespace SMOD
 {
 //! Job model. Stores job information for display in lists
 template<class T>

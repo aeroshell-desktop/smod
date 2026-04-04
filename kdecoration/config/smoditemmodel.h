@@ -11,7 +11,7 @@
 
 #include <QAbstractItemModel>
 
-namespace Breeze
+namespace SMOD
 {
 //* Job model. Stores job information for display in lists
 class ItemModel : public QAbstractItemModel
