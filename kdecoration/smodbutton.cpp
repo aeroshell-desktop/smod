@@ -209,6 +209,9 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
         const auto c = decoration()->window();
 
+        // configure painter
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
         painter->translate(g.topLeft());
 
         // pswin was here
@@ -217,8 +220,19 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
         QImage normalImg, hoverImg, activeImg;
         QPoint glyphOffset;
-        QString glyphType = m_data.glyphName, dpiScale = "";
+        QString glyphType = m_data.glyphName;
         QString textureName = m_data.textureName;
+        QString dpiScale = "";
+
+        // offset the painter if maximized
+        // don't wanna offset the group because we'd also be moving the hitbox that way
+        if (c->isMaximized()) {
+            painter->translate(-2, 0);
+
+            if (m_smodType == SMOD::Maximize) {
+                glyphType = "restore";
+            }
+        }
 
         if (titlebarHeight >= 22 && titlebarHeight < 25) {
             dpiScale = "@1.25x";
@@ -240,6 +254,14 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             normal = QPixmap(":/smod/decoration/" + textureName + dpiScale);
             hover = QPixmap(":/smod/decoration/" + textureName + "-hover" + dpiScale);
             active = QPixmap(":/smod/decoration/" + textureName + "-active" + dpiScale);
+
+            if (!isEnabled()) {
+                glyphType += "-inactive";
+            }
+
+            glyph = QPixmap(":/smod/decoration/" + glyphType + "-glyph" + dpiScale);
+            glyphHover = QPixmap(":/smod/decoration/" + glyphType + "-hover-glyph" + dpiScale);
+            glyphActive = QPixmap(":/smod/decoration/" + glyphType + "-active-glyph" + dpiScale);
         }
 
         leftoverW = w - c_l - c_r;
@@ -262,16 +284,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             if (titlebarHeight == 18 || titlebarHeight == 17) {
                 l--;
             }
-        }
-
-        {
-            if (!isEnabled()) {
-                glyphType += "-inactive";
-            }
-
-            glyph = QPixmap(":/smod/decoration/" + glyphType + "-glyph" + dpiScale);
-            glyphHover = QPixmap(":/smod/decoration/" + glyphType + "-hover-glyph" + dpiScale);
-            glyphActive = QPixmap(":/smod/decoration/" + glyphType + "-active-glyph" + dpiScale);
         }
 
         switch (type()) {
@@ -299,9 +311,11 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         hImage = hover.toImage();
         aImage = active.toImage();
 
+        // TODO: switch to Borealis::Texture for HiDPI support. Also maybe
+        //       to use the msstyles atlas directly too, which will make
+        //       doing SMOD themes and the msstyles migration easier
         FrameTexture btn(l, r, t, b, w, h, &normal);
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
         if (!isPressed() && !m_isToggled) {
             image = hoverImage(image, hImage, m_hoverProgress);
             normal.convertFromImage(image);
@@ -332,7 +346,7 @@ void Button::setHoverProgress(qreal hoverProgress)
         m_hoverProgress = hoverProgress;
 
         if (qobject_cast<Decoration *>(decoration())) {
-            update(geometry().adjusted(-32, -32, 32, 32));
+            update();
         }
     }
 }

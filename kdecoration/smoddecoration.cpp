@@ -689,13 +689,14 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
             glowHeight = t + b;
         }
 
-        FrameTexture glow(l, r, t, b, glowWidth, glowHeight, &glowPixmap, opacity);
-
-        // only render if necessary
+        // only render if the caption is not empty
         if (!caption.trimmed().isEmpty()) {
+            FrameTexture glow(l, r, t, b, glowWidth, glowHeight, &glowPixmap, opacity);
+
             if (!invertText) {
                 int x = 0;
 
+                // TODO: rtl support
                 switch (titleAlignment) {
                 case InternalSettings::AlignLeft:
                     x = captionRect.x() + floor(rect.width() / 2) - floor(glowWidth / 2);
