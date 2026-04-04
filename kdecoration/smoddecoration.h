@@ -71,6 +71,7 @@ public:
 
     int titlebarHeight() const;
     int captionHeight() const;
+    QColor titleColor(bool active) const;
 
     static QString themeName();
     static QPixmap close_glow();
@@ -138,6 +139,8 @@ private:
 
     //*frame corner radius, scaled according to DPI
     qreal m_scaledCornerRadius = 3;
+    QColor m_activeFontColor;
+    QColor m_inactiveFontColor;
 };
 
 bool Decoration::hasBorders() const

@@ -110,6 +110,11 @@ int Decoration::captionHeight() const
     return hideTitleBar() ? borderTop() : borderTop() - settings()->smallSpacing() * 4 - 1;
 }
 
+QColor Decoration::titleColor(bool active) const
+{
+    return active ? m_activeFontColor : m_inactiveFontColor;
+}
+
 QString Decoration::themeName()
 {
     return SMOD::currentlyRegisteredPath;
@@ -227,6 +232,11 @@ void Decoration::reconfigure()
 
     KSharedConfig::Ptr config = KSharedConfig::openConfig();
     const KConfigGroup cg(config, QStringLiteral("KDE"));
+
+    const KConfigGroup wmConfig(KSharedConfig::openConfig(QStringLiteral("kdeglobals")), QStringLiteral("WM"));
+
+    m_activeFontColor = wmConfig.readEntry("activeForeground", QColor(0, 0, 0, 255));
+    m_inactiveFontColor = wmConfig.readEntry("inactiveForeground", QColor(20, 19, 18, 255));
 
     recalculateBorders();
     recalculateTitleBar();
@@ -629,7 +639,8 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         auto rect =
             fm.boundingRect(caption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), emojiOpt);
 
-        QColor textColor = c->color(KDecoration3::ColorGroup::Active, KDecoration3::ColorRole::Foreground);
+        // TODO: force active text color if the theme requests it to match Windows 7 behavior
+        QColor textColor = titleColor(c->isActive()); // c->color(KDecoration3::ColorGroup::Active, KDecoration3::ColorRole::Foreground);
 
         captionRect.setHeight(captionRect.height() - 3);
         painter->setFont(settings()->font());
