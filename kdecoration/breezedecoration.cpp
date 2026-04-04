@@ -613,8 +613,8 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
         // TODO: also test for accurate behavior here
-        const int left = m_leftButtons->geometry().right() + g_sizingmargins.frameLeftSizing().inset;
-        const int right = m_rightButtons->geometry().left() - g_sizingmargins.frameRightSizing().inset;
+        const int left = (m_leftButtons->geometry().x() + m_leftButtons->geometry().width()) + (hideIcon() ? g_sizingmargins.frameLeftSizing().inset : 0) + 2;
+        const int right = m_rightButtons->geometry().left() - (g_sizingmargins.frameRightSizing().inset) + 2;
 
         QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
 

@@ -78,7 +78,7 @@ void ConfigWidget::load()
     QStringList decoration_dirpaths = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, SMOD::DECORATIONS_PATH, QStandardPaths::LocateDirectory);
     QStringList all_files;
 
-    for (const QString decoration_dirpath : decoration_dirpaths) {
+    for (const QString &decoration_dirpath : decoration_dirpaths) {
         QDir decoration_dir(decoration_dirpath);
         all_files += decoration_dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
     }
