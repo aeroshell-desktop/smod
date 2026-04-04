@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SMOD_H
+#define SMOD_H
 
 /*
  * Generic reusable code for SMOD
@@ -24,11 +25,12 @@ enum ExceptionMask {
     BorderSize = 1 << 4,
 };
 
-const QString DECORATIONS_PATH = "smod/decorations/";
-const QString SMOD_EXTENSION = ".smod.rcc";
+const QString DECORATIONS_PATH = QStringLiteral("smod/decorations/");
+const QString SMOD_EXTENSION = QStringLiteral(".smod.rcc");
+const QString DEFAULT_THEME = QStringLiteral("Aero");
 
-static QString currentlyRegisteredResource = "";
-static QString currentlyRegisteredPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + "Aero" + SMOD_EXTENSION);
+static QString currentlyRegisteredResource = QStringLiteral();
+static QString currentlyRegisteredPath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + DEFAULT_THEME + SMOD_EXTENSION);
 
 // Because DecorationButton::Type doesn't have a type for a single close button
 // the order has to stay the same as DecorationButton::Type.
@@ -52,27 +54,26 @@ enum ButtonTypes {
 
 struct ButtonData {
     QString glyphName;
-    QString alternativeGlyphName;
     QString textureName;
 };
 
 // TODO: mayhaps make a function to fill this list
 //       this looks horrible lmao
-static QHash<ButtonTypes, ButtonData> buttonData{{Close, ButtonData{"close", "", "close"}},
-                                                 {CloseLone, ButtonData{"close", "", "close-single"}},
-                                                 {Maximize, ButtonData{"maximize", "restore", "maximize"}},
-                                                 {Minimize, ButtonData{"minimize", "", "minimize"}},
-                                                 {ContextHelp, ButtonData{"help", "", "minimize"}},
-                                                 {KeepBelow, ButtonData{"underlap", "", "minimize"}},
-                                                 {KeepAbove, ButtonData{"overlap", "", "minimize"}},
-                                                 {Shade, ButtonData{"shade", "", "minimize"}},
-                                                 {OnAllDesktops, ButtonData{"pin", "", "minimize"}},
-                                                 {ApplicationMenu, ButtonData{"menu", "", "minimize"}},
-                                                 {ExcludeFromCapture, ButtonData{"captureExclude", "", "minimize"}}};
+static QHash<ButtonTypes, ButtonData> buttonData{{Close, ButtonData{QStringLiteral("close"), QStringLiteral("close")}},
+                                                 {CloseLone, ButtonData{QStringLiteral("close"), QStringLiteral("close-single")}},
+                                                 {Maximize, ButtonData{QStringLiteral("maximize"), QStringLiteral("maximize")}},
+                                                 {Minimize, ButtonData{QStringLiteral("minimize"), QStringLiteral("minimize")}},
+                                                 {ContextHelp, ButtonData{QStringLiteral("help"), QStringLiteral("minimize")}},
+                                                 {KeepBelow, ButtonData{QStringLiteral("underlap"), QStringLiteral("minimize")}},
+                                                 {KeepAbove, ButtonData{QStringLiteral("overlap"), QStringLiteral("minimize")}},
+                                                 {Shade, ButtonData{QStringLiteral("shade"), QStringLiteral("minimize")}},
+                                                 {OnAllDesktops, ButtonData{QStringLiteral("pin"), QStringLiteral("minimize")}},
+                                                 {ApplicationMenu, ButtonData{QStringLiteral("menu"), QStringLiteral("minimize")}},
+                                                 {ExcludeFromCapture, ButtonData{QStringLiteral("captureExclude"), QStringLiteral("minimize")}}};
 
 inline void registerResource(const QString &name)
 {
-    if (currentlyRegisteredResource != "") {
+    if (currentlyRegisteredResource != QStringLiteral()) {
         QString path = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + currentlyRegisteredResource + SMOD_EXTENSION);
 
         if (!path.isEmpty()) {
@@ -85,7 +86,7 @@ inline void registerResource(const QString &name)
 
     QString path = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + name + SMOD_EXTENSION);
     if (path.isEmpty()) {
-        path = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + "Aero" + SMOD_EXTENSION);
+        path = QStandardPaths::locate(QStandardPaths::GenericDataLocation, DECORATIONS_PATH + DEFAULT_THEME + SMOD_EXTENSION);
         printf("smod: File not found, fallback to default theme %s\n", path.toStdString().c_str());
     }
 
@@ -96,3 +97,5 @@ inline void registerResource(const QString &name)
 }
 
 }
+
+#endif // SMOD_H

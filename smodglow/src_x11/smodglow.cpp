@@ -10,7 +10,6 @@
  */
 
 #include "smodglow.h"
-#include "smod.h"
 
 #include <KConfig>
 #include <KConfigGroup>
@@ -36,7 +35,6 @@ SmodGlowEffect::SmodGlowEffect()
     setupEffectHandlerConnections();
 
     reconfigure(ReconfigureAll);
-    currentlyRegisteredPath = QStringLiteral("");
 
     // NOTE is this needed?
     // effects->makeOpenGLContextCurrent();
@@ -63,9 +61,6 @@ void SmodGlowEffect::reconfigure(Effect::ReconfigureFlags flags)
     Q_UNUSED(flags)
 
     ensureResources();
-
-    /*m_active = SMOD::registerResource(SmodDecoration::themeName(), currentlyRegisteredPath);
-    currentlyRegisteredPath = SmodDecoration::themeName();*/
 
     loadTextures();
 
@@ -114,7 +109,7 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
     }
 
     // In order to access our custom signal we need to cast to the correct class
-    SmodDecoration *smoddecoration = qobject_cast<SmodDecoration *>(w->decoration());
+    SMOD::Decoration *smoddecoration = qobject_cast<SMOD::Decoration *>(w->decoration());
 
     // if the cast was unsuccessful (the loaded decoration plugin is not SMOD) then return
     if (!smoddecoration) {
@@ -125,15 +120,13 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 
 #if TESTING_NEW_DPI
     auto connection = connect(smoddecoration,
-                              &SmodDecoration::buttonHoveredChanged,
+                              &SMOD::Decoration::buttonHoveredChanged,
                               this,
-                              [w, this](KDecoration3::DecorationButtonType button, bool isFlipped, bool hovered, QPoint pos, int dpi) {
+                              [w, this](KDecoration3::DecorationButtonType button, bool hovered, QPoint pos, int dpi) {
 #else
-    auto connection = connect(smoddecoration,
-                              &SmodDecoration::buttonHoverStatus,
-                              this,
-                              [w, this](KDecoration3::DecorationButtonType button, bool isFlipped, QString textureType, bool hovered, QPoint pos) {
-                                  int dpi = m_current_dpi;
+    auto connection =
+        connect(smoddecoration, &SMOD::Decoration::buttonHoverStatus, this, [w, this](KDecoration3::DecorationButtonType button, bool hovered, QPoint pos) {
+            int dpi = m_current_dpi;
 #endif
                                   GlowAnimationHandler *anim;
 
@@ -144,10 +137,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -157,10 +148,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -170,10 +159,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -183,10 +170,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -196,10 +181,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -209,10 +192,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -222,10 +203,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -234,10 +213,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -246,10 +223,8 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 #if RIGHT_SIDE_ORIGIN
                                       anim->pos = -(pos + QPoint(CLOSEGLOW_SML, CLOSEGLOW_SMT));
 #else
-                                      anim->pos = pos - QPoint(CLOSEGLOW_SML, CLOSEGLOW_SMT);
+                anim->pos = pos - QPoint(CLOSEGLOW_SML, CLOSEGLOW_SMT);
 #endif
-                                      anim->m_isFlipped = isFlipped;
-                                      anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
                                       break;
                                   }
@@ -315,7 +290,7 @@ void SmodGlowEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, s
     if (!handler->m_needsRepaint) {
         return;
     }
-    SmodDecoration *smoddecoration = qobject_cast<SmodDecoration *>(w->decoration());
+    SMOD::Decoration *smoddecoration = qobject_cast<SMOD::Decoration *>(w->decoration());
 
     // if the cast was unsuccessful (the loaded decoration plugin is not SMOD) then return
     if (!smoddecoration) {
@@ -419,19 +394,19 @@ void SmodGlowEffect::postPaintWindow(EffectWindow *w)
 
 void SmodGlowEffect::windowAdded(EffectWindow *w)
 {
-    if (previousDecorationCount == 0 && SmodDecoration::decorationCount() != 0) {
+    if (previousDecorationCount == 0 && SMOD::Decoration::decorationCount() != 0) {
         loadTextures();
     }
-    previousDecorationCount = SmodDecoration::decorationCount();
+    previousDecorationCount = SMOD::Decoration::decorationCount();
 
-    m_active = m_active && previousDecorationCount != 0 && SmodDecoration::glowEnabled();
+    m_active = m_active && previousDecorationCount != 0 && SMOD::Decoration::glowEnabled();
 
     registerWindow(w);
 }
 
 void SmodGlowEffect::windowClosed(EffectWindow *w)
 {
-    if (SmodDecoration::decorationCount() == 0)
+    if (SMOD::Decoration::decorationCount() == 0)
         m_active = false;
     unregisterWindow(w);
 }
