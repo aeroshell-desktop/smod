@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "sizingmargins.h"
 #include "smod/smod.h"
 
 #include "breezedecoration.h"
@@ -33,10 +34,7 @@ class Button : public KDecoration3::DecorationButton
     Q_PROPERTY(qreal hoverProgress READ hoverProgress WRITE setHoverProgress);
 
 public:
-    //* constructor
     explicit Button(QObject *parent, const QVariantList &args);
-
-    //* destructor
     virtual ~Button() = default;
 
     //* button creation
@@ -45,116 +43,44 @@ public:
     //* render
     virtual void paint(QPainter *painter, const QRectF &repaintRegion) override;
 
-    //* flag
-    enum Flag {
-        FlagNone,
-        FlagStandalone,
-        FlagFirstInList,
-        FlagLastInList,
+    // if there is a button next to this button or nah
+    enum PositionInfo {
+        ImNothingLikeYall,
+        LeftSide,
+        RightSide,
+        BothSides
     };
-
-    //* flag
-    void setFlag(Flag value)
-    {
-        m_flag = value;
-    }
-
-    //* standalone buttons
-    bool isStandAlone() const
-    {
-        return m_flag == FlagStandalone;
-    }
-
-    //* offset
-    void setOffset(const QPointF &value)
-    {
-        m_offset = value;
-    }
-
-    //* horizontal offset, for rendering
-    void setHorizontalOffset(qreal value)
-    {
-        m_offset.setX(value);
-    }
-
-    //* vertical offset, for rendering
-    void setVerticalOffset(qreal value)
-    {
-        m_offset.setY(value);
-    }
-
-    //* set icon size
-    void setIconSize(const QSize &value)
-    {
-        m_iconSize = value;
-    }
-
-    //*@name active state change animation
-    //@{
-    void setOpacity(qreal value)
-    {
-        if (m_opacity == value) {
-            return;
-        }
-        m_opacity = value;
-        update();
-    }
-
-    qreal opacity() const
-    {
-        return m_opacity;
-    }
-
-    //@}
 
     qreal hoverProgress() const;
     void setHoverProgress(qreal hoverProgress);
 
-    void smodPaintGlow(QPainter *painter, const QRectF &repaintArea);
+    bool isToggled() const;
+    void setToggled(bool toggled);
+
     void updateGeometry();
+    void reconfigure();
+
 Q_SIGNALS:
-    void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool isFlipped, QString textureType,  bool hovered, QPoint pos);
+    void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool hovered, QPoint pos);
 
 protected:
     void hoverEnterEvent(QHoverEvent *event) override;
     void hoverLeaveEvent(QHoverEvent *event) override;
-
-private Q_SLOTS:
-
-    //* apply configuration changes
-    void reconfigure();
 
 private:
     //* private constructor
     explicit Button(KDecoration3::DecorationButtonType type, Decoration *decoration, QObject *parent = nullptr);
 
     void startHoverAnimation(qreal endValue);
-    void smodPaint(QPainter *painter, const QRectF &repaintRegion);
 
-    Flag m_flag = FlagNone;
+    bool m_isToggled = false;
 
-    //* active state change animation
-    QVariantAnimation *m_animation;
-
-    //* vertical offset (for rendering)
-    QPointF m_offset;
-
-    //* icon size
-    QSize m_iconSize;
-
-    //* status or smthing idk
-    bool m_isToggled{false};
-    bool m_isMirrored{false};
-    bool m_isFlipped{false};
-    QString m_textureType{};
-    bool m_gtkButton{false};
-
+    PositionInfo posInfo = ImNothingLikeYall;
     SMOD::ButtonData m_data;
+    SMOD::ButtonTypes m_smodType = SMOD::Custom;
+    ButtonSizingMargins m_sizingInfo;
 
-    //* active state change opacity
-    qreal m_opacity = 0;
-    int index = -1;
-
+    // animation
     QPointer<QPropertyAnimation> m_hoverAnimation;
     qreal m_hoverProgress;
 };

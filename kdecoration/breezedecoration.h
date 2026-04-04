@@ -20,8 +20,6 @@
 #include <QVariantAnimation>
 #include <QByteArray>
 
-#define INNER_BORDER_SIZE 2
-
 // This is absolutely needed in Qt6
 // even though it absolutely wasn't needed in Qt5
 // funny
@@ -103,7 +101,7 @@ public:
     inline bool isOOTB() const;
 
 Q_SIGNALS:
-    void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool isFlipped, QString textureType, bool hovered, QPoint pos);
+    void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool hovered, QPoint pos);
 
 public Q_SLOTS:
     bool init() override;

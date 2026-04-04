@@ -48,13 +48,13 @@ namespace SMOD
                                                      {CloseLone, ButtonData{"close", "", "close-single"}},
                                                      {Maximize, ButtonData{"maximize", "restore", "maximize"}},
                                                      {Minimize, ButtonData{"minimize", "", "minimize"}},
-                                                     {ContextHelp, ButtonData{"help", "", ""}},
-                                                     {KeepBelow, ButtonData{"underlap", "", ""}},
-                                                     {KeepAbove, ButtonData{"overlap", "", ""}},
-                                                     {Shade, ButtonData{"shade", "", ""}},
-                                                     {OnAllDesktops, ButtonData{"pin", "", ""}},
-                                                     {ApplicationMenu, ButtonData{"menu", "", ""}},
-                                                     {ExcludeFromCapture, ButtonData{"captureExclude", "", ""}}};
+                                                     {ContextHelp, ButtonData{"help", "", "minimize"}},
+                                                     {KeepBelow, ButtonData{"underlap", "", "minimize"}},
+                                                     {KeepAbove, ButtonData{"overlap", "", "minimize"}},
+                                                     {Shade, ButtonData{"shade", "", "minimize"}},
+                                                     {OnAllDesktops, ButtonData{"pin", "", "minimize"}},
+                                                     {ApplicationMenu, ButtonData{"menu", "", "minimize"}},
+                                                     {ExcludeFromCapture, ButtonData{"captureExclude", "", "minimize"}}};
 
     inline void registerResource(const QString &name)
     {

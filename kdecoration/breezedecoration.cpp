@@ -359,7 +359,7 @@ void Decoration::updateButtonsGeometry()
 
         if (!m_leftButtons->buttons().isEmpty()) {
             for (QPointer<KDecoration3::DecorationButton> button : m_leftButtons->buttons()) {
-                static_cast<Button *>(button.data())->updateGeometry();
+                static_cast<Button *>(button.data())->reconfigure();
             }
         }
     }
@@ -378,7 +378,7 @@ void Decoration::updateButtonsGeometry()
 
         if (!m_rightButtons->buttons().isEmpty()) {
             for (QPointer<KDecoration3::DecorationButton> button : m_rightButtons->buttons()) {
-                static_cast<Button *>(button.data())->updateGeometry();
+                static_cast<Button *>(button.data())->reconfigure();
             }
         }
     }
@@ -608,6 +608,8 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
     }
 
     if (!hideCaption()) {
+        painter->save();
+
         const auto c = window();
         int titleAlignment = internalSettings()->titleAlignment();
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
@@ -618,17 +620,15 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 
         QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
 
-        QString caption = settings()->fontMetrics().elidedText(c->caption(), Qt::ElideMiddle, captionRect.width());
-        // remove program name
-        caption.remove(QRegularExpression(" —.+"));
+        QString caption = settings()->fontMetrics().elidedText(c->caption().remove(QRegularExpression(" —.+")), Qt::ElideMiddle, captionRect.width());
 
         // replace emojis for █
         // fixes a BUG in which the glow is shorter than the actual text when there's emojis
-        QTextOption opt;
-        opt.setFlags(QTextOption::ShowDefaultIgnorables);
+        QTextOption emojiOpt;
+        emojiOpt.setFlags(QTextOption::ShowDefaultIgnorables);
         QFontMetrics fm(settings()->font());
         auto rect =
-            fm.boundingRect(caption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), opt);
+            fm.boundingRect(caption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), emojiOpt);
 
         QColor textColor = c->color(KDecoration3::ColorGroup::Active, KDecoration3::ColorRole::Foreground);
 
@@ -726,6 +726,8 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
                 painter->setOpacity(1.0);
             }
         }
+
+        painter->restore();
     }
 
     if (m_leftButtons) {

@@ -13,7 +13,6 @@ set(breezedecoration_SRCS
     breezeexceptionlist.cpp
     frametexture.cpp
     sizingmargins.cpp
-    smod/smodbutton.cpp
 )
 
 ### build library
