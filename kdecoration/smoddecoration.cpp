@@ -358,7 +358,7 @@ void Decoration::updateButtonsGeometry()
     if (m_leftButtons) {
         m_leftButtons->setSpacing(g_sizingmargins.commonSizing().caption_button_spacing);
 
-        const int startingX = borderLeft();
+        const int startingX = borderLeft() + (hideInnerBorder() ? sizingMargins().leftSide().margin_right : 0);
 
         if (!g_sizingmargins.commonSizing().caption_button_align_vcenter) {
             m_leftButtons->setPos(QPointF(startingX + (isMaximized() ? 4 : 0) - g_sizingmargins.frameLeftSizing().inset, vPadding));
@@ -377,7 +377,8 @@ void Decoration::updateButtonsGeometry()
     if (m_rightButtons) {
         m_rightButtons->setSpacing(g_sizingmargins.commonSizing().caption_button_spacing);
 
-        const int startingX = size().width() - borderRight() - m_rightButtons->geometry().width();
+        const int startingX =
+            size().width() - borderRight() - m_rightButtons->geometry().width() - (hideInnerBorder() ? sizingMargins().rightSide().margin_left : 0);
 
         if (!g_sizingmargins.commonSizing().caption_button_align_vcenter) {
             m_rightButtons->setPos(QPointF(startingX - (isMaximized() ? 2 : 0) + g_sizingmargins.frameRightSizing().inset, vPadding));
