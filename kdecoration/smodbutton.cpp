@@ -10,8 +10,10 @@
 
 #include <KColorUtils>
 #include <KDecoration3/DecoratedWindow>
+#include <KDecoration3/kdecoration3/decorationdefines.h>
 #include <KIconLoader>
 
+#include <QCursor>
 #include <QPainter>
 #include <QPainterPath>
 #include <QVariantAnimation>
@@ -57,11 +59,13 @@ Button::Button(QObject *parent, const QVariantList &args)
 //__________________________________________________________________
 Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::Decoration *decoration, QObject *parent)
 {
-    if (auto d = qobject_cast<Decoration *>(decoration)) {
+    if (auto d = qobject_cast<SMOD::Decoration *>(decoration)) {
         Button *b = new Button(type, d, parent);
         const auto c = d->window();
 
         b->setVisible(true);
+        b->setAcceptedButtons(Qt::LeftButton);
+        connect(b, &KDecoration3::DecorationButton::visibilityChanged, d, &SMOD::Decoration::requestUpdateButtonPositions);
 
         switch (type) {
         case KDecoration3::DecorationButtonType::Close:

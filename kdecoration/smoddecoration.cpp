@@ -64,6 +64,7 @@ Decoration::~Decoration()
 
 void Decoration::paint(QPainter *painter, const QRectF &repaintRegion)
 {
+    // then paint
     paintOuterBorder(painter, repaintRegion);
     paintSideHighlights(painter, repaintRegion);
     paintTitleBar(painter, repaintRegion);
@@ -223,6 +224,13 @@ bool Decoration::init()
     return true;
 }
 
+void Decoration::requestUpdateButtonPositions()
+{
+    QTimer::singleShot(0, this, [&] {
+        updateButtonPositions();
+    });
+}
+
 void Decoration::reconfigure()
 {
     m_internalSettings = SettingsProvider::self()->internalSettings(this);
@@ -340,10 +348,15 @@ void Decoration::recalculateSizes()
 
     if (m_leftButtons && m_rightButtons) {
         updateButtonsGeometry();
+        updateButtonPositions();
     }
 
     updateBlur();
     update();
+}
+
+void Decoration::updateButtonPositions()
+{
 }
 
 void Decoration::updateButtonsGeometry()

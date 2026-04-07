@@ -106,12 +106,14 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     bool init() override;
+    void requestUpdateButtonPositions();
 
 private Q_SLOTS:
     void reconfigure();
     void recalculateBorders();
     void recalculateTitleBar();
     void recalculateSizes();
+    void updateButtonPositions();
     void updateButtonsGeometry();
     void updateButtonsGeometryDelayed();
     void updateBlur();
