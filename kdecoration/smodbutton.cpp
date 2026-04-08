@@ -164,7 +164,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         return;
     }
 
-    painter->save();
     auto deco = qobject_cast<Decoration *>(decoration());
     int titlebarHeight = deco->titlebarHeight();
 
@@ -186,16 +185,15 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
     //     painter->scale(scaleFactor, scaleFactor);
     // }
 
+    painter->save();
+
     // menu button
     if (type() == KDecoration3::DecorationButtonType::Menu) {
         const auto c = deco->window();
         QSizeF iconSize = geometry().size();
         QRectF iconRect(geometry().topLeft(), iconSize);
 
-        const int vPadding = c->isMaximized() ? 1 : (decoration()->settings()->smallSpacing() * 2) - 1;
-        const int hPadding = c->isMaximized() ? -2 : 0;
-
-        painter->translate(QPointF(hPadding, vPadding));
+        painter->translate(QPointF(0, c->isMaximized() ? 1 : (decoration()->settings()->smallSpacing() * 2) - 1));
 
         iconRect.translate(0, (titlebarHeight - iconSize.height()) / 2);
         c->icon().paint(painter, iconRect.toRect());

@@ -420,7 +420,7 @@ void Decoration::updateButtonsGeometry()
         const int startingX = borderLeft() + (hideInnerBorder() ? sizingMargins().leftSide().margin_right : 0);
 
         if (!g_sizingmargins.commonSizing().caption_button_align_vcenter) {
-            m_leftButtons->setPos(QPointF(startingX + (isMaximized() ? 4 : 0) - g_sizingmargins.frameLeftSizing().inset, vPadding));
+            m_leftButtons->setPos(QPointF(startingX + (isMaximized() ? 2 : 0) - g_sizingmargins.frameLeftSizing().inset, vPadding));
         } else {
             m_leftButtons->setPos(QPointF(startingX, borderTop() / 2.0f - m_leftButtons->geometry().height() / 2.0f));
         }
@@ -684,7 +684,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
         // TODO: also test for accurate behavior here
-        const int left = (m_leftButtons->geometry().x() + m_leftButtons->geometry().width()) + (hideIcon() ? g_sizingmargins.frameLeftSizing().inset : 0) + 2;
+        const int left = (m_leftButtons->geometry().x() + m_leftButtons->geometry().width()) + (hideIcon() ? 3 : 5);
         const int right = m_rightButtons->geometry().left() - (g_sizingmargins.frameRightSizing().inset) + 2;
 
         QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
