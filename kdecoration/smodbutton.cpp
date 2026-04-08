@@ -7,6 +7,7 @@
 #include "smodbutton.h"
 
 #include "frametexture.h"
+#include "smod.h"
 
 #include <KColorUtils>
 #include <KDecoration3/DecoratedWindow>
@@ -148,6 +149,7 @@ Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::De
             break;
         }
 
+        d->requestUpdateButtonPositions();
         return b;
     }
 
@@ -204,12 +206,19 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         qreal h = g.height();
 
         // sizing margins
-        int l = m_sizingInfo.margin_left, t = m_sizingInfo.margin_top;
-        int r = m_sizingInfo.margin_right, b = m_sizingInfo.margin_bottom;
+        int l = m_sizingInfo.margin_left, r = m_sizingInfo.margin_right;
+        int t = m_sizingInfo.margin_top, b = m_sizingInfo.margin_bottom;
 
         // content margins
-        int c_l = m_sizingInfo.content_left, c_t = m_sizingInfo.content_top;
-        int c_r = m_sizingInfo.content_right, c_b = m_sizingInfo.content_bottom;
+        int c_l = 0, c_r = 0;
+        int c_t = m_sizingInfo.content_top, c_b = m_sizingInfo.content_bottom;
+
+        if (m_isFlipped) {
+            c_l = m_sizingInfo.content_right;
+            c_r = m_sizingInfo.content_left;
+        } else if (m_isMirrored) {
+            c_l = c_r = m_sizingInfo.content_left;
+        }
 
         const auto c = decoration()->window();
 
@@ -218,15 +227,31 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
         painter->translate(g.topLeft());
 
-        // pswin was here
-        QPixmap glyph, glyphHover, glyphActive;
-        QPixmap normal, hover, active;
-
-        QImage normalImg, hoverImg, activeImg;
+        QString textureName = m_data.textureName, glyphName = m_data.glyphName;
         QPoint glyphOffset;
-        QString glyphType = m_data.glyphName;
-        QString textureName = m_data.textureName;
-        QString dpiScale = "";
+
+        // TODO FIXME: take KDecoration3::DecoratedWindow::scale() into consideration too
+        if (titlebarHeight >= 22 && titlebarHeight < 25) {
+            m_dpiScale = "@1.25x";
+        } else if (titlebarHeight >= 25 && titlebarHeight < 27) {
+            m_dpiScale = "@1.5x";
+        } else if (titlebarHeight >= 27) {
+            m_dpiScale = "@2x";
+        }
+
+        // change texture according to position
+        if (m_smodType != Close && m_smodType != CloseLone) {
+            switch (m_posInList) {
+            case Lone:
+            case First:
+            case Last:
+                textureName = "minimize";
+                break;
+            case Middle:
+                textureName = "maximize";
+                break;
+            }
+        }
 
         // offset the painter if maximized
         // don't wanna offset the group because we'd also be moving the hitbox that way
@@ -234,105 +259,114 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             painter->translate(-2, 0);
 
             if (m_smodType == SMOD::Maximize) {
-                glyphType = "restore";
+                glyphName = "restore";
             }
         }
 
-        if (titlebarHeight >= 22 && titlebarHeight < 25) {
-            dpiScale = "@1.25x";
-        } else if (titlebarHeight >= 25 && titlebarHeight < 27) {
-            dpiScale = "@1.5x";
-        } else if (titlebarHeight >= 27) {
-            dpiScale = "@2x";
-        }
-
-        int leftoverW = 0;
-        int leftoverH = 0;
-
-        // load the textures normally first
+        // load the textures
         {
-            if (!c->isActive()) {
-                textureName += "-unfocus";
-            }
+            QString t = textureName;
+            QString g = glyphName;
 
-            normal = QPixmap(":/smod/decoration/" + textureName + dpiScale);
-            hover = QPixmap(":/smod/decoration/" + textureName + "-hover" + dpiScale);
-            active = QPixmap(":/smod/decoration/" + textureName + "-active" + dpiScale);
+            if (!c->isActive()) {
+                t += "-unfocus";
+            }
 
             if (!isEnabled()) {
-                glyphType += "-inactive";
+                g += "-inactive";
             }
 
-            glyph = QPixmap(":/smod/decoration/" + glyphType + "-glyph" + dpiScale);
-            glyphHover = QPixmap(":/smod/decoration/" + glyphType + "-hover-glyph" + dpiScale);
-            glyphActive = QPixmap(":/smod/decoration/" + glyphType + "-active-glyph" + dpiScale);
-        }
-
-        leftoverW = w - c_l - c_r;
-        if (leftoverW < 0) {
-            leftoverW = 0;
-        }
-
-        leftoverH = (titlebarHeight - 1) - c_t - c_b;
-        if (leftoverH < 0) {
-            leftoverH = 0;
-        }
-
-        if (textureName == "maximize") {
-            if (titlebarHeight == 18) {
-                l--;
-            } else if (titlebarHeight == 17) {
-                l -= 2;
-            }
-        } else if (textureName == "minimize") {
-            if (titlebarHeight == 18 || titlebarHeight == 17) {
-                l--;
+            if (m_currentTextureName != t || m_currentGlyphName != g || m_posInList != m_prevPos) {
+                m_currentTextureName = t;
+                m_currentGlyphName = g;
+                loadPixmaps();
             }
         }
 
-        switch (type()) {
-        case KDecoration3::DecorationButtonType::Maximize:
-            if (deco && deco->isMaximized()) {
-                glyphOffset = QPoint(c_l + ceil((leftoverW - glyph.width()) / 2.0), c_t + ceil((leftoverH - glyph.height()) / 2.0));
-
-            } else {
-                glyphOffset = QPoint(c_l + ceil((leftoverW - glyph.width()) / 2.0), c_t + ceil((leftoverH - glyph.height()) / 2.0));
+        // glyph margins i think
+        {
+            int leftoverW = w - c_l - c_r;
+            if (leftoverW < 0) {
+                leftoverW = 0;
             }
-            break;
 
-        case KDecoration3::DecorationButtonType::Close:
-            glyphOffset = QPoint(c_l + ceil((leftoverW - glyph.width()) / 2.0), c_t + ceil((leftoverH - glyph.height()) / 2.0));
-            break;
+            int leftoverH = (titlebarHeight - 1) - c_t - c_b;
+            if (leftoverH < 0) {
+                leftoverH = 0;
+            }
 
-        default:
-            glyphOffset = QPoint(c_l + ceil((leftoverW - glyph.width()) / 2.0), c_t + ceil((leftoverH - glyph.height()) / 2.0));
-            break;
+            // automatic scaling or smthing
+            if (textureName == "maximize") {
+                if (titlebarHeight < 19) {
+                    l -= (19 - titlebarHeight);
+                }
+            } else if (textureName == "minimize") {
+                if (titlebarHeight < 19) {
+                    l--;
+                }
+            }
+
+            // set glyph offset
+            if (type() == KDecoration3::DecorationButtonType::Close) {
+                glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+
+            } else if (textureName == "maximize") {
+                if (deco && deco->isMaximized()) {
+                    glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+
+                } else {
+                    glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+                }
+
+            } else if (textureName == "minimize") {
+                glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+            }
         }
 
+        // for animations
         QImage image, hImage, aImage;
 
-        image = normal.toImage();
-        hImage = hover.toImage();
-        aImage = active.toImage();
+        image = m_normal.toImage();
+        hImage = m_hover.toImage();
+        aImage = m_active.toImage();
+
+        QPixmap final = m_normal;
 
         // TODO: switch to Borealis::Texture for HiDPI support. Also maybe
         //       to use the msstyles atlas directly too, which will make
         //       doing SMOD themes and the msstyles migration easier
-        FrameTexture btn(l, r, t, b, w, h, &normal);
+        FrameTexture btn(l, r, t, b, w, h, &final);
 
         if (!isPressed() && !m_isToggled) {
             image = hoverImage(image, hImage, m_hoverProgress);
-            normal.convertFromImage(image);
+            final.convertFromImage(image);
             // render button texture
             btn.render(painter);
             // render glyph
-            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), glyph.width(), glyph.height(), isHovered() ? glyphHover : glyph);
+            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), isHovered() ? m_glyphHover : m_glyph);
         } else {
-            normal.convertFromImage(aImage);
+            final.convertFromImage(aImage);
             btn.render(painter);
-            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), glyph.width(), glyph.height(), glyphActive);
+            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), m_glyphActive);
         }
     }
+
+    /*QString posTxt;
+    switch (m_posInList) {
+    case First:
+        posTxt = "first";
+        break;
+    case Middle:
+        posTxt = "middle";
+        break;
+    case Last:
+        posTxt = "last";
+        break;
+    case Lone:
+        posTxt = "lone";
+        break;
+    }
+    painter->drawText(QRectF(QPointF(0, 0), size()), m_currentTextureName, QTextOption());*/
 
     painter->restore();
 
@@ -363,6 +397,17 @@ bool Button::isToggled() const
 void Button::setToggled(bool toggled)
 {
     m_isToggled = toggled;
+}
+
+Button::Position Button::positionInList()
+{
+    return m_posInList;
+}
+
+void Button::setPositionInList(Position position)
+{
+    m_posInList = position;
+    update();
 }
 
 void Button::updateGeometry()
@@ -428,11 +473,6 @@ Button::Button(KDecoration3::DecorationButtonType type, Decoration *decoration, 
     : DecorationButton(type, decoration, parent)
     , m_hoverProgress(0.0)
 {
-    // check if it's for gtk
-    /*if (QCoreApplication::applicationName() == QStringLiteral("kded6")) {
-        m_gtkButton = true;
-    }*/
-
     // connections
     connect(decoration->window(), SIGNAL(iconChanged(QIcon)), this, SLOT(update()));
     connect(decoration->settings().get(), &KDecoration3::DecorationSettings::reconfigured, this, &Button::reconfigure);
@@ -464,6 +504,131 @@ void Button::startHoverAnimation(qreal endValue)
     hoverAnimation->setEndValue(endValue);
     hoverAnimation->setDuration(1 + qRound(200 * qAbs(m_hoverProgress - endValue)));
     hoverAnimation->start();
+}
+
+void Button::loadPixmaps()
+{
+    m_glyph = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-glyph" + m_dpiScale);
+    m_glyphHover = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-hover-glyph" + m_dpiScale);
+    m_glyphActive = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-active-glyph" + m_dpiScale);
+
+    QList<QPixmap> pixmapsToMod{QPixmap(":/smod/decoration/" + m_currentTextureName + m_dpiScale),
+                                QPixmap(":/smod/decoration/" + m_currentTextureName + "-hover" + m_dpiScale),
+                                QPixmap(":/smod/decoration/" + m_currentTextureName + "-active" + m_dpiScale)};
+
+    QList<QPixmap> moddedPixmaps;
+
+    // reset
+    m_isFlipped = false;
+    m_isMirrored = false;
+
+    if (auto deco = static_cast<Decoration *>(decoration()); deco && deco->sizingMargins().commonSizing().group_buttons) {
+        for (int i = 0; i < pixmapsToMod.length(); i++) {
+            QPixmap pixmap = pixmapsToMod.at(i);
+            QImage img;
+
+            if (pixmap.isNull()) {
+                continue;
+            }
+
+            // modify according to position and texture name
+            switch (m_posInList) {
+            case Lone: {
+                if (m_currentTextureName.contains("minimize")) {
+                    img = pixmap.copy(0, 0, round(pixmap.width() / 2), pixmap.height()).toImage();
+                    img.flip(Qt::Horizontal);
+
+                    QPixmap mergedPixmap = pixmap;
+                    QPainter painter;
+
+                    if (painter.begin(&mergedPixmap)) {
+                        QRect rightRect(img.width() + 1, 0, img.width(), img.height());
+                        painter.save();
+                        painter.setCompositionMode(QPainter::CompositionMode_Clear);
+                        painter.eraseRect(rightRect);
+                        painter.restore();
+                        painter.drawImage(rightRect, img);
+                        painter.end();
+                        pixmap = mergedPixmap;
+                        m_isMirrored = true;
+                    } else {
+                        qWarning() << "smod: could not mirror minimize button pixmap";
+                    }
+                }
+                break;
+            }
+
+            case First: {
+                if (m_smodType == SMOD::Close) {
+                    img = pixmap.toImage();
+                    img.flip(Qt::Horizontal);
+                    pixmap.convertFromImage(img);
+                    m_isFlipped = true;
+                }
+                break;
+            }
+
+            case Last: {
+                if (m_smodType != SMOD::Close) {
+                    img = pixmap.toImage();
+                    img.flip(Qt::Horizontal);
+                    pixmap.convertFromImage(img);
+                    m_isFlipped = true;
+                }
+                break;
+            }
+
+            case Middle: {
+                if (m_smodType == SMOD::Close) {
+                    img = pixmap.copy(0, 0, round(pixmap.width() / 2), pixmap.height()).toImage();
+                    img.flip(Qt::Horizontal);
+
+                    QPixmap mergedPixmap = pixmap;
+                    QPainter painter;
+
+                    if (painter.begin(&mergedPixmap)) {
+                        QRect rightRect(img.width() + 1, 0, img.width(), img.height());
+                        painter.save();
+                        painter.setCompositionMode(QPainter::CompositionMode_Clear);
+                        painter.eraseRect(rightRect);
+                        painter.restore();
+                        painter.drawImage(rightRect, img);
+                        painter.end();
+                        pixmap = mergedPixmap;
+                        m_isMirrored = true;
+                    } else {
+                        qWarning() << "smod: could not mirror close button pixmap";
+                    }
+                }
+                break;
+            }
+            }
+
+            moddedPixmaps.append(pixmap);
+        }
+    }
+
+    if (moddedPixmaps.isEmpty()) {
+        moddedPixmaps = pixmapsToMod;
+    }
+
+    if (moddedPixmaps.length() >= 1) {
+        m_normal = moddedPixmaps.at(0);
+    } else {
+        m_normal = pixmapsToMod.at(0);
+    }
+
+    if (moddedPixmaps.length() >= 2) {
+        m_hover = moddedPixmaps.at(1);
+    } else {
+        m_hover = pixmapsToMod.at(1);
+    }
+
+    if (moddedPixmaps.length() >= 3) {
+        m_active = moddedPixmaps.at(2);
+    } else {
+        m_active = pixmapsToMod.at(2);
+    }
 }
 
 } // namespace

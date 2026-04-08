@@ -357,6 +357,52 @@ void Decoration::recalculateSizes()
 
 void Decoration::updateButtonPositions()
 {
+    // don't know if it's gonna krash
+    // keeping it anyway just in case
+    if (QCoreApplication::applicationName() == QStringLiteral("kded6")) {
+        return;
+    }
+
+    auto iterate = [&](QList<KDecoration3::DecorationButton *> buttonList) {
+        int max = buttonList.length();
+        for (int index = 0; index < max; index++) {
+            auto kdecobutton = buttonList.at(index);
+
+            typedef KDecoration3::DecorationButtonType Type;
+
+            bool canGroupPrev = false;
+            bool canGroupNext = false;
+            auto button = static_cast<SMOD::Button *>(kdecobutton);
+
+            button->index = index;
+
+            if (!kdecobutton->isVisible() || kdecobutton->type() == Type::Spacer || kdecobutton->type() == Type::Menu) {
+                continue;
+            }
+
+            if (int prev = index - 1; prev > -1) {
+                auto prevButton = buttonList.at(prev);
+                canGroupPrev = prevButton->isVisible() && prevButton->type() != Type::Spacer && prevButton->type() != Type::Menu;
+            }
+            if (int next = index + 1; next < max) {
+                auto nextButton = buttonList.at(next);
+                canGroupNext = nextButton->isVisible() && nextButton->type() != Type::Spacer && nextButton->type() != Type::Menu;
+            }
+
+            if (!canGroupPrev && canGroupNext) {
+                button->setPositionInList(SMOD::Button::First);
+            } else if (canGroupPrev && !canGroupNext) {
+                button->setPositionInList(SMOD::Button::Last);
+            } else if (canGroupPrev && canGroupNext) {
+                button->setPositionInList(SMOD::Button::Middle);
+            } else if (!canGroupPrev && !canGroupNext) {
+                button->setPositionInList(SMOD::Button::Lone);
+            }
+        }
+    };
+
+    iterate(m_leftButtons->buttons());
+    iterate(m_rightButtons->buttons());
 }
 
 void Decoration::updateButtonsGeometry()

@@ -33,6 +33,13 @@ class Button : public KDecoration3::DecorationButton
     Q_PROPERTY(qreal hoverProgress READ hoverProgress WRITE setHoverProgress);
 
 public:
+    enum Position {
+        Lone,
+        First,
+        Middle,
+        Last
+    };
+
     explicit Button(QObject *parent, const QVariantList &args);
     virtual ~Button() = default;
 
@@ -42,19 +49,16 @@ public:
     //* render
     virtual void paint(QPainter *painter, const QRectF &repaintRegion) override;
 
-    // if there is a button next to this button or nah
-    enum PositionInfo {
-        ImNothingLikeYall,
-        LeftSide,
-        RightSide,
-        BothSides
-    };
-
     qreal hoverProgress() const;
     void setHoverProgress(qreal hoverProgress);
 
     bool isToggled() const;
     void setToggled(bool toggled);
+
+    Position positionInList();
+    void setPositionInList(Position position);
+
+    int index = 0;
 
     void updateGeometry();
     void reconfigure();
@@ -72,9 +76,17 @@ private:
 
     void startHoverAnimation(qreal endValue);
 
-    bool m_isToggled = false;
+    void loadPixmaps();
 
-    PositionInfo posInfo = ImNothingLikeYall;
+    QString m_currentTextureName, m_currentGlyphName, m_dpiScale;
+    QPixmap m_glyph, m_glyphHover, m_glyphActive;
+    QPixmap m_normal, m_hover, m_active;
+
+    bool m_isToggled = false;
+    bool m_isFlipped = false, m_isMirrored = false;
+
+    Position m_prevPos = Lone;
+    Position m_posInList = Lone;
     SMOD::ButtonData m_data;
     SMOD::ButtonTypes m_smodType = SMOD::Custom;
     ButtonSizingMargins m_sizingInfo;
