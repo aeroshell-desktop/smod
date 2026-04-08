@@ -420,8 +420,6 @@ void Decoration::updateButtonsGeometry()
     const int vPadding = isMaximized() ? -1 : 1;
 
     // left buttons positioning
-    // TODO: get a 7 VM and look if this is accurate behavior later
-    //       my damn Vista VM hates custom msstyles bro
     if (m_leftButtons) {
         m_leftButtons->setSpacing(g_sizingmargins.commonSizing().caption_button_spacing);
 
@@ -692,7 +690,6 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         int titleAlignment = internalSettings()->titleAlignment();
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
-        // TODO: also test for accurate behavior here
         const int left = (m_leftButtons->geometry().x() + m_leftButtons->geometry().width()) + (hideIcon() ? 3 : 5);
         const int right = m_rightButtons->geometry().left() - (g_sizingmargins.frameRightSizing().inset) + 2;
 
