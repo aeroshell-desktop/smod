@@ -18,7 +18,7 @@ add_library(smoddecoration SHARED
     ${smoddecoration_config_PART_FORMS_HEADERS})
 
 set_target_properties(smoddecoration PROPERTIES
-    OUTPUT_NAME aeroshell.smod
+    OUTPUT_NAME org.smod.smod
     PREFIX ""
 )
 
@@ -71,7 +71,7 @@ ecm_generate_headers(smod_CamelCase_HEADERS
 
 ecm_generate_pkgconfig_file(
     BASE_NAME "smoddecoration"
-    LIB_NAME ":aeroshell.smod.so"
+    LIB_NAME ":org.smod.smod.so"
     INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR}
     LIB_INSTALL_DIR ${KDE_INSTALL_PLUGINDIR}/org.kde.kdecoration3
     FILENAME_VAR pkgconfig_filename
