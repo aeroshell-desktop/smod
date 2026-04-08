@@ -327,14 +327,7 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
 #if RIGHT_SIDE_ORIGIN
     QPoint origin = w->frameGeometry().topLeft().toPoint() + QPoint(w->frameGeometry().width(), 0);
 #else
-    auto maximizeState = w->window()->maximizeMode();
-    int diff = 0;//w->frameGeometry().width() - (handler->m_close->pos.x() + m_texture_close.get()->size().width()) + 3;
-
-    if(maximizeState == KWin::MaximizeMode::MaximizeFull)
-        diff = -2;
-
     QPoint origin = w->pos().toPoint();
-    origin += QPoint(diff, 0);
 #endif
 
     /*qDebug() << "Min texture: " << m_texture_minimize.get()->size();

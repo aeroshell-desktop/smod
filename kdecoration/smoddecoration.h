@@ -67,8 +67,6 @@ public:
     SizingMargins sizingMargins() const;
     InternalSettingsPtr internalSettings() const;
 
-    QString getButtonGroupStr(Button *button) const;
-
     int titlebarHeight() const;
     int captionHeight() const;
     QColor titleColor(bool active) const;
@@ -113,6 +111,7 @@ private Q_SLOTS:
     void recalculateBorders();
     void recalculateTitleBar();
     void recalculateSizes();
+    void updateButtonsOffset();
     void updateButtonPositions();
     void updateButtonsGeometry();
     void updateButtonsGeometryDelayed();

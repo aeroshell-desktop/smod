@@ -17,7 +17,9 @@
 #include <QCursor>
 #include <QPainter>
 #include <QPainterPath>
+#include <QTimer>
 #include <QVariantAnimation>
+#include <ctime>
 
 namespace SMOD
 {
@@ -167,39 +169,28 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
     auto deco = qobject_cast<Decoration *>(decoration());
     int titlebarHeight = deco->titlebarHeight();
 
-    // QRect g = geometry().toRect();
-    // if (deco->window()){
-    //     qreal scale = deco->window()->scale();
-    //
-    //     qDebug() << scale;
-    //
-    //     QRect scaledTargetRect = g;
-    //     scaledTargetRect.setWidth(scaledTargetRect.width() * scale);
-    //     scaledTargetRect.setHeight(scaledTargetRect.height() * scale);
-    //     scaledTargetRect.setX(scaledTargetRect.x() * scale);
-    //     scaledTargetRect.setY(scaledTargetRect.y() * scale);
-    //
-    //     g = scaledTargetRect;
-    //
-    //     qreal scaleFactor = 1.0/scale;
-    //     painter->scale(scaleFactor, scaleFactor);
-    // }
+    QRect g = geometry().toRect();
+
+    if (m_offset < 0) {
+        g.adjust(0, 0, m_offset, 0);
+    } else if (m_offset > 0) {
+        g.adjust(m_offset, 0, 0, 0);
+    }
 
     painter->save();
 
     // menu button
     if (type() == KDecoration3::DecorationButtonType::Menu) {
         const auto c = deco->window();
-        QSizeF iconSize = geometry().size();
-        QRectF iconRect(geometry().topLeft(), iconSize);
+        QSize iconSize = g.size();
+        QRect iconRect(g.topLeft(), iconSize);
 
         painter->translate(QPointF(0, c->isMaximized() ? 1 : (decoration()->settings()->smallSpacing() * 2) - 1));
 
         iconRect.translate(0, (titlebarHeight - iconSize.height()) / 2);
-        c->icon().paint(painter, iconRect.toRect());
+        c->icon().paint(painter, iconRect);
 
     } else if (type() != KDecoration3::DecorationButtonType::Spacer) {
-        QRect g = geometry().toRect();
         qreal w = g.width();
         qreal h = g.height();
 
@@ -251,14 +242,8 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
         }
 
-        // offset the painter if maximized
-        // don't wanna offset the group because we'd also be moving the hitbox that way
-        if (c->isMaximized()) {
-            painter->translate(-2, 0);
-
-            if (m_smodType == SMOD::Maximize) {
-                glyphName = "restore";
-            }
+        if (c->isMaximized() && m_smodType == SMOD::Maximize) {
+            glyphName = "restore";
         }
 
         // load the textures
@@ -349,23 +334,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         }
     }
 
-    /*QString posTxt;
-    switch (m_posInList) {
-    case First:
-        posTxt = "first";
-        break;
-    case Middle:
-        posTxt = "middle";
-        break;
-    case Last:
-        posTxt = "last";
-        break;
-    case Lone:
-        posTxt = "lone";
-        break;
-    }
-    painter->drawText(QRectF(QPointF(0, 0), size()), m_currentTextureName, QTextOption());*/
-
     painter->restore();
 
     return;
@@ -408,11 +376,46 @@ void Button::setPositionInList(Position position)
     update();
 }
 
+int Button::offset()
+{
+    return m_offset;
+}
+
+void Button::setOffset(int offset)
+{
+    if (type() == KDecoration3::DecorationButtonType::Spacer && type() == KDecoration3::DecorationButtonType::Menu) {
+        return;
+    }
+
+    m_offset = offset;
+    updateGeometry();
+}
+
 void Button::updateGeometry()
 {
-    auto d = qobject_cast<Decoration *>(decoration());
-    QRect buttonRect = d->buttonRect(type());
+    auto deco = qobject_cast<Decoration *>(decoration());
+    QRect buttonRect = deco->buttonRect(type());
+
+    if (m_offset < 0) {
+        buttonRect.adjust(m_offset, 0, 0, 0);
+    } else if (m_offset > 0) {
+        buttonRect.adjust(0, 0, m_offset, 0);
+    }
+
+    // otherwise white border is going to be visible with glow
+    if (m_isMirrored) {
+        buttonRect.adjust(0, 0, 1, 0);
+    }
+
     setGeometry(buttonRect);
+}
+
+void Button::scheduleGeometryUpdate()
+{
+    QTimer::singleShot(0, this, [&] {
+        updateGeometry();
+        update();
+    });
 }
 
 void Button::reconfigure()
@@ -428,13 +431,9 @@ void Button::reconfigure()
 
     m_smodType = (SMOD::ButtonTypes)type();
     if (SMOD::buttonData.contains(m_smodType)) {
-        KDecoration3::DecoratedWindow *window = nullptr;
+        KDecoration3::DecoratedWindow *window = decoration()->window();
 
-        if (deco) {
-            window = deco->window();
-        }
-
-        if (m_smodType == SMOD::Close && window && !(window->isMinimizeable() || window->isMaximizeable() || window->providesContextHelp())) {
+        if (m_smodType == SMOD::Close && !(window->isMinimizeable() || window->isMaximizeable() || window->providesContextHelp())) {
             m_data = SMOD::buttonData.value(SMOD::CloseLone);
         } else {
             m_data = SMOD::buttonData.value(m_smodType);
@@ -451,7 +450,17 @@ void Button::hoverEnterEvent(QHoverEvent *event)
     KDecoration3::DecorationButton::hoverEnterEvent(event);
 
     if (isHovered()) {
-        Q_EMIT buttonHoverStatus(type(), true, geometry().topLeft().toPoint());
+        QPoint topLeft = geometry().topLeft().toPoint();
+
+        if (m_offset > 0) {
+            topLeft += QPoint(m_offset, 0);
+        }
+
+        if (m_isFlipped) {
+            topLeft -= QPoint(1, 0);
+        }
+
+        Q_EMIT buttonHoverStatus(type(), true, topLeft);
         startHoverAnimation(1.0);
     }
 }
@@ -461,7 +470,17 @@ void Button::hoverLeaveEvent(QHoverEvent *event)
     KDecoration3::DecorationButton::hoverLeaveEvent(event);
 
     if (!isHovered()) {
-        Q_EMIT buttonHoverStatus(type(), false, geometry().topLeft().toPoint());
+        QPoint topLeft = geometry().topLeft().toPoint();
+
+        if (m_offset > 0) {
+            topLeft += QPoint(m_offset, 0);
+        }
+
+        if (m_isFlipped) {
+            topLeft -= QPoint(1, 0);
+        }
+
+        Q_EMIT buttonHoverStatus(type(), false, topLeft);
         startHoverAnimation(0.0);
     }
 }
@@ -626,6 +645,10 @@ void Button::loadPixmaps()
         m_active = moddedPixmaps.at(2);
     } else {
         m_active = pixmapsToMod.at(2);
+    }
+
+    if (m_isMirrored) {
+        scheduleGeometryUpdate();
     }
 }
 

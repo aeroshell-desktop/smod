@@ -58,9 +58,11 @@ public:
     Position positionInList();
     void setPositionInList(Position position);
 
-    int index = 0;
+    int offset();
+    void setOffset(int offset);
 
     void updateGeometry();
+    void scheduleGeometryUpdate();
     void reconfigure();
 
 Q_SIGNALS:
@@ -85,6 +87,7 @@ private:
     bool m_isToggled = false;
     bool m_isFlipped = false, m_isMirrored = false;
 
+    int m_offset = 0;
     Position m_prevPos = Lone;
     Position m_posInList = Lone;
     SMOD::ButtonData m_data;

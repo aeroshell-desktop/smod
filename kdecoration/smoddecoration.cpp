@@ -86,21 +86,6 @@ InternalSettingsPtr Decoration::internalSettings() const
     return m_internalSettings;
 }
 
-QString Decoration::getButtonGroupStr(Button *button) const
-{
-    if (!m_leftButtons || !m_rightButtons) {
-        qWarning() << "smod: button groups not initialized (how was this even called), returning...";
-        return "";
-    }
-
-    if (m_leftButtons->buttons().indexOf(button) != -1)
-        return "left";
-    else if (m_rightButtons->buttons().indexOf(button) != -1)
-        return "right";
-
-    return "";
-}
-
 int Decoration::titlebarHeight() const
 {
     return internalSettings()->titlebarSize();
@@ -161,9 +146,8 @@ QRect Decoration::buttonRect(KDecoration3::DecorationButtonType button) const
         width = 16;
         height = titlebarHeight();
         break;
-    // TODO: make the spacer size changeable
     case KDecoration3::DecorationButtonType::Spacer:
-        width = 8;
+        width = 5;
         break;
 
     default:
@@ -349,10 +333,32 @@ void Decoration::recalculateSizes()
     if (m_leftButtons && m_rightButtons) {
         updateButtonsGeometry();
         updateButtonPositions();
+        updateButtonsOffset();
     }
 
     updateBlur();
     update();
+}
+
+void Decoration::updateButtonsOffset()
+{
+    if (QCoreApplication::applicationName() == QStringLiteral("kded6")) {
+        return;
+    }
+
+    bool isMaximized = window()->isMaximized();
+
+    if (!m_leftButtons->buttons().isEmpty()) {
+        if (auto button = static_cast<SMOD::Button *>(m_leftButtons->buttons().first())) {
+            button->setOffset(isMaximized ? 2 : 0);
+        }
+    }
+
+    if (!m_rightButtons->buttons().isEmpty()) {
+        if (auto button = static_cast<SMOD::Button *>(m_rightButtons->buttons().last())) {
+            button->setOffset(isMaximized ? -2 : 0);
+        }
+    }
 }
 
 void Decoration::updateButtonPositions()
@@ -370,13 +376,15 @@ void Decoration::updateButtonPositions()
 
             typedef KDecoration3::DecorationButtonType Type;
 
+            if (!kdecobutton->isVisible() || kdecobutton->type() == Type::Spacer || kdecobutton->type() == Type::Menu) {
+                continue;
+            }
+
             bool canGroupPrev = false;
             bool canGroupNext = false;
             auto button = static_cast<SMOD::Button *>(kdecobutton);
 
-            button->index = index;
-
-            if (!kdecobutton->isVisible() || kdecobutton->type() == Type::Spacer || kdecobutton->type() == Type::Menu) {
+            if (!button) {
                 continue;
             }
 
@@ -457,6 +465,7 @@ void Decoration::updateButtonsGeometryDelayed()
 {
     QTimer::singleShot(0, this, [&] {
         updateButtonsGeometry();
+        updateButtonsOffset();
         update();
     });
 }
