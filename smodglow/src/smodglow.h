@@ -52,7 +52,7 @@ public:
     ~SmodGlowEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
-    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
+    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data) override;
 #ifdef BUILD_KF6
     void paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &region, WindowPaintData &data)
         override;
@@ -272,13 +272,13 @@ public:
     GlowAnimationHandler *m_shade = nullptr, *m_underlap = nullptr, *m_overlap = nullptr;
     GlowAnimationHandler *m_help = nullptr, *m_min = nullptr, *m_max = nullptr, *m_close = nullptr;
 
-    QRect m_captureExclude_rect = QRect(), m_pin_rect = QRect(), m_menu_rect = QRect();
-    QRect m_shade_rect = QRect(), m_underlap_rect = QRect(), m_overlap_rect = QRect();
-    QRect m_help_rect = QRect(), m_min_rect = QRect(), m_max_rect = QRect(), m_close_rect = QRect();
+    Rect m_captureExclude_rect{}, m_pin_rect{}, m_menu_rect{};
+    Rect m_shade_rect{}, m_underlap_rect{}, m_overlap_rect{};
+    Rect m_help_rect{}, m_min_rect{}, m_max_rect{}, m_close_rect{};
 
-    Region m_minimizePaintRegion = Region();
-    Region m_maximizePaintRegion = Region();
-    Region m_closePaintRegion = Region();
+    Region m_minimizePaintRegion{};
+    Region m_maximizePaintRegion{};
+    Region m_closePaintRegion{};
 
     QMetaObject::Connection m_decoration_connection = QMetaObject::Connection();
     bool m_needsRepaint = false;
