@@ -1,11 +1,14 @@
 #pragma once
 
+#include "smod.h"
+
 #include <QFile>
 #include <QString>
 #include <QSettings>
 
-namespace Breeze
+namespace SMOD
 {
+
 struct ButtonSizingMargins
 {
     int width;
@@ -74,24 +77,14 @@ class SizingMargins
 public:
     SizingMargins();
     ~SizingMargins();
+
     void loadSizingMargins();
 
     GlowSizing glowSizing() const;
     ShadowSizing shadowSizing() const;
     CommonSizing commonSizing() const;
 
-    ButtonSizingMargins captureExcludeSizing() const;
-    ButtonSizingMargins menuSizing() const;
-    ButtonSizingMargins pinSizing() const;
-    ButtonSizingMargins shadeSizing() const;
-    ButtonSizingMargins overlapSizing() const;
-    ButtonSizingMargins underlapSizing() const;
-
-    ButtonSizingMargins helpSizing() const;
-    ButtonSizingMargins maximizeSizing() const;
-    ButtonSizingMargins minimizeSizing() const;
-    ButtonSizingMargins closeSizing() const;
-    ButtonSizingMargins closeLoneSizing() const;
+    ButtonSizingMargins buttonSizingFor(SMOD::ButtonTypes type) const;
 
     BorderFrame frameLeftSizing() const;
     BorderFrame frameRightSizing() const;
@@ -106,6 +99,7 @@ public:
     FrameMargins rightSide() const;
     FrameMargins topSide() const;
     FrameMargins bottomSide() const;
+
     bool loaded() const;
 
 private:
@@ -114,18 +108,7 @@ private:
     ShadowSizing m_shadowSizing;
     CommonSizing m_commonSizing;
 
-    ButtonSizingMargins m_captureExcludeSizing;
-    ButtonSizingMargins m_menuSizing;
-    ButtonSizingMargins m_pinSizing;
-    ButtonSizingMargins m_shadeSizing;
-    ButtonSizingMargins m_underlapSizing;
-    ButtonSizingMargins m_overlapSizing;
-
-    ButtonSizingMargins m_helpSizing;
-    ButtonSizingMargins m_maximizeSizing;
-    ButtonSizingMargins m_minimizeSizing;
-    ButtonSizingMargins m_closeSizing;
-    ButtonSizingMargins m_closeLoneSizing;
+    QHash<SMOD::ButtonTypes, ButtonSizingMargins> m_buttonSizingMargins;
 
     BorderFrame m_frameLeftSizing;
     BorderFrame m_frameRightSizing;

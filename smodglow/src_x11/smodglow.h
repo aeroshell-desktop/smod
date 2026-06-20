@@ -20,8 +20,7 @@
 #include <kwinglutils.h>
 #endif
 
-#include <SMOD/Decoration/BreezeDecoration>
-typedef Breeze::Decoration SmodDecoration;
+#include <SMOD/Decoration/SMODDecoration>
 
 // TODO remove "+ 1.0" when I fix the textures
 #define MINMAXGLOW_SML 9.0f
@@ -180,8 +179,6 @@ public:
     QPointer<QPropertyAnimation> m_hoverAnimation = QPointer<QPropertyAnimation>();
     qreal m_hoverProgress = 0.0;
     QPoint pos = QPoint();
-    bool m_isFlipped{false};
-    QString m_textureType{};
 
 Q_SIGNALS:
     void animStarted();

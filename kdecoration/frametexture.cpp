@@ -6,7 +6,7 @@
  * 6 - bottomleft, 7 - bottom, 8 - bottomright
  */
 
-namespace Breeze
+namespace SMOD
 {
     qreal clip(qreal a)
     {

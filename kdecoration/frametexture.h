@@ -2,7 +2,7 @@
 #include <QPixmap>
 #include <QPainter>
 
-namespace Breeze
+namespace SMOD
 {
 class FrameTexture
 {
