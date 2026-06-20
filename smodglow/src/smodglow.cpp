@@ -42,16 +42,7 @@ SmodGlowEffect::SmodGlowEffect()
     // NOTE is this needed?
     //effects->makeOpenGLContextCurrent();
 
-    m_shader = ShaderManager::instance()->generateShaderFromFile(
-        ShaderTrait::MapTexture,
-        QString(),
-        QStringLiteral(":/effects/smodglow/shaders/shader.frag")
-    );
-    /*m_shader = ShaderManager::instance()->generateCustomShader(
-        ShaderTrait::MapTexture,
-        QByteArray(),
-        SmodDecoration::glow_shader()
-    );*/
+    m_shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture, QString(), QStringLiteral(":/effects/smodglow/shaders/shader.frag"));
 }
 
 SmodGlowEffect::~SmodGlowEffect()
