@@ -1,4 +1,3 @@
-#include "smod.h"
 #include "smodglow.h"
 #include <QVector2D>
 
@@ -43,7 +42,7 @@ void SmodGlowEffect::loadTextures()
         m_needsDpiChange = false;
     }
 
-    m_texture_minimize = GLTexture::upload(SmodDecoration::minimize_glow() /*QPixmap(QStringLiteral(":/effects/smodglow/textures/minimize") + dpiSuffix*/);
+    m_texture_minimize = GLTexture::upload(SMOD::Decoration::minimize_glow() /*QPixmap(QStringLiteral(":/effects/smodglow/textures/minimize") + dpiSuffix*/);
     if (!m_texture_minimize) {
         printf("Wrong min\n");
         m_active = false;
@@ -52,7 +51,7 @@ void SmodGlowEffect::loadTextures()
     m_texture_minimize->setFilter(GL_LINEAR);
     m_texture_minimize->setWrapMode(GL_CLAMP_TO_EDGE);
 
-    m_texture_maximize = GLTexture::upload(SmodDecoration::maximize_glow() /*QPixmap(QStringLiteral(":/effects/smodglow/textures/maximize") + dpiSuffix*/);
+    m_texture_maximize = GLTexture::upload(SMOD::Decoration::maximize_glow() /*QPixmap(QStringLiteral(":/effects/smodglow/textures/maximize") + dpiSuffix*/);
     if (!m_texture_maximize) {
         printf("Wrong max\n");
         m_active = false;
@@ -62,7 +61,7 @@ void SmodGlowEffect::loadTextures()
     m_texture_maximize->setFilter(GL_LINEAR);
     m_texture_maximize->setWrapMode(GL_CLAMP_TO_EDGE);
 
-    m_texture_close = GLTexture::upload(SmodDecoration::close_glow() /*QPixmap(QStringLiteral(":/effects/smodglow/textures/close") + dpiSuffix*/);
+    m_texture_close = GLTexture::upload(SMOD::Decoration::close_glow() /*QPixmap(QStringLiteral(":/effects/smodglow/textures/close") + dpiSuffix*/);
     if (!m_texture_close) {
         printf("Wrong close\n");
         m_active = false;
@@ -121,8 +120,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     QMatrix4x4 colorMat = colorMatrix(data.brightness() * hdr_brightness_correction, data.saturation());
 
     {
-        GLTexture *m_preferred_texture =
-            handler->m_captureExclude->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_captureExclude->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_captureExclude_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -139,7 +137,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_menu->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_menu->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_menu_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -156,7 +154,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_pin->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_pin->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_pin_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -173,7 +171,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_shade->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_shade->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_shade_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -190,7 +188,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_underlap->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_underlap->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_underlap_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -207,7 +205,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_overlap->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_overlap->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_overlap_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -224,7 +222,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_help->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_help->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_help_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -241,7 +239,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_min->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_min->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_min_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -258,7 +256,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = handler->m_max->m_textureType == QStringLiteral("minimize") ? m_texture_minimize.get() : m_texture_maximize.get();
+        GLTexture *m_preferred_texture = m_texture_maximize.get();
         float opacity = handler->m_max->hoverProgress() * w->opacity() * data.opacity();
         const QRectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_max_rect, scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();

@@ -1,0 +1,6 @@
+File=smodsettingsdata.kcfg
+ClassName=InternalSettings
+NameSpace=SMOD
+Singleton=false
+Mutators=true
+GlobalEnums=true

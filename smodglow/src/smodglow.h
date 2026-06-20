@@ -20,9 +20,7 @@
 #include <kwinglutils.h>
 #endif
 
-#include <SMOD/Decoration/BreezeDecoration>
-typedef Breeze::Decoration SmodDecoration;
-
+#include <SMOD/Decoration/SMODDecoration>
 
 // TODO remove "+ 1.0" when I fix the textures
 #define MINMAXGLOW_SML 9.0f
@@ -118,16 +116,13 @@ public:
     {
         QPropertyAnimation *hoverAnimation = m_hoverAnimation.data();
 
-        if (hoverAnimation)
-        {
-            if (hoverAnimation->endValue() == endValue)
-            {
+        if (hoverAnimation) {
+            if (hoverAnimation->endValue() == endValue) {
                 return;
             }
 
             hoverAnimation->stop();
-        } else if (m_hoverProgress != endValue)
-        {
+        } else if (m_hoverProgress != endValue) {
             hoverAnimation = new QPropertyAnimation(this, "hoverProgress");
             m_hoverAnimation = hoverAnimation;
 
@@ -157,8 +152,7 @@ public:
     {
         QPropertyAnimation *hoverAnimation = m_hoverAnimation.data();
 
-        if (hoverAnimation)
-        {
+        if (hoverAnimation) {
             hoverAnimation->stop();
             setHoverProgress(0.0);
             //Q_EMIT animFinished();
@@ -172,22 +166,20 @@ public:
 
     void setHoverProgress(qreal hoverProgress)
     {
-        if (m_hoverProgress != hoverProgress)
-        {
+        if (m_hoverProgress != hoverProgress) {
             m_hoverProgress = hoverProgress;
         }
     }
     ~GlowAnimationHandler()
     {
-        if(!m_hoverAnimation.isNull())
+        if (!m_hoverAnimation.isNull()) {
             delete m_hoverAnimation;
+        }
     }
 
     QPointer<QPropertyAnimation> m_hoverAnimation = QPointer<QPropertyAnimation>();
     qreal m_hoverProgress = 0.0;
     QPoint pos = QPoint();
-    bool m_isFlipped{false};
-    QString m_textureType{};
 
 Q_SIGNALS:
     void animStarted();

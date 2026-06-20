@@ -10,7 +10,6 @@
  */
 
 #include "smodglow.h"
-#include "smod.h"
 
 #include <KConfig>
 #include <KConfigGroup>
@@ -39,7 +38,6 @@ SmodGlowEffect::SmodGlowEffect()
     setupEffectHandlerConnections();
 
     reconfigure(ReconfigureAll);
-    currentlyRegisteredPath = QStringLiteral("");
 
     // NOTE is this needed?
     //effects->makeOpenGLContextCurrent();
@@ -122,189 +120,155 @@ void SmodGlowEffect::setupEffectWindowConnections(const EffectWindow *w)
 
 void SmodGlowEffect::registerWindow(const EffectWindow *w)
 {
-    if (!w || windows.contains(w) || !w->hasDecoration())
-    {
+    if (!w || windows.contains(w) || !w->hasDecoration()) {
         return;
     }
 
     // In order to access our custom signal we need to cast to the correct class
-    SmodDecoration *smoddecoration = qobject_cast<SmodDecoration*>(w->decoration());
+    SMOD::Decoration *smoddecoration = qobject_cast<SMOD::Decoration *>(w->decoration());
 
     // if the cast was unsuccessful (the loaded decoration plugin is not SMOD) then return
-    if (!smoddecoration)
-    {
+    if (!smoddecoration) {
         return;
     }
 
     // Attempt to connect to the decoration signal.
 
 #if TESTING_NEW_DPI
-    auto connection = connect(smoddecoration, &SmodDecoration::buttonHoveredChanged, this,
-        [w, this](KDecoration3::DecorationButtonType button, bool isFlipped, bool hovered, QPoint pos, int dpi) {
+    auto connection = connect(smoddecoration,
+                              &SMOD::Decoration::buttonHoveredChanged,
+                              this,
+                              [w, this](KDecoration3::DecorationButtonType button, bool hovered, QPoint pos, int dpi) {
 #else
-    auto connection = connect(smoddecoration, &SmodDecoration::buttonHoverStatus, this,
-        [w, this](KDecoration3::DecorationButtonType button, bool isFlipped, QString textureType, bool hovered, QPoint pos) {
-        int dpi = m_current_dpi;
+    auto connection =
+        connect(smoddecoration, &SMOD::Decoration::buttonHoverStatus, this, [w, this](KDecoration3::DecorationButtonType button, bool hovered, QPoint pos) {
+            int dpi = m_current_dpi;
 #endif
+                                  GlowAnimationHandler *anim;
 
-        GlowAnimationHandler *anim;
-
-        switch (button)
-        {
-        case KDecoration3::DecorationButtonType::ExcludeFromCapture: {
-            anim = this->windows.value(w)->m_captureExclude;
+                                  switch (button) {
+                                  case KDecoration3::DecorationButtonType::ExcludeFromCapture: {
+                                      anim = this->windows.value(w)->m_captureExclude;
 
 #if RIGHT_SIDE_ORIGIN
-            anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-            anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-            anim->m_isFlipped = isFlipped;
-            anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-            break;
-        }
-            case KDecoration3::DecorationButtonType::ApplicationMenu:
-            {
-                anim = this->windows.value(w)->m_menu;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::ApplicationMenu: {
+                                      anim = this->windows.value(w)->m_menu;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::OnAllDesktops:
-            {
-                anim = this->windows.value(w)->m_pin;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::OnAllDesktops: {
+                                      anim = this->windows.value(w)->m_pin;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::Shade:
-            {
-                anim = this->windows.value(w)->m_shade;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::Shade: {
+                                      anim = this->windows.value(w)->m_shade;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::KeepBelow:
-            {
-                anim = this->windows.value(w)->m_underlap;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::KeepBelow: {
+                                      anim = this->windows.value(w)->m_underlap;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::KeepAbove:
-            {
-                anim = this->windows.value(w)->m_overlap;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::KeepAbove: {
+                                      anim = this->windows.value(w)->m_overlap;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::ContextHelp:
-            {
-                anim = this->windows.value(w)->m_help;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::ContextHelp: {
+                                      anim = this->windows.value(w)->m_help;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::Minimize:
-            {
-                anim = this->windows.value(w)->m_min;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::Minimize: {
+                                      anim = this->windows.value(w)->m_min;
 
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::Maximize:
-            {
-                anim = this->windows.value(w)->m_max;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::Maximize: {
+                                      anim = this->windows.value(w)->m_max;
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT));
 #else
-                anim->pos = pos - QPoint(MINMAXGLOW_SML + (isFlipped ? 1 : 0), MINMAXGLOW_SMT);
+                anim->pos = pos - QPoint(MINMAXGLOW_SML, MINMAXGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            case KDecoration3::DecorationButtonType::Close:
-            {
-                anim = this->windows.value(w)->m_close;
+                                      break;
+                                  }
+                                  case KDecoration3::DecorationButtonType::Close: {
+                                      anim = this->windows.value(w)->m_close;
 #if RIGHT_SIDE_ORIGIN
-                anim->pos = -(pos + QPoint(CLOSEGLOW_SML, CLOSEGLOW_SMT));
+                                      anim->pos = -(pos + QPoint(CLOSEGLOW_SML, CLOSEGLOW_SMT));
 #else
                 anim->pos = pos - QPoint(CLOSEGLOW_SML, CLOSEGLOW_SMT);
 #endif
-                anim->m_isFlipped = isFlipped;
-                anim->m_textureType = textureType.split(QStringLiteral("-")).takeFirst();
 
-                break;
-            }
-            default:
-            {
-                return;
-            }
-        }
+                                      break;
+                                  }
+                                  default: {
+                                      return;
+                                  }
+                                  }
 
-        if (dpi != m_current_dpi)
-        {
-            m_next_dpi = (WindowButtonsDPI)dpi;
-            m_needsDpiChange = true;
-        }
+                                  if (dpi != m_current_dpi) {
+                                      m_next_dpi = (WindowButtonsDPI)dpi;
+                                      m_needsDpiChange = true;
+                                  }
 
-        anim->startHoverAnimation(hovered ? 1.0 : 0.0);
-    });
+                                  anim->startHoverAnimation(hovered ? 1.0 : 0.0);
+                              });
 
-    if (!connection)
-    {
+    if (!connection) {
         return;
     }
 
@@ -317,8 +281,7 @@ void SmodGlowEffect::registerWindow(const EffectWindow *w)
 
 void SmodGlowEffect::unregisterWindow(const EffectWindow *w)
 {
-    if (windows.contains(w))
-    {
+    if (windows.contains(w)) {
         windows.value(w)->stopAll();
         disconnect(windows.value(w)->m_decoration_connection);
         delete windows.value(w);
@@ -328,8 +291,7 @@ void SmodGlowEffect::unregisterWindow(const EffectWindow *w)
 
 void SmodGlowEffect::stopAllAnimations(const EffectWindow *w)
 {
-    if (windows.contains(w))
-    {
+    if (windows.contains(w)) {
         windows.value(w)->stopAll();
     }
 }
@@ -338,46 +300,34 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
 {
     effects->prePaintWindow(view, w, data);
 
-    if(w->isUserResize())
-    {
+    if (w->isUserResize()) {
         stopAllAnimations(w);
         return;
     }
-    if (!windows.contains(w))
-    {
+    if (!windows.contains(w)) {
         return;
     }
 
-    if (m_needsDpiChange)
-    {
+    if (m_needsDpiChange) {
         loadTextures();
     }
 
     GlowHandler *handler = windows.value(w);
 
-    if (!handler->m_needsRepaint)
-    {
+    if (!handler->m_needsRepaint) {
         return;
     }
-    SmodDecoration *smoddecoration = qobject_cast<SmodDecoration*>(w->decoration());
+    SMOD::Decoration *smoddecoration = qobject_cast<SMOD::Decoration *>(w->decoration());
 
     // if the cast was unsuccessful (the loaded decoration plugin is not SMOD) then return
-    if (!smoddecoration)
-    {
+    if (!smoddecoration) {
         return;
     }
 
 #if RIGHT_SIDE_ORIGIN
     QPoint origin = w->frameGeometry().topLeft().toPoint() + QPoint(w->frameGeometry().width(), 0);
 #else
-    auto maximizeState = w->window()->maximizeMode();
-    int diff = 0;//w->frameGeometry().width() - (handler->m_close->pos.x() + m_texture_close.get()->size().width()) + 3;
-
-    if(maximizeState == KWin::MaximizeMode::MaximizeFull)
-        diff = -2;
-
     QPoint origin = w->pos().toPoint();
-    origin += QPoint(diff, 0);
 #endif
 
     /*qDebug() << "Min texture: " << m_texture_minimize.get()->size();
@@ -445,8 +395,7 @@ void SmodGlowEffect::postPaintScreen()
     for (auto it = windows.begin(); it != windows.end(); ++it) {
         GlowHandler *handler = it.value();
 
-        if (handler->m_needsRepaint)
-        {
+        if (handler->m_needsRepaint) {
             effects->addRepaint(m_prevPaint);
         }
     }
@@ -456,20 +405,21 @@ void SmodGlowEffect::postPaintScreen()
 
 void SmodGlowEffect::windowAdded(EffectWindow *w)
 {
-    if(previousDecorationCount == 0 && SmodDecoration::decorationCount() != 0)
-    {
+    if (previousDecorationCount == 0 && SMOD::Decoration::decorationCount() != 0) {
         loadTextures();
     }
-    previousDecorationCount = SmodDecoration::decorationCount();
+    previousDecorationCount = SMOD::Decoration::decorationCount();
 
-    m_active = m_active && previousDecorationCount != 0 && SmodDecoration::glowEnabled();
+    m_active = m_active && previousDecorationCount != 0 && SMOD::Decoration::glowEnabled();
 
     registerWindow(w);
 }
 
 void SmodGlowEffect::windowClosed(EffectWindow *w)
 {
-    if(SmodDecoration::decorationCount() == 0) m_active = false;
+    if (SMOD::Decoration::decorationCount() == 0) {
+        m_active = false;
+    }
     unregisterWindow(w);
 }
 
