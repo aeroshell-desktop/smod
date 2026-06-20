@@ -63,7 +63,7 @@ public:
 
     bool isActive() const override
     {
-        return m_active;
+        return m_active && m_shader;
     }
 
     int requestedEffectChainPosition() const override
