@@ -134,7 +134,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_captureExclude->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_captureExclude_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_captureExclude_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_captureExclude_rect.x() * scale, handler->m_captureExclude_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -151,7 +151,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_menu->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_menu_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_menu_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_menu_rect.x() * scale, handler->m_menu_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -168,7 +168,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_pin->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_pin_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_pin_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_pin_rect.x() * scale, handler->m_pin_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -185,7 +185,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_shade->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_shade_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_shade_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_shade_rect.x() * scale, handler->m_shade_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -202,7 +202,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_underlap->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_underlap_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_underlap_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_underlap_rect.x() * scale, handler->m_underlap_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -219,7 +219,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_overlap->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_overlap_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_overlap_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_overlap_rect.x() * scale, handler->m_overlap_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -237,7 +237,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_help->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_help_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_help_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_help_rect.x() * scale, handler->m_help_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -254,7 +254,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_min->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_min_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_min_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_min_rect.x() * scale, handler->m_min_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -271,7 +271,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     {
         GLTexture *m_preferred_texture = m_texture_maximize.get();
         float opacity = handler->m_max->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_max_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_max_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_max_rect.x() * scale, handler->m_max_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -287,7 +287,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_close->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(scaledRect(handler->m_close_rect, scale));
+        const RectF pixelGeometry = snapToPixelGridF(handler->m_close_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_close_rect.x() * scale, handler->m_close_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);

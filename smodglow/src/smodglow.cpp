@@ -296,9 +296,9 @@ void SmodGlowEffect::stopAllAnimations(const EffectWindow *w)
     }
 }
 
-void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data)
 {
-    effects->prePaintWindow(view, w, data, presentTime);
+    effects->prePaintWindow(view, w, data);
 
     if (w->isUserResize()) {
         stopAllAnimations(w);
@@ -353,27 +353,27 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
     shade_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
     underlap_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
     overlap_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
-    help_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
-    close_size += QSize(CLOSEGLOW_SML*2, CLOSEGLOW_SMT*2);
+    help_size += QSize(MINMAXGLOW_SML * 2 + 1, MINMAXGLOW_SMT * 2);
     min_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
     max_size += QSize(MINMAXGLOW_SML*2+1, MINMAXGLOW_SMT*2);
+    close_size += QSize(CLOSEGLOW_SML * 2, CLOSEGLOW_SMT * 2);
     /*qDebug() << "Min size: " << min_size;
     qDebug() << "Max size: " << max_size;
     qDebug() << "Close size: " << close_size;*/
-    handler->m_captureExclude_rect = QRect(origin + handler->m_captureExclude->pos, captureExclude_size);
-    handler->m_menu_rect = QRect(origin + handler->m_menu->pos, menu_size);
-    handler->m_pin_rect = QRect(origin + handler->m_pin->pos, pin_size);
-    handler->m_shade_rect = QRect(origin + handler->m_shade->pos, shade_size);
-    handler->m_underlap_rect  = QRect(origin + handler->m_underlap->pos,  underlap_size);
-    handler->m_overlap_rect  = QRect(origin + handler->m_overlap->pos,  overlap_size);
-    handler->m_help_rect  = QRect(origin + handler->m_help->pos,  help_size);
-    handler->m_min_rect   = QRect(origin + handler->m_min->pos,   min_size);
-    handler->m_max_rect   = QRect(origin + handler->m_max->pos,   max_size);
-    handler->m_close_rect = QRect(origin + handler->m_close->pos, close_size);
+    handler->m_captureExclude_rect = Rect(origin + handler->m_captureExclude->pos, captureExclude_size);
+    handler->m_menu_rect = Rect(origin + handler->m_menu->pos, menu_size);
+    handler->m_pin_rect = Rect(origin + handler->m_pin->pos, pin_size);
+    handler->m_shade_rect = Rect(origin + handler->m_shade->pos, shade_size);
+    handler->m_underlap_rect = Rect(origin + handler->m_underlap->pos, underlap_size);
+    handler->m_overlap_rect = Rect(origin + handler->m_overlap->pos, overlap_size);
+    handler->m_help_rect = Rect(origin + handler->m_help->pos, help_size);
+    handler->m_min_rect = Rect(origin + handler->m_min->pos, min_size);
+    handler->m_max_rect = Rect(origin + handler->m_max->pos, max_size);
+    handler->m_close_rect = Rect(origin + handler->m_close->pos, close_size);
 
-    /*handler->m_min_rect   = QRect(origin + handler->m_min->pos,   m_texture_minimize.get()->size());
-    handler->m_max_rect   = QRect(origin + handler->m_max->pos,   m_texture_maximize.get()->size());
-    handler->m_close_rect = QRect(origin + handler->m_close->pos, m_texture_close.get()->size());*/
+    /*handler->m_min_rect   = Rect(origin + handler->m_min->pos,   m_texture_minimize.get()->size());
+    handler->m_max_rect   = Rect(origin + handler->m_max->pos,   m_texture_maximize.get()->size());
+    handler->m_close_rect = Rect(origin + handler->m_close->pos, m_texture_close.get()->size());*/
 
     Region newPaint = Region();
     newPaint |= Rect(handler->m_captureExclude_rect);
@@ -387,15 +387,6 @@ void SmodGlowEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPre
     newPaint |= Rect(handler->m_max_rect);
     newPaint |= Rect(handler->m_close_rect);
 
-    if (newPaint != m_prevPaint) {
-        Region clearRegion = m_prevPaint - newPaint;
-
-        if (!clearRegion.isEmpty()) {
-            data.devicePaint |= clearRegion;
-        }
-    }
-
-    data.devicePaint |= newPaint;
     m_prevPaint = newPaint;
 }
 
