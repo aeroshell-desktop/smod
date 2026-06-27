@@ -1,4 +1,6 @@
-#version 140
+#version 300 es
+
+precision highp float;
 
 uniform sampler2D sampler;
 uniform float opacity;
@@ -18,12 +20,15 @@ float map(float value, float originalMin, float originalMax, float newMin, float
 }
 
 float processAxis(float coord, float textureBorder, float windowBorder) {
-    if (coord < windowBorder)
-        return map(coord, 0, windowBorder, 0, textureBorder);
-    else if (coord < 1 - windowBorder)
-        return map(coord,  windowBorder, 1 - windowBorder, textureBorder, 1 - textureBorder);
-    else
-        return map(coord, 1 - windowBorder, 1, 1 - textureBorder, 1);
+    if (coord < windowBorder) {
+        return map(coord, 0.0f, windowBorder, 0.0f, textureBorder);
+    }
+    else if (coord < 1.0f - windowBorder) {
+        return map(coord,  windowBorder, 1.0f - windowBorder, textureBorder, 1.0f - textureBorder);
+    }
+    else {
+        return map(coord, 1.0f - windowBorder, 1.0f, 1.0f - textureBorder, 1.0f);
+    }
 }
 
 void main()
@@ -32,7 +37,7 @@ void main()
     vec2 u_borders = vec2(borderleft / texturerect.x, bordertop / texturerect.y); // Borders normalized for the original texture
     vec2 newUV = vec2(
         processAxis(texcoord0.x, u_borders.x, u_dimensions.x),
-        processAxis(texcoord0.y, u_borders.y, u_dimensions.y)
+                      processAxis(texcoord0.y, u_borders.y, u_dimensions.y)
     );
     fragColor = texture(sampler, newUV) * opacity;
     fragColor *= colorMatrix;
