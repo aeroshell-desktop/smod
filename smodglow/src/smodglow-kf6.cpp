@@ -131,8 +131,10 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     const auto scale = viewport.scale();
     QMatrix4x4 colorMat = colorMatrix(data.brightness() * hdr_brightness_correction, data.saturation());
 
+    GLTexture *m_preferred_texture = m_texture_minimize.get();
+
+    // TODO FIXME: this should really be simplified...
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_captureExclude->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_captureExclude_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -141,7 +143,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_captureExclude_rect.width(), handler->m_captureExclude_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -149,7 +151,6 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_menu->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_menu_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -158,7 +159,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_menu_rect.width(), handler->m_menu_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -166,7 +167,6 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_pin->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_pin_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -175,7 +175,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_pin_rect.width(), handler->m_pin_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -183,7 +183,6 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_shade->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_shade_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -192,7 +191,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_shade_rect.width(), handler->m_shade_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -200,7 +199,6 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_underlap->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_underlap_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -209,7 +207,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_underlap_rect.width(), handler->m_underlap_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -217,7 +215,6 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_overlap->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_overlap_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -226,16 +223,14 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_overlap_rect.width(), handler->m_overlap_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
     }
 
-
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_help->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_help_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -244,7 +239,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_help_rect.width(), handler->m_help_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -252,7 +247,6 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     {
-        GLTexture *m_preferred_texture = m_texture_minimize.get();
         float opacity = handler->m_min->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_min_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -261,15 +255,16 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_min_rect.width(), handler->m_min_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
     }
 
+    m_preferred_texture = m_texture_maximize.get();
+
     {
-        GLTexture *m_preferred_texture = m_texture_maximize.get();
         float opacity = handler->m_max->hoverProgress() * w->opacity() * data.opacity();
         const RectF pixelGeometry = snapToPixelGridF(handler->m_max_rect.scaled(scale));
         QMatrix4x4 mvp = viewport.projectionMatrix();
@@ -278,7 +273,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, MINMAXGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_max_rect.width(), handler->m_max_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
@@ -294,7 +289,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_opacity, opacity);
         m_shader->setUniform(uniform_bordertop, CLOSEGLOW_SMT);
         m_shader->setUniform(uniform_borderleft, CLOSEGLOW_SML);
-        m_shader->setUniform(uniform_targetrect, QVector2D(pixelGeometry.width(), pixelGeometry.height()));
+        m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_close_rect.width(), handler->m_close_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
         QSize rect = m_texture_close.get()->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
