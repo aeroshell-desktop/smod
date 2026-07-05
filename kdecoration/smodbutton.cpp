@@ -66,7 +66,6 @@ Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::De
         Button *b = new Button(type, d, parent);
         const auto c = d->window();
 
-        b->setVisible(true);
         b->setAcceptedButtons(Qt::LeftButton);
         connect(b, &KDecoration3::DecorationButton::visibilityChanged, d, &SMOD::Decoration::requestUpdateButtonPositions);
 
