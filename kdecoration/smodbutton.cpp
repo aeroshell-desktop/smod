@@ -179,9 +179,10 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
     painter->save();
 
+    const auto c = deco->window();
+
     // menu button
     if (type() == KDecoration3::DecorationButtonType::Menu) {
-        const auto c = deco->window();
         QSize iconSize = g.size();
         QRect iconRect(g.topLeft(), iconSize);
 
@@ -199,7 +200,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         int t = m_sizingInfo.margin_top, b = m_sizingInfo.margin_bottom;
 
         // content margins
-        int c_l = 0, c_r = 0;
+        int c_l = m_sizingInfo.content_left, c_r = m_sizingInfo.content_right;
         int c_t = m_sizingInfo.content_top, c_b = m_sizingInfo.content_bottom;
 
         if (m_isFlipped) {
@@ -208,8 +209,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         } else if (m_isMirrored) {
             c_l = c_r = m_sizingInfo.content_left;
         }
-
-        const auto c = decoration()->window();
 
         // configure painter
         painter->setRenderHint(QPainter::Antialiasing, true);
@@ -279,18 +278,16 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
 
             // automatic scaling or smthing
-            if (textureName == "maximize") {
-                if (titlebarHeight < 19) {
-                    l -= (19 - titlebarHeight);
-                }
-            } else if (textureName == "minimize") {
-                if (titlebarHeight < 19) {
+            if (titlebarHeight < 19) {
+                if (textureName == "maximize") {
+                    l -= 19 - titlebarHeight;
+                } else if (textureName == "minimize") {
                     l--;
                 }
             }
 
             // set glyph offset
-            if (type() == KDecoration3::DecorationButtonType::Close) {
+            if (type() == KDecoration3::DecorationButtonType::Close || textureName == "minimize") {
                 glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
 
             } else if (textureName == "maximize") {
@@ -300,9 +297,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
                 } else {
                     glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
                 }
-
-            } else if (textureName == "minimize") {
-                glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
             }
         }
 
