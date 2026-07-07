@@ -694,16 +694,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         const int right = m_rightButtons->geometry().left() - (g_sizingmargins.frameRightSizing().inset) + 2;
 
         QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
-
         QString caption = settings()->fontMetrics().elidedText(c->caption().remove(QRegularExpression(" —.+")), Qt::ElideMiddle, captionRect.width());
-
-        // replace emojis for █
-        // fixes a BUG in which the glow is shorter than the actual text when there's emojis
-        QTextOption emojiOpt;
-        emojiOpt.setFlags(QTextOption::ShowDefaultIgnorables);
-        QFontMetrics fm(settings()->font());
-        auto rect =
-            fm.boundingRect(caption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), emojiOpt);
 
         // TODO: force active text color if the theme requests it to match Windows 7 behavior
         QColor textColor = titleColor(c->isActive()); // c->color(KDecoration3::ColorGroup::Active, KDecoration3::ColorRole::Foreground);
@@ -726,9 +717,22 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         label.setStyleSheet("QLabel { background: #00aaaaaa; }");
         label.setPalette(palette);
 
-        auto font = settings()->font();
+        QFont font = settings()->font();
         font.setKerning(false);
         label.setFont(font);
+
+        QFontMetrics fm(font);
+
+        if (titleAlignment == InternalSettings::AlignCenterFullWidth) {
+            QRect textRect = fm.boundingRect(caption);
+            textRect.moveLeft(size().width() / 2 - textRect.width() / 2);
+
+            if (textRect.intersects(m_leftButtons->geometry().toRect())) {
+                titleAlignment = InternalSettings::AlignLeft;
+            } else if (textRect.intersects(m_rightButtons->geometry().toRect())) {
+                titleAlignment = InternalSettings::AlignRight;
+            }
+        }
 
         if (titleAlignment == InternalSettings::AlignRight) {
             label.setAlignment(Qt::AlignRight);
@@ -754,6 +758,13 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+        // replace emojis for '█'
+        // fixes a BUG in which the glow is shorter than the actual text when there's emojis
+        QTextOption emojiOpt;
+        emojiOpt.setFlags(QTextOption::ShowDefaultIgnorables);
+        QRect rect =
+            fm.boundingRect(caption.replace(QRegularExpression("\\p{Extended_Pictographic}", QRegularExpression::UseUnicodePropertiesOption), "█"), emojiOpt);
 
         int glowWidth = rect.width() + 32;
         int glowHeight = rect.height() * 1.2;
