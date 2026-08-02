@@ -299,6 +299,18 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
         }
 
+        if (m_normal.isNull() || m_hover.isNull() || m_active.isNull()) {
+            qCritical("smod: Button textures are null. Cannot continue rendering");
+            painter->restore();
+            return;
+        }
+
+        if (m_glyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull()) {
+            qCritical("smod: Button glyph textures are null. Cannot continue rendering");
+            painter->restore();
+            return;
+        }
+
         // for animations
         QImage image, hImage, aImage;
 
@@ -312,7 +324,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         //       to use the msstyles atlas directly too, which will make
         //       doing SMOD themes and the msstyles migration easier
         FrameTexture btn(l, r, t, b, w, h, &final);
-
         if (!isPressed() && !m_isToggled) {
             image = hoverImage(image, hImage, m_hoverProgress);
             final.convertFromImage(image);
@@ -522,6 +533,11 @@ void Button::loadPixmaps()
     m_glyphHover = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-hover-glyph" + m_dpiScale);
     m_glyphActive = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-active-glyph" + m_dpiScale);
 
+    // TODO: uncap this after themes can provide any scale they want for each texture, like in msstyles
+    if (m_dpiScale == "@2x") {
+        m_dpiScale = "@1.5x";
+    }
+
     QList<QPixmap> pixmapsToMod{QPixmap(":/smod/decoration/" + m_currentTextureName + m_dpiScale),
                                 QPixmap(":/smod/decoration/" + m_currentTextureName + "-hover" + m_dpiScale),
                                 QPixmap(":/smod/decoration/" + m_currentTextureName + "-active" + m_dpiScale)};
@@ -538,6 +554,11 @@ void Button::loadPixmaps()
             QImage img;
 
             if (pixmap.isNull()) {
+                if (i + 1 == pixmapsToMod.length()) {
+                    qCritical("smod: All button textures are null! Please check the SMOD theme");
+                    qInfo() << "smod: Current texture name:" << m_currentTextureName;
+                    qInfo() << "smod: Current texture suffix:" << m_dpiScale;
+                }
                 continue;
             }
 
