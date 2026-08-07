@@ -189,8 +189,11 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
         iconRect.translate(0, (titlebarHeight - iconSize.height()) / 2);
         c->icon().paint(painter, iconRect);
-
     } else if (type() != KDecoration3::DecorationButtonType::Spacer) {
+        const bool isMaximized = c->isMaximized();
+        const bool isUnfocused = !c->isActive();
+        const bool isInactive = !isEnabled();
+
         qreal w = g.width();
         qreal h = g.height();
 
@@ -208,11 +211,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         } else if (m_isMirrored) {
             c_l = c_r = m_sizingInfo.content_left;
         }
-
-        // configure painter
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-        painter->translate(g.topLeft());
 
         QString textureName = m_data.textureName, glyphName = m_data.glyphName;
         QPoint glyphOffset;
@@ -240,7 +238,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
         }
 
-        if (c->isMaximized() && m_smodType == SMOD::Maximize) {
+        if (isMaximized && m_smodType == SMOD::Maximize) {
             glyphName = "restore";
         }
 
@@ -248,12 +246,10 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         {
             QString t = textureName;
             QString g = glyphName;
-
-            if (!c->isActive()) {
+            if (isUnfocused) {
                 t += "-unfocus";
             }
-
-            if (!isEnabled()) {
+            if (isInactive) {
                 g += "-inactive";
             }
 
@@ -288,32 +284,23 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             // set glyph offset
             if (type() == KDecoration3::DecorationButtonType::Close || textureName == "minimize") {
                 glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
-
             } else if (textureName == "maximize") {
-                if (deco && deco->isMaximized()) {
+                if (deco && isMaximized) {
                     glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
-
                 } else {
                     glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
                 }
             }
         }
 
-        if (m_normal.isNull() || m_hover.isNull() || m_active.isNull()) {
-            qCritical("smod: Button textures are null. Cannot continue rendering");
-            painter->restore();
-            return;
-        }
-
-        if (m_glyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull()) {
-            qCritical("smod: Button glyph textures are null. Cannot continue rendering");
-            painter->restore();
-            return;
+        bool renderButtonTexture = !(m_normal.isNull() || m_hover.isNull() || m_active.isNull());
+        bool renderButtonGlyph = !(m_glyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull());
+        if (isInactive) {
+            renderButtonGlyph = !m_glyph.isNull();
         }
 
         // for animations
         QImage image, hImage, aImage;
-
         image = m_normal.toImage();
         hImage = m_hover.toImage();
         aImage = m_active.toImage();
@@ -324,17 +311,33 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         //       to use the msstyles atlas directly too, which will make
         //       doing SMOD themes and the msstyles migration easier
         FrameTexture btn(l, r, t, b, w, h, &final);
+
+        // configure painter
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter->translate(g.topLeft());
+
         if (!isPressed() && !m_isToggled) {
-            image = hoverImage(image, hImage, m_hoverProgress);
-            final.convertFromImage(image);
             // render button texture
-            btn.render(painter);
+            if (renderButtonTexture) {
+                image = hoverImage(image, hImage, m_hoverProgress);
+                final.convertFromImage(image);
+                btn.render(painter);
+            }
+
             // render glyph
-            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), isHovered() ? m_glyphHover : m_glyph);
+            if (renderButtonGlyph) {
+                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), isHovered() ? m_glyphHover : m_glyph);
+            }
         } else {
-            final.convertFromImage(aImage);
-            btn.render(painter);
-            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), m_glyphActive);
+            if (renderButtonTexture) {
+                final.convertFromImage(aImage);
+                btn.render(painter);
+            }
+
+            if (renderButtonGlyph) {
+                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), m_glyphActive);
+            }
         }
     }
 
@@ -542,6 +545,16 @@ void Button::loadPixmaps()
                                 QPixmap(":/smod/decoration/" + m_currentTextureName + "-hover" + m_dpiScale),
                                 QPixmap(":/smod/decoration/" + m_currentTextureName + "-active" + m_dpiScale)};
 
+    for (int i = 0; i < pixmapsToMod.length(); i++) {
+        if (pixmapsToMod.at(i).isNull()) {
+            qCritical("smod: Null button texture detected. Please check the SMOD theme");
+            qInfo() << "smod: Current texture name:" << m_currentTextureName;
+            qInfo() << "smod: Current texture suffix:" << m_dpiScale;
+            pixmapsToMod.removeAt(i);
+            continue;
+        }
+    }
+
     QList<QPixmap> moddedPixmaps;
 
     // reset
@@ -552,15 +565,6 @@ void Button::loadPixmaps()
         for (int i = 0; i < pixmapsToMod.length(); i++) {
             QPixmap pixmap = pixmapsToMod.at(i);
             QImage img;
-
-            if (pixmap.isNull()) {
-                if (i + 1 == pixmapsToMod.length()) {
-                    qCritical("smod: All button textures are null! Please check the SMOD theme");
-                    qInfo() << "smod: Current texture name:" << m_currentTextureName;
-                    qInfo() << "smod: Current texture suffix:" << m_dpiScale;
-                }
-                continue;
-            }
 
             // modify according to position and texture name
             switch (m_posInList) {
