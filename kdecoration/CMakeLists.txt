@@ -1,7 +1,5 @@
 add_definitions(-DTRANSLATION_DOMAIN="smod_deco")
 
-################# newt target #################
-### plugin classes
 set(smoddecoration_SRCS
     smodbutton.cpp
     smoddecoration.cpp
@@ -11,24 +9,18 @@ set(smoddecoration_SRCS
     sizingmargins.cpp
 )
 
-### build library
 kconfig_add_kcfg_files(smoddecoration_SRCS smodsettings.kcfgc)
 add_library(smoddecoration SHARED
     ${smoddecoration_SRCS}
     ${smoddecoration_config_PART_FORMS_HEADERS})
-
 set_target_properties(smoddecoration PROPERTIES
     OUTPUT_NAME org.smod.smod
     PREFIX ""
+    POSITION_INDEPENDENT_CODE TRUE
+    ENABLE_EXPORTS TRUE
 )
-
 target_compile_definitions(smoddecoration PRIVATE MYSHAREDLIB_LIBRARY)
-
-set_target_properties(smoddecoration PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-set_target_properties(smoddecoration PROPERTIES ENABLE_EXPORTS TRUE)
-
 add_compile_options(-fPIC)
-
 target_link_libraries(smoddecoration
     PRIVATE
         Qt6::Widgets
@@ -46,12 +38,12 @@ install(TARGETS smoddecoration DESTINATION ${KDE_INSTALL_PLUGINDIR}/${KDECORATIO
 add_subdirectory(config)
 
 set(smod_HEADERS
-  smod.h
-  smodbutton.h
-  smoddecoration.h
-  smodexceptionlist.h
-  smodsettingsprovider.h
-  sizingmargins.h
+    smod.h
+    smodbutton.h
+    smoddecoration.h
+    smodexceptionlist.h
+    smodsettingsprovider.h
+    sizingmargins.h
 )
 
 kconfig_add_kcfg_files(smod_HEADERS smodsettings.kcfgc)
