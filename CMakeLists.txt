@@ -65,6 +65,13 @@ if(BUILD_EFFECTWL OR BUILD_EFFECTX11)
         ConfigWidgets
     )
 
+    # assume decoration library is already installed
+    if (NOT BUILD_DECORATION)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(smoddecoration REQUIRED IMPORTED_TARGET smoddecoration)
+        add_library(smoddecoration ALIAS PkgConfig::smoddecoration)
+    endif()
+
     if(BUILD_EFFECTX11)
         find_package(KWinX11 REQUIRED kwineffects)
     else()

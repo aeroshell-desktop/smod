@@ -11,6 +11,9 @@ add_library(smodglow SHARED)
 set_target_properties(smodglow PROPERTIES
     PREFIX ""
 )
+if (NOT BUILD_DECORATION)
+    target_link_directories(smodglow-x11 PRIVATE ${smoddecoration_LIBRARY_DIRS})
+endif()
 target_link_libraries(smodglow
     PRIVATE
         smoddecoration
