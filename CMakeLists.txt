@@ -13,7 +13,7 @@ set(QT_MIN_VERSION "6.7.0")
 set(QT_MAJOR_VERSION 6)
 
 option(BUILD_EFFECTX11 "Build the caption glow effect for X11" OFF)
-option(BUILD_EFFECTWL "Build the caption glow effect for Wayland" ON)
+option(BUILD_EFFECT "Build the caption glow effect for Wayland" ON)
 option(BUILD_DECORATION "Build the decoration" ON)
 
 # We need this because we can't include KDECMakeSettings here, because that
@@ -60,7 +60,7 @@ if(BUILD_DECORATION)
     add_subdirectory(kdecoration)
 endif()
 
-if(BUILD_EFFECTWL OR BUILD_EFFECTX11)
+if(BUILD_EFFECT OR BUILD_EFFECTX11)
     find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
         ConfigWidgets
     )

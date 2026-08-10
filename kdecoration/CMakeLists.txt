@@ -10,9 +10,7 @@ set(smoddecoration_SRCS
 )
 
 kconfig_add_kcfg_files(smoddecoration_SRCS smodsettings.kcfgc)
-add_library(smoddecoration SHARED
-    ${smoddecoration_SRCS}
-    ${smoddecoration_config_PART_FORMS_HEADERS})
+add_library(smoddecoration SHARED ${smoddecoration_SRCS} ${smoddecoration_config_PART_FORMS_HEADERS})
 set_target_properties(smoddecoration PROPERTIES
     OUTPUT_NAME org.smod.smod
     PREFIX ""
@@ -36,7 +34,6 @@ target_link_libraries(smoddecoration
 install(TARGETS smoddecoration DESTINATION ${KDE_INSTALL_PLUGINDIR}/${KDECORATION_PLUGIN_DIR})
 
 add_subdirectory(config)
-
 set(smod_HEADERS
     smod.h
     smodbutton.h
@@ -47,7 +44,6 @@ set(smod_HEADERS
 )
 
 kconfig_add_kcfg_files(smod_HEADERS smodsettings.kcfgc)
-
 ecm_generate_headers(smod_CamelCase_HEADERS
     HEADER_NAMES
         SMOD
@@ -60,7 +56,6 @@ ecm_generate_headers(smod_CamelCase_HEADERS
     REQUIRED_HEADERS
         smod_HEADERS
 )
-
 ecm_generate_pkgconfig_file(
     BASE_NAME "smoddecoration"
     LIB_NAME ":org.smod.smod.so"
@@ -70,11 +65,10 @@ ecm_generate_pkgconfig_file(
 )
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/decorations DESTINATION ${CMAKE_INSTALL_PREFIX}/share/smod)
-
 install(
     FILES
         ${smod_HEADERS}
-        ${breezedecoration_config_PART_FORMS_HEADERS}
+        ${smoddecoration_config_PART_FORMS_HEADERS}
         ${smod_CamelCase_HEADERS}
 
     DESTINATION
@@ -83,7 +77,6 @@ install(
     COMPONENT
         Devel
 )
-
 install(
     FILES
         ${pkgconfig_filename}
