@@ -7,7 +7,7 @@ set(effect_SRCS
     smodglow.qrc
 )
 
-add_library(smodglow SHARED)
+add_library(smodglow SHARED ${effect_SRCS})
 set_target_properties(smodglow PROPERTIES
     PREFIX ""
 )
@@ -20,6 +20,7 @@ target_link_libraries(smodglow
         Qt6::Core Qt6::DBus
         KF6::ConfigCore KF6::ConfigGui
         KWin::kwin
+        KDecoration3::KDecoration
 )
 
 install(TARGETS smodglow DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)

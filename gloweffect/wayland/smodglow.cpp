@@ -84,24 +84,15 @@ void SmodGlowEffect::setupEffectHandlerConnections()
 {
     connect(effects, &EffectsHandler::windowAdded, this, &SmodGlowEffect::windowAdded, Qt::UniqueConnection);
     connect(effects, &EffectsHandler::windowClosed, this, &SmodGlowEffect::windowClosed, Qt::UniqueConnection);
-#ifndef BUILD_KF6
-    connect(effects, &EffectsHandler::windowMaximizedStateChanged, this, &SmodGlowEffect::windowMaximizedStateChanged, Qt::UniqueConnection);
-    connect(effects, &EffectsHandler::windowMinimized, this, &SmodGlowEffect::windowMinimized, Qt::UniqueConnection);
-    connect(effects, &EffectsHandler::windowStartUserMovedResized, this, &SmodGlowEffect::windowStartUserMovedResized, Qt::UniqueConnection);
-    connect(effects, &EffectsHandler::windowFullScreenChanged, this, &SmodGlowEffect::effectWindowFullScreenChanged, Qt::UniqueConnection);
-    connect(effects, &EffectsHandler::windowDecorationChanged, this, &SmodGlowEffect::windowDecorationChanged, Qt::UniqueConnection);
-#endif
 }
 
 void SmodGlowEffect::setupEffectWindowConnections(const EffectWindow *w)
 {
-#ifdef BUILD_KF6
     connect(w, &EffectWindow::windowMaximizedStateChanged, this, &SmodGlowEffect::windowMaximizedStateChanged, Qt::UniqueConnection);
     connect(w, &EffectWindow::minimizedChanged, this, &SmodGlowEffect::windowMinimized, Qt::UniqueConnection);
     connect(w, &EffectWindow::windowStartUserMovedResized, this, &SmodGlowEffect::windowStartUserMovedResized, Qt::UniqueConnection);
     connect(w, &EffectWindow::windowFullScreenChanged, this, &SmodGlowEffect::effectWindowFullScreenChanged, Qt::UniqueConnection);
     connect(w, &EffectWindow::windowDecorationChanged, this, &SmodGlowEffect::windowDecorationChanged, Qt::UniqueConnection);
-#endif
 }
 
 void SmodGlowEffect::registerWindow(const EffectWindow *w)

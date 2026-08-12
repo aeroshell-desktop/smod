@@ -7,7 +7,7 @@ set(effect_SRCS
     smodglow.qrc
 )
 
-add_library(smodglow-x11 SHARED)
+add_library(smodglow-x11 SHARED ${effect_SRCS})
 set_target_properties(smodglow-x11 PROPERTIES
     PREFIX ""
 )
@@ -20,6 +20,7 @@ target_link_libraries(smodglow-x11
         Qt6::Core Qt6::DBus
         KF6::ConfigCore KF6::ConfigGui
         KWinX11::kwin
+        KDecoration3::KDecoration
 )
 
 install(TARGETS smodglow-x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)

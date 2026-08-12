@@ -49,6 +49,8 @@ find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
     Quick Widgets DBus
 )
 
+find_package(KDecoration3 REQUIRED)
+
 if(BUILD_DECORATION)
     find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
         CoreAddons ColorScheme
@@ -56,7 +58,6 @@ if(BUILD_DECORATION)
         IconThemes WindowSystem
         KCMUtils
     )
-    find_package(KDecoration3 REQUIRED)
     add_subdirectory(kdecoration)
 endif()
 

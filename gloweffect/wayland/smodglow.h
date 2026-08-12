@@ -6,7 +6,6 @@
 #include <QPointer>
 #include <QPropertyAnimation>
 
-#ifdef BUILD_KF6
 #include "core/pixelgrid.h"
 #include "core/renderviewport.h"
 #include "effect/effecthandler.h"
@@ -15,10 +14,6 @@
 #include "opengl/glshadermanager.h"
 #include "opengl/gltexture.h"
 #include "window.h"
-#else
-#include <kwineffects.h>
-#include <kwinglutils.h>
-#endif
 
 #include <SMOD/Decoration/SMODDecoration>
 
@@ -50,12 +45,8 @@ public:
 
     void reconfigure(ReconfigureFlags flags) override;
     void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data) override;
-#ifdef BUILD_KF6
     void paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &region, WindowPaintData &data)
         override;
-#else
-    void paintWindow(EffectWindow *w, int mask, QRegion region, WindowPaintData &data) override;
-#endif
     void postPaintScreen() override;
 
     static bool supported();
@@ -136,11 +127,7 @@ public:
         hoverAnimation->setEndValue(endValue);
         // hoverAnimation->setDuration(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue)));
         hoverAnimation->setDuration( //(int)std::chrono::milliseconds(
-#ifdef BUILD_KF6
             (int)(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue))) * effects->animationTimeFactor()
-#else
-            (int)SmodGlowEffect::animationTime(0.75 + qRound(100 * qAbs(m_hoverProgress - endValue)))
-#endif
             //)
         );
 
