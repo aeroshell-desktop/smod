@@ -12,7 +12,29 @@ namespace SMOD
     {
         return a < 0 ? 0 : a;
     }
-    FrameTexture::FrameTexture(int l, int r, int t, int b, qreal w, qreal h, QPixmap* p, qreal opacity, bool align, qreal o_x, qreal o_y, qreal src_w, qreal src_h) : normal(p), l(l), r(r), t(t), b(b), alignPixels(align), off_x(o_x), off_y(o_y), width(src_w), height(src_h)
+    FrameTexture::FrameTexture(int l,
+                               int r,
+                               int t,
+                               int b,
+                               qreal w,
+                               qreal h,
+                               QPixmap *p,
+                               qreal opacity,
+                               bool align,
+                               qreal o_x,
+                               qreal o_y,
+                               qreal src_w,
+                               qreal src_h)
+        : normal(p)
+        , off_x(o_x)
+        , off_y(o_y)
+        , width(src_w)
+        , height(src_h)
+        , l(l)
+        , r(r)
+        , t(t)
+        , b(b)
+        , alignPixels(align)
     {
         if(width == -1) width = normal->width();
         if(height == -1) height = normal->height();
