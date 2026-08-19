@@ -1,0 +1,5 @@
+if(BUILD_EFFECTX11)
+    add_subdirectory(x11)
+else()
+    add_subdirectory(wayland)
+endif()
