@@ -52,6 +52,7 @@ find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
 find_package(KDecoration3 REQUIRED)
 
 if(BUILD_DECORATION)
+    add_subdirectory(theme)
     find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
         CoreAddons ColorScheme
         Config GuiAddons I18n

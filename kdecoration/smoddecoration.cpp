@@ -108,17 +108,17 @@ QString Decoration::themeName()
 
 QPixmap Decoration::close_glow()
 {
-    return QPixmap(QStringLiteral(":/effects/smodglow/textures/close"));
+    return QPixmap(QStringLiteral(":/glow/textures/close"));
 }
 
 QPixmap Decoration::maximize_glow()
 {
-    return QPixmap(QStringLiteral(":/effects/smodglow/textures/maximize"));
+    return QPixmap(QStringLiteral(":/glow/textures/maximize"));
 }
 
 QPixmap Decoration::minimize_glow()
 {
-    return QPixmap(QStringLiteral(":/effects/smodglow/textures/minimize"));
+    return QPixmap(QStringLiteral(":/glow/textures/minimize"));
 }
 
 int Decoration::decorationCount()
@@ -504,7 +504,7 @@ void Decoration::paintSideHighlights(QPainter *painter, const QRectF &repaintReg
     if (!isMaximized() && !hideInnerBorder()) {
         auto margins_left = sizingMargins().frameLeftSizing();
         auto margins_right = sizingMargins().frameRightSizing();
-        QPixmap sidehighlight(":/smod/decoration/sidehighlight" + (!c->isActive() ? QString("-unfocus") : QString("")));
+        QPixmap sidehighlight(":/decoration/frame/sidehighlight/" + (!c->isActive() ? QString("unfocus") : QString("focus")));
         painter->drawPixmap(margins_left.inset, borderTop(), borderLeft() - margins_left.inset - margins_left.inset, SIDEBAR_HEIGHT, sidehighlight);
         painter->drawPixmap(size().width() - borderRight() + margins_right.inset,
                             borderTop(),
@@ -519,21 +519,19 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
 {
     Q_UNUSED(repaintRegion);
     bool active = window()->isActive();
-    QString s_top(":/smod/decoration/top");
-    QString s_left(":/smod/decoration/left");
-    QString s_right(":/smod/decoration/right");
-    QString s_bottom(":/smod/decoration/bottom");
+    QString s_prefix("focused");
+    if (!active) {
+        s_prefix = QStringLiteral("unfocused");
+    }
+
+    QString s_top(":/decoration/frame/" + s_prefix + "/top");
+    QString s_left(":/decoration/frame/" + s_prefix + "/left");
+    QString s_right(":/decoration/frame/" + s_prefix + "/right");
+    QString s_bottom(":/decoration/frame/" + s_prefix + "/bottom");
 
     if (!internalSettings()->enableShadow()) {
         s_top += QString("_noshadow");
         s_bottom += QString("_noshadow");
-    }
-
-    if (!active) {
-        s_top += QString("_unfocus");
-        s_bottom += QString("_unfocus");
-        s_left += QString("_unfocus");
-        s_right += QString("_unfocus");
     }
 
     if (hideInnerBorder()) {
@@ -747,7 +745,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         label.setFixedWidth(captionRect.width());
         label.setFixedHeight(captionRect.height());
 
-        QPixmap glowPixmap(":/smod/decoration/glow");
+        QPixmap glowPixmap(":/decoration/frame/glow");
 
         auto glowMargins = sizingMargins().glowSizing();
         int l = glowMargins.margin_left;
@@ -834,7 +832,13 @@ std::shared_ptr<KDecoration3::DecorationShadow> Decoration::createShadow(bool ac
     QMargins margins(sizing.margin_left, sizing.margin_top, sizing.margin_right, sizing.margin_bottom);
     QMargins padding(sizing.padding_left, sizing.padding_top, sizing.padding_right, sizing.padding_bottom);
 
-    QImage texture = QImage(active ? ":/smod/decoration/shadow" : ":/smod/decoration/shadow-unfocus");
+    QString texturePath(":/decoration/frame/shadow/");
+    QString variant("normal");
+    if (!active) {
+        variant = QStringLiteral("unfocus");
+    }
+
+    QImage texture = QImage(texturePath + variant);
     QRect innerShadowRect = texture.rect() - margins;
 
     auto shadow = std::make_shared<KDecoration3::DecorationShadow>();
