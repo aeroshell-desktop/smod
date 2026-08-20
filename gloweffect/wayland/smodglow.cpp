@@ -58,6 +58,20 @@ void SmodGlowEffect::reconfigure(Effect::ReconfigureFlags flags)
 {
     Q_UNUSED(flags)
     ensureResources();
+
+    loadTextures();
+
+    if (!isActive()) {
+        qDebug() << "kwin_effect_smodglow: SMOD RCC \"smodgloweffecttextures\" not found!";
+        return;
+    }
+
+    const auto windowlist = effects->stackingOrder();
+
+    for (EffectWindow *window : windowlist) {
+        unregisterWindow(window);
+        registerWindow(window);
+    }
 }
 
 void SmodGlowEffect::setupEffectHandlerConnections()
