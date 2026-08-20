@@ -64,7 +64,6 @@ ecm_generate_pkgconfig_file(
     FILENAME_VAR pkgconfig_filename
 )
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/decorations DESTINATION ${CMAKE_INSTALL_PREFIX}/share/smod)
 install(
     FILES
         ${smod_HEADERS}

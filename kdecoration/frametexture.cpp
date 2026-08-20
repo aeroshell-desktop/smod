@@ -26,15 +26,15 @@ namespace SMOD
                                qreal src_w,
                                qreal src_h)
         : normal(p)
-        , off_x(o_x)
-        , off_y(o_y)
-        , width(src_w)
-        , height(src_h)
         , l(l)
         , r(r)
         , t(t)
         , b(b)
         , alignPixels(align)
+        , off_x(o_x)
+        , off_y(o_y)
+        , width(src_w)
+        , height(src_h)
     {
         if(width == -1) width = normal->width();
         if(height == -1) height = normal->height();

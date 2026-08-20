@@ -13,7 +13,7 @@ SizingMargins::~SizingMargins()
 
 void SizingMargins::loadSizingMargins()
 {
-    QSettings settings(":/smod/decoration/sizingmargins", QSettings::IniFormat);
+    QSettings settings(":/decoration/sizingmargins", QSettings::IniFormat);
     // GlowSizing
     m_glowSizing.margin_left   = settings.value("Glow/margin_left",   24).toInt();
     m_glowSizing.margin_right  = settings.value("Glow/margin_right",  25).toInt();
