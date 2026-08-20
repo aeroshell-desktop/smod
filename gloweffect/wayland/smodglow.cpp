@@ -40,7 +40,6 @@ SmodGlowEffect::SmodGlowEffect()
     // effects->makeOpenGLContextCurrent();
 
     m_shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture, QString(), QStringLiteral(":/effects/smodglow/shaders/shader.frag"));
-
     if (!m_shader) {
         qWarning() << "kwin_effect_smodglow: Failed to load shader!";
     }
@@ -58,17 +57,12 @@ bool SmodGlowEffect::supported()
 void SmodGlowEffect::reconfigure(Effect::ReconfigureFlags flags)
 {
     Q_UNUSED(flags)
-
     ensureResources();
-
-    /*m_active = SMOD::registerResource(SmodDecoration::themeName(), currentlyRegisteredPath);
-    currentlyRegisteredPath = SmodDecoration::themeName();*/
 
     loadTextures();
 
     if (!isActive()) {
         qDebug() << "kwin_effect_smodglow: SMOD RCC \"smodgloweffecttextures\" not found!";
-
         return;
     }
 

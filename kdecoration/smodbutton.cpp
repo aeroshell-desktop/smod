@@ -191,7 +191,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         c->icon().paint(painter, iconRect);
     } else if (type() != KDecoration3::DecorationButtonType::Spacer) {
         const bool isMaximized = c->isMaximized();
-        const bool isUnfocused = !c->isActive();
         const bool isInactive = !isEnabled();
 
         qreal w = g.width();
@@ -243,15 +242,10 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         }
 
         // load the textures
+        // TODO: use the notresponding textures
         {
             QString t = textureName;
             QString g = glyphName;
-            if (isUnfocused) {
-                t += "-unfocus";
-            }
-            if (isInactive) {
-                g += "-inactive";
-            }
 
             if (m_currentTextureName != t || m_currentGlyphName != g || m_posInList != m_prevPos) {
                 m_currentTextureName = t;
@@ -293,10 +287,11 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
         }
 
+        QPixmap firstGlyph = isInactive ? m_glyphDisabled : m_glyph;
         bool renderButtonTexture = !(m_normal.isNull() || m_hover.isNull() || m_active.isNull());
-        bool renderButtonGlyph = !(m_glyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull());
+        bool renderButtonGlyph = !(firstGlyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull());
         if (isInactive) {
-            renderButtonGlyph = !m_glyph.isNull();
+            renderButtonGlyph = !firstGlyph.isNull();
         }
 
         // for animations
@@ -327,7 +322,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
             // render glyph
             if (renderButtonGlyph) {
-                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), isHovered() ? m_glyphHover : m_glyph);
+                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), firstGlyph.width(), firstGlyph.height(), isHovered() ? m_glyphHover : firstGlyph);
             }
         } else {
             if (renderButtonTexture) {
@@ -336,7 +331,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
 
             if (renderButtonGlyph) {
-                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), m_glyph.width(), m_glyph.height(), m_glyphActive);
+                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), firstGlyph.width(), firstGlyph.height(), m_glyphActive);
             }
         }
     }
@@ -532,18 +527,26 @@ void Button::startHoverAnimation(qreal endValue)
 
 void Button::loadPixmaps()
 {
-    m_glyph = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-glyph" + m_dpiScale);
-    m_glyphHover = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-hover-glyph" + m_dpiScale);
-    m_glyphActive = QPixmap(":/smod/decoration/" + m_currentGlyphName + "-active-glyph" + m_dpiScale);
+    m_glyph = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/normal" + m_dpiScale);
+    m_glyphHover = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/hover" + m_dpiScale);
+    m_glyphActive = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/active" + m_dpiScale);
+    m_glyphDisabled = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/disabled" + m_dpiScale);
 
     // TODO: uncap this after themes can provide any scale they want for each texture, like in msstyles
     if (m_dpiScale == "@2x") {
         m_dpiScale = "@1.5x";
     }
 
-    QList<QPixmap> pixmapsToMod{QPixmap(":/smod/decoration/" + m_currentTextureName + m_dpiScale),
-                                QPixmap(":/smod/decoration/" + m_currentTextureName + "-hover" + m_dpiScale),
-                                QPixmap(":/smod/decoration/" + m_currentTextureName + "-active" + m_dpiScale)};
+    QString texturePath(":/decoration/button/");
+    if (!decoration()->window()->isActive()) {
+        texturePath += QStringLiteral("unfocused/");
+    } else {
+        texturePath += QStringLiteral("focused/");
+    }
+
+    QList<QPixmap> pixmapsToMod{QPixmap(texturePath + m_currentTextureName + "/normal" + m_dpiScale),
+                                QPixmap(texturePath + m_currentTextureName + "/hover" + m_dpiScale),
+                                QPixmap(texturePath + m_currentTextureName + "/active" + m_dpiScale)};
 
     for (int i = 0; i < pixmapsToMod.length(); i++) {
         if (pixmapsToMod.at(i).isNull()) {
@@ -649,19 +652,19 @@ void Button::loadPixmaps()
 
     if (moddedPixmaps.length() >= 1) {
         m_normal = moddedPixmaps.at(0);
-    } else {
+    } else if (pixmapsToMod.length() >= 1) {
         m_normal = pixmapsToMod.at(0);
     }
 
     if (moddedPixmaps.length() >= 2) {
         m_hover = moddedPixmaps.at(1);
-    } else {
+    } else if (pixmapsToMod.length() >= 2) {
         m_hover = pixmapsToMod.at(1);
     }
 
     if (moddedPixmaps.length() >= 3) {
         m_active = moddedPixmaps.at(2);
-    } else {
+    } else if (pixmapsToMod.length() >= 3) {
         m_active = pixmapsToMod.at(2);
     }
 

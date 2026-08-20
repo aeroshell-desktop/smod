@@ -59,17 +59,17 @@ struct ButtonData {
 
 // TODO: mayhaps make a function to fill this list
 //       this looks horrible lmao
-static QHash<ButtonTypes, ButtonData> buttonData{{Close, ButtonData{QStringLiteral("close"), QStringLiteral("close")}},
-                                                 {CloseLone, ButtonData{QStringLiteral("close"), QStringLiteral("close-single")}},
-                                                 {Maximize, ButtonData{QStringLiteral("maximize"), QStringLiteral("maximize")}},
-                                                 {Minimize, ButtonData{QStringLiteral("minimize"), QStringLiteral("minimize")}},
-                                                 {ContextHelp, ButtonData{QStringLiteral("help"), QStringLiteral("minimize")}},
-                                                 {KeepBelow, ButtonData{QStringLiteral("underlap"), QStringLiteral("minimize")}},
-                                                 {KeepAbove, ButtonData{QStringLiteral("overlap"), QStringLiteral("minimize")}},
-                                                 {Shade, ButtonData{QStringLiteral("shade"), QStringLiteral("minimize")}},
-                                                 {OnAllDesktops, ButtonData{QStringLiteral("pin"), QStringLiteral("minimize")}},
-                                                 {ApplicationMenu, ButtonData{QStringLiteral("menu"), QStringLiteral("minimize")}},
-                                                 {ExcludeFromCapture, ButtonData{QStringLiteral("captureExclude"), QStringLiteral("minimize")}}};
+static QHash<ButtonTypes, ButtonData> buttonData{{Close, {QStringLiteral("close"), QStringLiteral("close")}},
+                                                 {CloseLone, {QStringLiteral("close"), QStringLiteral("close-single")}},
+                                                 {Maximize, {QStringLiteral("maximize"), QStringLiteral("maximize")}},
+                                                 {Minimize, {QStringLiteral("minimize"), QStringLiteral("minimize")}},
+                                                 {ContextHelp, {QStringLiteral("help"), QStringLiteral("minimize")}},
+                                                 {KeepBelow, {QStringLiteral("underlap"), QStringLiteral("minimize")}},
+                                                 {KeepAbove, {QStringLiteral("overlap"), QStringLiteral("minimize")}},
+                                                 {Shade, {QStringLiteral("shade"), QStringLiteral("minimize")}},
+                                                 {OnAllDesktops, {QStringLiteral("pin"), QStringLiteral("minimize")}},
+                                                 {ApplicationMenu, {QStringLiteral("menu"), QStringLiteral("minimize")}},
+                                                 {ExcludeFromCapture, {QStringLiteral("captureexclude"), QStringLiteral("minimize")}}};
 
 inline void registerResource(const QString &name)
 {

@@ -81,7 +81,7 @@ private:
     void loadPixmaps();
 
     QString m_currentTextureName, m_currentGlyphName, m_dpiScale;
-    QPixmap m_glyph, m_glyphHover, m_glyphActive;
+    QPixmap m_glyph, m_glyphHover, m_glyphActive, m_glyphDisabled;
     QPixmap m_normal, m_hover, m_active;
 
     bool m_isToggled = false;
