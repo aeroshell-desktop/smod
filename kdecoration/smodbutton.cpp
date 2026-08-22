@@ -544,9 +544,11 @@ void Button::loadPixmaps()
         texturePath += QStringLiteral("focused/");
     }
 
-    QList<QPixmap> pixmapsToMod{QPixmap(texturePath + m_currentTextureName + "/normal" + m_dpiScale),
-                                QPixmap(texturePath + m_currentTextureName + "/hover" + m_dpiScale),
-                                QPixmap(texturePath + m_currentTextureName + "/active" + m_dpiScale)};
+    m_normal = QPixmap(texturePath + m_currentTextureName + "/normal" + m_dpiScale);
+    m_hover = QPixmap(texturePath + m_currentTextureName + "/hover" + m_dpiScale);
+    m_active = QPixmap(texturePath + m_currentTextureName + "/active" + m_dpiScale);
+
+    QList<QPixmap> pixmapsToMod{m_normal, m_hover, m_active};
 
     for (int i = 0; i < pixmapsToMod.length(); i++) {
         if (pixmapsToMod.at(i).isNull()) {
@@ -646,26 +648,15 @@ void Button::loadPixmaps()
         }
     }
 
-    if (moddedPixmaps.isEmpty()) {
-        moddedPixmaps = pixmapsToMod;
-    }
-
     if (moddedPixmaps.length() >= 1) {
         m_normal = moddedPixmaps.at(0);
-    } else if (pixmapsToMod.length() >= 1) {
-        m_normal = pixmapsToMod.at(0);
     }
-
     if (moddedPixmaps.length() >= 2) {
         m_hover = moddedPixmaps.at(1);
-    } else if (pixmapsToMod.length() >= 2) {
-        m_hover = pixmapsToMod.at(1);
     }
 
     if (moddedPixmaps.length() >= 3) {
         m_active = moddedPixmaps.at(2);
-    } else if (pixmapsToMod.length() >= 3) {
-        m_active = pixmapsToMod.at(2);
     }
 
     if (m_isMirrored) {
