@@ -12,6 +12,7 @@ build-linux-x64:
     - cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build .
     - cmake --build build 
     - DESTDIR=out cmake --install build
+    - cmake --install build --prefix /usr
     - cmake -G Ninja -DBUILD_EFFECTX11=ON -DBUILD_DECORATION=OFF -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build-x11 .
     - cmake --build build-x11
     - DESTDIR=out cmake --install build-x11
