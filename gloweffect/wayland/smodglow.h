@@ -15,7 +15,7 @@
 #include "opengl/gltexture.h"
 #include "window.h"
 
-#include <SMOD/Decoration/SMODDecoration>
+#include <smoddecoration.h>
 
 // TODO remove "+ 1.0" when I fix the textures
 #define MINMAXGLOW_SML 9.0f
