@@ -9,16 +9,10 @@ build-linux-x64:
     - pacman-key --init
     - pacman -Syu --needed --noconfirm ninja cmake gcc gcc-libs glibc frameworkintegration gcc-libs glibc kcmutils kcolorscheme kconfig kcoreaddons kdecoration kguiaddons ki18n kiconthemes kirigami kwidgetsaddons kwindowsystem qt6-base qt6-declarative qt6-svg extra-cmake-modules kwin kwin-x11  kdoctools krunner plasma-wayland-protocols wayland wayland-protocols python xorg-xwayland pkgconf vulkan-headers
   script:
-    - cmake -G Ninja -DBUILD_EFFECT=OFF -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build .
+    - cmake -G Ninja -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build .
     - cmake --build build 
     - DESTDIR=out cmake --install build
-    - cmake --install build --prefix /usr
-    - mkdir smodglow
-    - cd smodglow
-    - cmake -G Ninja -DBUILD_DECORATION=OFF -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build ..
-    - cmake --build build
-    - DESTDIR=out cmake --install build
-    - cmake -G Ninja -DBUILD_EFFECTX11=ON -DBUILD_DECORATION=OFF -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build-x11 ..
+    - cmake -G Ninja -DBUILD_EFFECTX11=ON -DBUILD_DECORATION=OFF -DBUILD_TESTING=ON -DCMAKE_INSTALL_PREFIX=/usr -B build-x11 .
     - cmake --build build-x11
     - DESTDIR=out cmake --install build-x11
   artifacts:
@@ -28,4 +22,3 @@ build-linux-x64:
     expire_in: 6 mos
     paths: 
       - out/
-      - smodglow/out/
