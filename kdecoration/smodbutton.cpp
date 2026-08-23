@@ -555,12 +555,9 @@ void Button::loadPixmaps()
             qCritical("smod: Null button texture detected. Please check the SMOD theme");
             qInfo() << "smod: Current texture name:" << m_currentTextureName;
             qInfo() << "smod: Current texture suffix:" << m_dpiScale;
-            pixmapsToMod.removeAt(i);
             continue;
         }
     }
-
-    QList<QPixmap> moddedPixmaps;
 
     // reset
     m_isFlipped = false;
@@ -570,6 +567,10 @@ void Button::loadPixmaps()
         for (int i = 0; i < pixmapsToMod.length(); i++) {
             QPixmap pixmap = pixmapsToMod.at(i);
             QImage img;
+
+            if (pixmap.isNull()) {
+                continue;
+            }
 
             // modify according to position and texture name
             switch (m_posInList) {
@@ -644,19 +645,18 @@ void Button::loadPixmaps()
             }
             }
 
-            moddedPixmaps.append(pixmap);
+            switch (i) {
+            case 0:
+                m_normal = pixmap;
+                break;
+            case 1:
+                m_hover = pixmap;
+                break;
+            case 2:
+                m_active = pixmap;
+                break;
+            }
         }
-    }
-
-    if (moddedPixmaps.length() >= 1) {
-        m_normal = moddedPixmaps.at(0);
-    }
-    if (moddedPixmaps.length() >= 2) {
-        m_hover = moddedPixmaps.at(1);
-    }
-
-    if (moddedPixmaps.length() >= 3) {
-        m_active = moddedPixmaps.at(2);
     }
 
     if (m_isMirrored) {
