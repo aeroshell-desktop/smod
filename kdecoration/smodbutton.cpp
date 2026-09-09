@@ -62,12 +62,16 @@ Button::Button(QObject *parent, const QVariantList &args)
 //__________________________________________________________________
 Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::Decoration *decoration, QObject *parent)
 {
-    if (auto d = qobject_cast<SMOD::Decoration *>(decoration)) {
+    if (Decoration *d = qobject_cast<SMOD::Decoration *>(decoration)) {
         Button *b = new Button(type, d, parent);
         const auto c = d->window();
 
         b->setAcceptedButtons(Qt::LeftButton);
         connect(b, &KDecoration3::DecorationButton::visibilityChanged, d, &SMOD::Decoration::requestUpdateButtonPositions);
+
+        connect(c, &KDecoration3::DecoratedWindow::activeChanged, b, [b] {
+            b->forcePixmapReload();
+        });
 
         switch (type) {
         case KDecoration3::DecorationButtonType::Close:
@@ -86,7 +90,7 @@ Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::De
 
                 b->setVisible(c->isMaximizeable() || c->isMinimizeable());
                 b->setEnabled(maximizeable);
-                b->update();
+                b->forcePixmapReload();
             });
             break;
         case KDecoration3::DecorationButtonType::Minimize:
@@ -102,7 +106,7 @@ Button *Button::create(KDecoration3::DecorationButtonType type, KDecoration3::De
 
                 b->setVisible(c->isMinimizeable() || c->isMaximizeable());
                 b->setEnabled(minimizeable);
-                b->update();
+                b->forcePixmapReload();
             });
             break;
         case KDecoration3::DecorationButtonType::ContextHelp:
@@ -247,7 +251,9 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             QString t = textureName;
             QString g = glyphName;
 
-            if (m_currentTextureName != t || m_currentGlyphName != g || m_posInList != m_prevPos) {
+            qDebug() << textureName << m_currentGlyphName;
+
+            if ((m_currentTextureName != t || m_currentGlyphName != g || m_posInList != m_prevPos) || m_forcePixmapReload) {
                 m_currentTextureName = t;
                 m_currentGlyphName = g;
                 loadPixmaps();
@@ -287,12 +293,8 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             }
         }
 
-        QPixmap firstGlyph = isInactive ? m_glyphDisabled : m_glyph;
         bool renderButtonTexture = !(m_normal.isNull() || m_hover.isNull() || m_active.isNull());
-        bool renderButtonGlyph = !(firstGlyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull());
-        if (isInactive) {
-            renderButtonGlyph = !firstGlyph.isNull();
-        }
+        bool renderButtonGlyph = !(m_glyph.isNull() || m_glyphHover.isNull() || m_glyphActive.isNull() || m_glyphDisabled.isNull());
 
         // for animations
         QImage image, hImage, aImage;
@@ -302,9 +304,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
         QPixmap final = m_normal;
 
-        // TODO: switch to Borealis::Texture for HiDPI support. Also maybe
-        //       to use the msstyles atlas directly too, which will make
-        //       doing SMOD themes and the msstyles migration easier
         FrameTexture btn(l, r, t, b, w, h, &final);
 
         // configure painter
@@ -312,27 +311,31 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
         painter->translate(g.topLeft());
 
-        if (!isPressed() && !m_isToggled) {
-            // render button texture
-            if (renderButtonTexture) {
-                image = hoverImage(image, hImage, m_hoverProgress);
-                final.convertFromImage(image);
-                btn.render(painter);
+        // render button texture
+        if (renderButtonTexture && !isPressed() && !m_isToggled) {
+            image = hoverImage(image, hImage, m_hoverProgress);
+            final.convertFromImage(image);
+            btn.render(painter);
+        } else if (renderButtonTexture) {
+            final.convertFromImage(aImage);
+            btn.render(painter);
+        }
+
+        // render glyph
+        if (renderButtonGlyph) {
+            QPixmap glyph;
+
+            if (isPressed()) {
+                glyph = m_glyphActive;
+            } else if (isHovered()) {
+                glyph = m_glyphHover;
+            } else if (isInactive) {
+                glyph = m_glyphDisabled;
+            } else {
+                glyph = m_glyph;
             }
 
-            // render glyph
-            if (renderButtonGlyph) {
-                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), firstGlyph.width(), firstGlyph.height(), isHovered() ? m_glyphHover : firstGlyph);
-            }
-        } else {
-            if (renderButtonTexture) {
-                final.convertFromImage(aImage);
-                btn.render(painter);
-            }
-
-            if (renderButtonGlyph) {
-                painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), firstGlyph.width(), firstGlyph.height(), m_glyphActive);
-            }
+            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), glyph.width(), glyph.height(), glyph);
         }
     }
 
@@ -365,6 +368,7 @@ bool Button::isToggled() const
 void Button::setToggled(bool toggled)
 {
     m_isToggled = toggled;
+    forcePixmapReload();
 }
 
 Button::Position Button::positionInList()
@@ -447,6 +451,12 @@ void Button::reconfigure()
     }
 }
 
+void Button::forcePixmapReload()
+{
+    m_forcePixmapReload = true;
+    update();
+}
+
 void Button::hoverEnterEvent(QHoverEvent *event)
 {
     KDecoration3::DecorationButton::hoverEnterEvent(event);
@@ -490,6 +500,7 @@ void Button::hoverLeaveEvent(QHoverEvent *event)
 // real constructor
 Button::Button(KDecoration3::DecorationButtonType type, Decoration *decoration, QObject *parent)
     : DecorationButton(type, decoration, parent)
+    , m_forcePixmapReload(false)
     , m_hoverProgress(0.0)
 {
     // connections
@@ -527,17 +538,21 @@ void Button::startHoverAnimation(qreal endValue)
 
 void Button::loadPixmaps()
 {
+    if (m_forcePixmapReload) {
+        m_forcePixmapReload = false;
+    }
+
     m_glyph = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/normal" + m_dpiScale);
     m_glyphHover = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/hover" + m_dpiScale);
     m_glyphActive = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/active" + m_dpiScale);
     m_glyphDisabled = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/disabled" + m_dpiScale);
 
-    // TODO: uncap this after themes can provide any scale they want for each texture, like in msstyles
     if (m_dpiScale == "@2x") {
         m_dpiScale = "@1.5x";
     }
 
     QString texturePath(":/decoration/button/");
+    qDebug() << m_currentTextureName << decoration()->window()->isActive();
     if (!decoration()->window()->isActive()) {
         texturePath += QStringLiteral("unfocused/");
     } else {

@@ -65,6 +65,8 @@ public:
     void scheduleGeometryUpdate();
     void reconfigure();
 
+    void forcePixmapReload();
+
 Q_SIGNALS:
     void buttonHoverStatus(KDecoration3::DecorationButtonType button, bool hovered, QPoint pos);
 
@@ -79,6 +81,8 @@ private:
     void startHoverAnimation(qreal endValue);
 
     void loadPixmaps();
+
+    bool m_forcePixmapReload;
 
     QString m_currentTextureName, m_currentGlyphName, m_dpiScale;
     QPixmap m_glyph, m_glyphHover, m_glyphActive, m_glyphDisabled;
