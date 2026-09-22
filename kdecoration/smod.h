@@ -63,7 +63,7 @@ static QHash<ButtonTypes, ButtonData> buttonData{{Close, {QStringLiteral("close"
                                                  {CloseLone, {QStringLiteral("close"), QStringLiteral("close-single")}},
                                                  {Maximize, {QStringLiteral("maximize"), QStringLiteral("maximize")}},
                                                  {Minimize, {QStringLiteral("minimize"), QStringLiteral("minimize")}},
-                                                 {ContextHelp, {QStringLiteral("help"), QStringLiteral("minimize")}},
+                                                 {ContextHelp, {QStringLiteral("contexthelp"), QStringLiteral("minimize")}},
                                                  {KeepBelow, {QStringLiteral("underlap"), QStringLiteral("minimize")}},
                                                  {KeepAbove, {QStringLiteral("overlap"), QStringLiteral("minimize")}},
                                                  {Shade, {QStringLiteral("shade"), QStringLiteral("minimize")}},
