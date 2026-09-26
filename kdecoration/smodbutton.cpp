@@ -21,6 +21,8 @@
 #include <QVariantAnimation>
 #include <ctime>
 
+#include "dpi.h"
+
 namespace SMOD
 {
 
@@ -168,11 +170,15 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
     if (!decoration()) {
         return;
     }
-
     auto deco = qobject_cast<Decoration *>(decoration());
-    int titlebarHeight = deco->titlebarHeight();
+    const auto c = deco->window();
+    qreal scale = c->scale();
+    int titlebarHeight = deco->titlebarHeight() * scale;
 
-    QRect g = geometry().toRect();
+    painter->save();
+    painter->scale(1.0 / scale, 1.0 / scale);
+
+    QRectF g = geometry();
 
     if (m_offset < 0) {
         g.adjust(0, 0, m_offset, 0);
@@ -180,19 +186,20 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         g.adjust(m_offset, 0, 0, 0);
     }
 
-    painter->save();
-
-    const auto c = deco->window();
+    g.moveTo(g.x() * scale, std::floor(g.y() * scale));
+    g.setWidth(g.width() * scale);
+    g.setHeight(g.height() * scale);
+    g = KDecoration3::snapToPixelGrid(g, scale);
 
     // menu button
     if (type() == KDecoration3::DecorationButtonType::Menu) {
-        QSize iconSize = g.size();
-        QRect iconRect(g.topLeft(), iconSize);
+        QSizeF iconSize = g.size();
+        QRectF iconRect(g.topLeft(), iconSize);
 
-        painter->translate(QPointF(0, c->isMaximized() ? 1 : (decoration()->settings()->smallSpacing() * 2) - 1));
+        painter->translate(QPointF(0, c->isMaximized() ? scale : ((decoration()->settings()->smallSpacing() * 2) - 1) * scale));
 
-        iconRect.translate(0, (titlebarHeight - iconSize.height()) / 2);
-        c->icon().paint(painter, iconRect);
+        iconRect.translate(0, ((titlebarHeight - iconSize.height()) / 2) * scale);
+        c->icon().paint(painter, iconRect.toRect());
     } else if (type() != KDecoration3::DecorationButtonType::Spacer) {
         const bool isMaximized = c->isMaximized();
         const bool isInactive = !isEnabled();
@@ -216,7 +223,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         }
 
         QString textureName = m_data.textureName, glyphName = m_data.glyphName;
-        QPoint glyphOffset;
+        QPointF glyphOffset;
 
         // TODO FIXME: take KDecoration3::DecoratedWindow::scale() into consideration too
         if (titlebarHeight >= 22 && titlebarHeight < 25) {
@@ -283,12 +290,12 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
             // set glyph offset
             if (type() == KDecoration3::DecorationButtonType::Close || textureName == "minimize") {
-                glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+                glyphOffset = QPointF(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
             } else if (textureName == "maximize") {
                 if (deco && isMaximized) {
-                    glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+                    glyphOffset = QPointF(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
                 } else {
-                    glyphOffset = QPoint(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
+                    glyphOffset = QPointF(c_l + ceil((leftoverW - m_glyph.width()) / 2.0), c_t + ceil((leftoverH - m_glyph.height()) / 2.0));
                 }
             }
         }
@@ -304,12 +311,13 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
 
         QPixmap final = m_normal;
 
-        FrameTexture btn(l, r, t, b, w, h, &final);
+        FrameTexture btn(l, r, t, b, w, h, 1.0, &final);
 
         // configure painter
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-        painter->translate(g.topLeft());
+
+        painter->translate(ALIGN(g.topLeft(), scale).toPoint());
 
         // render button texture
         if (renderButtonTexture && !isPressed() && !m_isToggled) {
@@ -335,7 +343,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
                 glyph = m_glyph;
             }
 
-            painter->drawPixmap(glyphOffset.x(), glyphOffset.y(), glyph.width(), glyph.height(), glyph);
+            painter->drawPixmap(std::round(glyphOffset.x()), std::round(glyphOffset.y()), glyph.width(), glyph.height(), glyph);
         }
     }
 
