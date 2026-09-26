@@ -236,11 +236,9 @@ void Decoration::reconfigure()
     m_activeFontColor = wmConfig.readEntry("activeForeground", QColor(0, 0, 0, 255));
     m_inactiveFontColor = wmConfig.readEntry("inactiveForeground", QColor(20, 19, 18, 255));
 
-    recalculateBorders();
-    recalculateTitleBar();
     updateShadow(true);
     updateButtonsGeometryDelayed();
-    update();
+    recalculateSizes();
 
     // Reload smodglow
     {
@@ -333,7 +331,6 @@ void Decoration::recalculateTitleBar()
 
 void Decoration::recalculateSizes()
 {
-    reconfigure();
     recalculateTitleBar();
     recalculateBorders();
 
