@@ -1,4 +1,5 @@
 #include "core/backendoutput.h"
+#include "core/rendertarget.h"
 #include "smodglow.h"
 #include <QVector2D>
 
@@ -106,10 +107,22 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         return;
     }
 
+    auto modulate = [&](float opacity, float brightness) {
+        const float a = opacity;
+        const float rgb = opacity * brightness;
+
+        return QVector4D(rgb, rgb, rgb, a);
+    };
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     ShaderManager::instance()->pushShader(m_shader.get());
+
+    const auto toXYZ = renderTarget.colorDescription()->containerColorimetry().toXYZ();
+    m_shader->setUniform(GLShader::FloatUniform::Saturation, data.saturation());
+    m_shader->setUniform(GLShader::Vec3Uniform::PrimaryBrightness, QVector3D(toXYZ(1, 0), toXYZ(1, 1), toXYZ(1, 2)));
+    m_shader->setColorspaceUniforms(ColorDescription::sRGB, renderTarget.colorDescription(), RenderingIntent::Perceptual);
 
     int uniform_opacity = m_shader->uniformLocation("opacity");
     int uniform_bordertop = m_shader->uniformLocation("bordertop");
@@ -117,8 +130,9 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     int uniform_targetrect = m_shader->uniformLocation("targetrect");
     int uniform_texturerect = m_shader->uniformLocation("texturerect");
     int uniform_colormatrix = m_shader->uniformLocation("colorMatrix");
+
     const auto scale = viewport.scale();
-    QMatrix4x4 colorMat = colorMatrix(data.brightness() * hdr_brightness_correction, data.saturation());
+    QMatrix4x4 colorMat = colorMatrix(data.brightness() * w->screen()->backendOutput()->brightnessSetting(), data.saturation());
 
     GLTexture *m_preferred_texture = m_texture_minimize.get();
 
@@ -134,6 +148,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_captureExclude_rect.width(), handler->m_captureExclude_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -150,6 +165,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_menu_rect.width(), handler->m_menu_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -166,6 +182,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_pin_rect.width(), handler->m_pin_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -182,6 +199,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_shade_rect.width(), handler->m_shade_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -198,6 +216,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_underlap_rect.width(), handler->m_underlap_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -214,6 +233,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_overlap_rect.width(), handler->m_overlap_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -230,6 +250,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_help_rect.width(), handler->m_help_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -246,6 +267,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_min_rect.width(), handler->m_min_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -264,6 +286,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, MINMAXGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_max_rect.width(), handler->m_max_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_preferred_texture->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         m_preferred_texture->render(pixelGeometry.size());
@@ -280,6 +303,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
         m_shader->setUniform(uniform_borderleft, CLOSEGLOW_SML);
         m_shader->setUniform(uniform_targetrect, QVector2D(handler->m_close_rect.width(), handler->m_close_rect.height()));
         m_shader->setUniform(uniform_colormatrix, colorMat);
+        m_shader->setUniform(GLShader::Vec4Uniform::ModulationConstant, modulate(opacity, data.brightness()));
         QSize rect = m_texture_close.get()->size();
         m_shader->setUniform(uniform_texturerect, QVector2D(rect.width(), rect.height()));
         GLTexture *texture = m_texture_close.get();

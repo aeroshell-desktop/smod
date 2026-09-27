@@ -39,7 +39,10 @@ SmodGlowEffect::SmodGlowEffect()
     // NOTE is this needed?
     // effects->makeOpenGLContextCurrent();
 
-    m_shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture, QString(), QStringLiteral(":/effects/smodglow/shaders/shader.frag"));
+    m_shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture | ShaderTrait::AdjustSaturation | ShaderTrait::Modulate
+                                                                     | ShaderTrait::TransformColorspace,
+                                                                 QString(),
+                                                                 QStringLiteral(":/effects/smodglow/shaders/shader.frag"));
     if (!m_shader) {
         qWarning() << "kwin_effect_smodglow: Failed to load shader!";
     }

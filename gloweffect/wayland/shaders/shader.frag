@@ -2,6 +2,8 @@
 
 precision highp float;
 
+#include "aeroshell/outputmanagement.frag"
+
 uniform sampler2D sampler;
 uniform float opacity;
 uniform float bordertop;
@@ -39,6 +41,6 @@ void main()
         processAxis(texcoord0.x, u_borders.x, u_dimensions.x),
                       processAxis(texcoord0.y, u_borders.y, u_dimensions.y)
     );
-    fragColor = texture(sampler, newUV) * opacity;
-    fragColor *= colorMatrix;
+    vec4 result = texture(sampler, newUV) * opacity;
+    fragColor = adjustOutput(result);
 }

@@ -2,5 +2,8 @@
 <qresource prefix="/effects/smodglow/shaders">
   <file alias="shader.frag">shaders/shader.frag</file>
 </qresource>
+<qresource prefix="/">
+  <file alias="opengl/aeroshell/outputmanagement.frag">shaders/outputmanagement.frag</file>
+</qresource>
 </RCC>
 
