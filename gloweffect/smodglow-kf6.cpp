@@ -94,17 +94,17 @@ bool SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     if ((scaled || (translated || (mask & PAINT_WINDOW_TRANSFORMED)))) {
-        return false;
+        return true;
     }
 
     if (!(windows.contains(w) && windows.value(w) && w->hasDecoration())) {
-        return false;
+        return true;
     }
 
     GlowHandler *handler = windows.value(w);
 
     if (!handler->m_needsRepaint) {
-        return false;
+        return true;
     }
 
     auto modulate = [&](float opacity, float brightness) {

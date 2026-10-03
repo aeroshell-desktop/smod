@@ -186,7 +186,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
         g.adjust(m_offset, 0, 0, 0);
     }
 
-    g.moveTo(g.x() * scale, std::floor(g.y() * scale));
+    g.moveTo(g.x() * scale, qFloor(g.y() * scale));
     g.setWidth(g.width() * scale);
     g.setHeight(g.height() * scale);
     g = KDecoration3::snapToPixelGrid(g, scale);
@@ -341,7 +341,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
                 glyph = m_glyph;
             }
 
-            painter->drawPixmap(std::round(glyphOffset.x()), std::round(glyphOffset.y()), glyph.width(), glyph.height(), glyph);
+            painter->drawPixmap(qRound(glyphOffset.x()), qRound(glyphOffset.y()), glyph.width(), glyph.height(), glyph);
         }
     }
 

@@ -518,12 +518,12 @@ void Decoration::paintSideHighlights(QPainter *painter, const QRectF &repaintReg
         QPixmap sidehighlight(":/decoration/frame/sidehighlight/" + (!c->isActive() ? QString("unfocus") : QString("focus")));
         painter->drawPixmap(margins_left.inset * scale,
                             borderTop() * scale,
-                            std::ceil((borderLeft() - margins_left.inset - margins_left.inset) * scale),
+                            qCeil((borderLeft() - margins_left.inset - margins_left.inset) * scale),
                             SIDEBAR_HEIGHT * scale,
                             sidehighlight);
-        painter->drawPixmap(std::floor((size().width() - borderRight() + margins_right.inset) * scale),
+        painter->drawPixmap(qFloor((size().width() - borderRight() + margins_right.inset) * scale),
                             borderTop() * scale,
-                            std::ceil((borderRight() - margins_right.inset - margins_right.inset) * scale),
+                            qCeil((borderRight() - margins_right.inset - margins_right.inset) * scale),
                             SIDEBAR_HEIGHT * scale,
                             sidehighlight);
     }
@@ -816,11 +816,11 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
                 // TODO: rtl support
                 switch (titleAlignment) {
                 case InternalSettings::AlignLeft:
-                    x = captionRect.x() + floor(rect.width() / 2) - floor(glowWidth / 2);
+                    x = captionRect.x() + qFloor(rect.width() / 2) - qFloor(glowWidth / 2);
                     break;
                 case InternalSettings::AlignRight:
                     // QT-BUG: QRect::right() is off by one
-                    x = ((captionRect.x() + captionRect.width()) - floor(rect.width() / 2)) - floor(glowWidth / 2);
+                    x = ((captionRect.x() + captionRect.width()) - qFloor(rect.width() / 2)) - qFloor(glowWidth / 2);
                     break;
                 case InternalSettings::AlignCenter:
                     x = captionRect.center().x() - glowWidth / 2;
