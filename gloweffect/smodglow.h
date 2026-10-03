@@ -15,7 +15,7 @@
 #include "opengl/gltexture.h"
 #include "window.h"
 
-#include <SMOD/Decoration/SMODDecoration>
+#include <smoddecoration.h>
 
 // TODO remove "+ 1.0" when I fix the textures
 #define MINMAXGLOW_SML 9.0f
@@ -44,16 +44,16 @@ public:
     ~SmodGlowEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
-    void prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
-    void
-    paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, QRegion region, WindowPaintData &data) override;
-    void postPaintWindow(EffectWindow *w) override;
+    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data) override;
+    bool paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &region, WindowPaintData &data)
+        override;
+    void postPaintScreen() override;
 
     static bool supported();
 
     bool isActive() const override
     {
-        return m_active;
+        return m_active && m_shader;
     }
 
     int requestedEffectChainPosition() const override
@@ -86,7 +86,7 @@ private:
     std::unique_ptr<GLTexture> m_texture_minimize, m_texture_maximize, m_texture_close;
     std::unique_ptr<GLShader> m_shader;
     QHash<const EffectWindow *, GlowHandler *> windows = QHash<const EffectWindow *, GlowHandler *>();
-    QRegion m_prevPaint = QRegion();
+    Region m_prevPaint = Region();
     QMatrix4x4 colorMatrix(const float &brightness, const float &saturation) const;
 
     WindowButtonsDPI m_current_dpi = DPI_100_PERCENT, m_next_dpi = DPI_100_PERCENT;
@@ -159,8 +159,9 @@ public:
     }
     ~GlowAnimationHandler()
     {
-        if (!m_hoverAnimation.isNull())
+        if (!m_hoverAnimation.isNull()) {
             delete m_hoverAnimation;
+        }
     }
 
     QPointer<QPropertyAnimation> m_hoverAnimation = QPointer<QPropertyAnimation>();
@@ -251,13 +252,13 @@ public:
     GlowAnimationHandler *m_shade = nullptr, *m_underlap = nullptr, *m_overlap = nullptr;
     GlowAnimationHandler *m_help = nullptr, *m_min = nullptr, *m_max = nullptr, *m_close = nullptr;
 
-    QRect m_captureExclude_rect = QRect(), m_pin_rect = QRect(), m_menu_rect = QRect();
-    QRect m_shade_rect = QRect(), m_underlap_rect = QRect(), m_overlap_rect = QRect();
-    QRect m_help_rect = QRect(), m_min_rect = QRect(), m_max_rect = QRect(), m_close_rect = QRect();
+    Rect m_captureExclude_rect{}, m_pin_rect{}, m_menu_rect{};
+    Rect m_shade_rect{}, m_underlap_rect{}, m_overlap_rect{};
+    Rect m_help_rect{}, m_min_rect{}, m_max_rect{}, m_close_rect{};
 
-    QRegion m_minimizePaintRegion = QRegion();
-    QRegion m_maximizePaintRegion = QRegion();
-    QRegion m_closePaintRegion = QRegion();
+    Region m_minimizePaintRegion{};
+    Region m_maximizePaintRegion{};
+    Region m_closePaintRegion{};
 
     QMetaObject::Connection m_decoration_connection = QMetaObject::Connection();
     bool m_needsRepaint = false;
@@ -271,7 +272,8 @@ public Q_SLOTS:
     void animFinished()
     {
         // TODO redo this
-        if ((m_captureExclude->m_hoverProgress == 0.0) && (m_menu->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+        if ((m_captureExclude->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
+            && (m_menu->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
             && (m_pin->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
             && (m_shade->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)
             && (m_underlap->m_hoverProgress == 0.0) //|| m_min->m_hoverProgress == 1.0)

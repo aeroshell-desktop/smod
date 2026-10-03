@@ -4,7 +4,7 @@ project(smod)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(PROJECT_VERSION "6.7.4")
+set(PROJECT_VERSION "6.8.0")
 set(PROJECT_VERSION_MAJOR 6)
 
 set(KF6_MIN_VERSION "6.10.0")
@@ -12,8 +12,7 @@ set(KDE_COMPILERSETTINGS_LEVEL "5.82")
 set(QT_MIN_VERSION "6.7.0")
 set(QT_MAJOR_VERSION 6)
 
-option(BUILD_EFFECTX11 "Build the caption glow effect for X11" OFF)
-option(BUILD_EFFECT "Build the caption glow effect for Wayland" ON)
+option(BUILD_EFFECT "Build the caption glow effect" ON)
 option(BUILD_DECORATION "Build the decoration" ON)
 
 # We need this because we can't include KDECMakeSettings here, because that
@@ -62,7 +61,7 @@ if(BUILD_DECORATION)
     add_subdirectory(kdecoration)
 endif()
 
-if(BUILD_EFFECT OR BUILD_EFFECTX11)
+if(BUILD_EFFECT)
     find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
         ConfigWidgets
     )
@@ -74,11 +73,7 @@ if(BUILD_EFFECT OR BUILD_EFFECTX11)
         add_library(smoddecoration ALIAS PkgConfig::smoddecoration)
     endif()
 
-    if(BUILD_EFFECTX11)
-        find_package(KWinX11 REQUIRED kwineffects)
-    else()
-        find_package(KWin REQUIRED kwineffects)
-    endif()
+    find_package(KWin REQUIRED kwineffects)
 
     add_subdirectory(gloweffect)
 endif()

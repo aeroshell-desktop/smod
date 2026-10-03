@@ -74,7 +74,7 @@ void SmodGlowEffect::loadTextures()
     m_active = true;
 }
 
-void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
+bool SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
                                  const RenderViewport &viewport,
                                  EffectWindow *w,
                                  int mask,
@@ -93,17 +93,17 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
 
     if ((scaled || (translated || (mask & PAINT_WINDOW_TRANSFORMED)))) {
-        return;
+        return false;
     }
 
     if (!(windows.contains(w) && windows.value(w) && w->hasDecoration())) {
-        return;
+        return false;
     }
 
     GlowHandler *handler = windows.value(w);
 
     if (!handler->m_needsRepaint) {
-        return;
+        return false;
     }
 
     glEnable(GL_BLEND);
@@ -125,7 +125,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     // TODO FIXME: this should really be simplified...
     {
         float opacity = handler->m_captureExclude->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_captureExclude_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_captureExclude_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_captureExclude_rect.x() * scale, handler->m_captureExclude_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -141,7 +141,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_menu->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_menu_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_menu_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_menu_rect.x() * scale, handler->m_menu_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -157,7 +157,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_pin->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_pin_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_pin_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_pin_rect.x() * scale, handler->m_pin_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -173,7 +173,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_shade->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_shade_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_shade_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_shade_rect.x() * scale, handler->m_shade_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -189,7 +189,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_underlap->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_underlap_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_underlap_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_underlap_rect.x() * scale, handler->m_underlap_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -205,7 +205,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_overlap->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_overlap_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_overlap_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_overlap_rect.x() * scale, handler->m_overlap_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -221,7 +221,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_help->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_help_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_help_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_help_rect.x() * scale, handler->m_help_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -237,7 +237,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_min->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_min_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_min_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_min_rect.x() * scale, handler->m_min_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -255,7 +255,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_max->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_max_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_max_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_max_rect.x() * scale, handler->m_max_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -271,7 +271,7 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
 
     {
         float opacity = handler->m_close->hoverProgress() * w->opacity() * data.opacity();
-        const RectF pixelGeometry = snapToPixelGridF(handler->m_close_rect.scaled(scale));
+        const RectF pixelGeometry = handler->m_close_rect.scaled(scale);
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(handler->m_close_rect.x() * scale, handler->m_close_rect.y() * scale);
         m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -287,6 +287,8 @@ void SmodGlowEffect::paintWindow(const RenderTarget &renderTarget,
     }
     ShaderManager::instance()->popShader();
     glDisable(GL_BLEND);
+
+    return true;
 }
 
 }

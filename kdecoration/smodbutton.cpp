@@ -251,8 +251,6 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             QString t = textureName;
             QString g = glyphName;
 
-            qDebug() << textureName << m_currentGlyphName;
-
             if ((m_currentTextureName != t || m_currentGlyphName != g || m_posInList != m_prevPos) || m_forcePixmapReload) {
                 m_currentTextureName = t;
                 m_currentGlyphName = g;
@@ -552,7 +550,6 @@ void Button::loadPixmaps()
     }
 
     QString texturePath(":/decoration/button/");
-    qDebug() << m_currentTextureName << decoration()->window()->isActive();
     if (!decoration()->window()->isActive()) {
         texturePath += QStringLiteral("unfocused/");
     } else {
