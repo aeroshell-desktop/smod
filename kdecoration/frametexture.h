@@ -19,7 +19,20 @@ public:
      * alignPixels - cast float positions into integers
      * (off_x, off_y, src_w, src_h) form a rectangle that crops the source pixmap which gets rid of everything else we don't want to sample when 9-slicing'
      */
-    FrameTexture(int l, int r, int t, int b, qreal w, qreal h, QPixmap* p, qreal opacity = 1.0, bool alignPixels = false, qreal off_x = 0, qreal off_y = 0, qreal src_w = -1, qreal src_h = -1);
+    FrameTexture(int l,
+                 int r,
+                 int t,
+                 int b,
+                 qreal w,
+                 qreal h,
+                 qreal scale,
+                 QPixmap *p,
+                 qreal opacity = 1.0,
+                 bool alignPixels = false,
+                 qreal off_x = 0,
+                 qreal off_y = 0,
+                 qreal src_w = -1,
+                 qreal src_h = -1);
     void setGeometry(qreal w, qreal h); // Update final size of the rendered texture
     void setOpacity(qreal opacity);
     void render(QPainter *painter);
@@ -38,7 +51,8 @@ private:
     QPixmap *normal;
     qreal off_x, off_y;
     qreal width, height;
-    int l,r,t,b;
+    qreal scale;
+    qreal l, r, t, b;
     bool alignPixels;
 };
 }

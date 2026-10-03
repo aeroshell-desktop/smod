@@ -12,12 +12,13 @@ namespace SMOD
     {
         return a < 0 ? 0 : a;
     }
-    FrameTexture::FrameTexture(int l,
-                               int r,
-                               int t,
-                               int b,
+    FrameTexture::FrameTexture(int l_in,
+                               int r_in,
+                               int t_in,
+                               int b_in,
                                qreal w,
                                qreal h,
+                               qreal scale,
                                QPixmap *p,
                                qreal opacity,
                                bool align,
@@ -30,14 +31,19 @@ namespace SMOD
         , off_y(o_y)
         , width(src_w)
         , height(src_h)
-        , l(l)
-        , r(r)
-        , t(t)
-        , b(b)
+        , scale(scale)
+        , l(l_in)
+        , r(r_in)
+        , t(t_in)
+        , b(b_in)
         , alignPixels(align)
     {
         if(width == -1) width = normal->width();
         if(height == -1) height = normal->height();
+
+        w = std::round(w * scale);
+        h = std::round(h * scale);
+
         for(int i = 0; i < 9; i++)
         {
             fragments[i].opacity = opacity;
@@ -50,32 +56,32 @@ namespace SMOD
         fragments[TOPLEFT].sourceTop = 0;
         fragments[TOPLEFT].width = l;
         fragments[TOPLEFT].height = t;
-        fragments[TOPLEFT].x = (0 + fragments[TOPLEFT].width / 2);
-        fragments[TOPLEFT].y = (0 + fragments[TOPLEFT].height / 2);
+        fragments[TOPLEFT].x = (0 + fragments[TOPLEFT].width / 2.0);
+        fragments[TOPLEFT].y = (0 + fragments[TOPLEFT].height / 2.0);
 
         // TopRight
         fragments[TOPRIGHT].sourceLeft = width - r;
         fragments[TOPRIGHT].sourceTop = 0;
         fragments[TOPRIGHT].width = r;
         fragments[TOPRIGHT].height = t;
-        fragments[TOPRIGHT].x = (w - r + fragments[TOPRIGHT].width / 2);
-        fragments[TOPRIGHT].y = (0     + fragments[TOPRIGHT].height / 2);
+        fragments[TOPRIGHT].x = (w - r + fragments[TOPRIGHT].width / 2.0);
+        fragments[TOPRIGHT].y = (0 + fragments[TOPRIGHT].height / 2.0);
 
         // BottomLeft
         fragments[BOTTOMLEFT].sourceLeft = 0;
         fragments[BOTTOMLEFT].sourceTop = height - b;
         fragments[BOTTOMLEFT].width = l;
         fragments[BOTTOMLEFT].height = b;
-        fragments[BOTTOMLEFT].x = (0     + fragments[BOTTOMLEFT].width / 2);
-        fragments[BOTTOMLEFT].y = (h - b + fragments[BOTTOMLEFT].height / 2);
+        fragments[BOTTOMLEFT].x = (0 + fragments[BOTTOMLEFT].width / 2.0);
+        fragments[BOTTOMLEFT].y = (h - b + fragments[BOTTOMLEFT].height / 2.0);
 
         // BottomRight
         fragments[BOTTOMRIGHT].sourceLeft = width - r;
         fragments[BOTTOMRIGHT].sourceTop = height - b;
         fragments[BOTTOMRIGHT].width = r;
         fragments[BOTTOMRIGHT].height = b;
-        fragments[BOTTOMRIGHT].x = (w - r + fragments[BOTTOMRIGHT].width / 2);
-        fragments[BOTTOMRIGHT].y = (h - b + fragments[BOTTOMRIGHT].height / 2);
+        fragments[BOTTOMRIGHT].x = (w - r + fragments[BOTTOMRIGHT].width / 2.0);
+        fragments[BOTTOMRIGHT].y = (h - b + fragments[BOTTOMRIGHT].height / 2.0);
 
         // Top
         fragments[TOP].sourceLeft = l;
@@ -83,8 +89,8 @@ namespace SMOD
         fragments[TOP].width = width - l - r;
         fragments[TOP].height = t;
         fragments[TOP].scaleX = clip(w-l-r) / fragments[TOP].width;
-        fragments[TOP].x = (l + fragments[TOP].width* fragments[TOP].scaleX / 2);
-        fragments[TOP].y = (0 + fragments[TOP].height*fragments[TOP].scaleY / 2);
+        fragments[TOP].x = (l + fragments[TOP].width * fragments[TOP].scaleX / 2.0);
+        fragments[TOP].y = (0 + fragments[TOP].height * fragments[TOP].scaleY / 2.0);
 
         // Left
         fragments[LEFT].sourceLeft = 0;
@@ -92,8 +98,8 @@ namespace SMOD
         fragments[LEFT].width = l;
         fragments[LEFT].height = height - t - b;
         fragments[LEFT].scaleY =       clip(h-t-b) / fragments[LEFT].height;
-        fragments[LEFT].x = (0 + fragments[LEFT].width* fragments[LEFT].scaleX / 2);
-        fragments[LEFT].y = (t + fragments[LEFT].height*fragments[LEFT].scaleY / 2);
+        fragments[LEFT].x = (0 + fragments[LEFT].width * fragments[LEFT].scaleX / 2.0);
+        fragments[LEFT].y = (t + fragments[LEFT].height * fragments[LEFT].scaleY / 2.0);
 
         // Right
         fragments[RIGHT].sourceLeft = width - r;
@@ -101,8 +107,8 @@ namespace SMOD
         fragments[RIGHT].width = r;
         fragments[RIGHT].height = height - t - b;
         fragments[RIGHT].scaleY =         clip(h-t-b) / fragments[RIGHT].height;
-        fragments[RIGHT].x = (w-r + fragments[RIGHT].width* fragments[RIGHT].scaleX / 2);
-        fragments[RIGHT].y = (t   + fragments[RIGHT].height*fragments[RIGHT].scaleY / 2);
+        fragments[RIGHT].x = (w - r + fragments[RIGHT].width * fragments[RIGHT].scaleX / 2.0);
+        fragments[RIGHT].y = (t + fragments[RIGHT].height * fragments[RIGHT].scaleY / 2.0);
 
         // Center
         fragments[CENTER].sourceLeft = l;
@@ -111,8 +117,8 @@ namespace SMOD
         fragments[CENTER].height = height - t - b;
         fragments[CENTER].scaleX = clip(w-l-r) / fragments[CENTER].width;
         fragments[CENTER].scaleY = clip(h-t-b) / fragments[CENTER].height;
-        fragments[CENTER].x = (l + fragments[CENTER].width* fragments[CENTER].scaleX / 2);
-        fragments[CENTER].y = (t + fragments[CENTER].height*fragments[CENTER].scaleY / 2);
+        fragments[CENTER].x = (l + fragments[CENTER].width * fragments[CENTER].scaleX / 2.0);
+        fragments[CENTER].y = (t + fragments[CENTER].height * fragments[CENTER].scaleY / 2.0);
 
         // Bottom
         fragments[BOTTOM].sourceLeft = l;
@@ -120,8 +126,8 @@ namespace SMOD
         fragments[BOTTOM].width = width - l - r;
         fragments[BOTTOM].height = b;
         fragments[BOTTOM].scaleX =         clip(w-l-r) / fragments[BOTTOM].width;
-        fragments[BOTTOM].x = (l +   fragments[BOTTOM].width* fragments[BOTTOM].scaleX / 2);
-        fragments[BOTTOM].y = (h-b + fragments[BOTTOM].height*fragments[BOTTOM].scaleY / 2);
+        fragments[BOTTOM].x = (l + fragments[BOTTOM].width * fragments[BOTTOM].scaleX / 2.0);
+        fragments[BOTTOM].y = (h - b + fragments[BOTTOM].height * fragments[BOTTOM].scaleY / 2.0);
         for(int i = 0; i < 9; i++)
         {
             fragments[i].sourceLeft += off_x;
@@ -145,18 +151,18 @@ namespace SMOD
     }
     void FrameTexture::setGeometry(qreal w, qreal h)
     {
-        fragments[TOPRIGHT].x = (w - r + fragments[TOPRIGHT].width / 2);
-        fragments[BOTTOMLEFT].y = (h - b + fragments[BOTTOMLEFT].height / 2);
-        fragments[BOTTOMRIGHT].x = (w - r + fragments[BOTTOMRIGHT].width / 2);
-        fragments[BOTTOMRIGHT].y = (h - b + fragments[BOTTOMRIGHT].height / 2);
+        fragments[TOPRIGHT].x = (w - r + fragments[TOPRIGHT].width / 2.0);
+        fragments[BOTTOMLEFT].y = (h - b + fragments[BOTTOMLEFT].height / 2.0);
+        fragments[BOTTOMRIGHT].x = (w - r + fragments[BOTTOMRIGHT].width / 2.0);
+        fragments[BOTTOMRIGHT].y = (h - b + fragments[BOTTOMRIGHT].height / 2.0);
         fragments[TOP].scaleX = clip(w-l-r) / fragments[TOP].width;
         fragments[LEFT].scaleY = clip(h-t-b) / fragments[LEFT].height;
         fragments[RIGHT].scaleY = clip(h-t-b) / fragments[RIGHT].height;
-        fragments[RIGHT].x = (w-r + fragments[RIGHT].width*fragments[RIGHT].scaleX / 2);
+        fragments[RIGHT].x = (w - r + fragments[RIGHT].width * fragments[RIGHT].scaleX / 2.0);
         fragments[CENTER].scaleX = clip(w-l-r) / fragments[CENTER].width;
         fragments[CENTER].scaleY = clip(h-t-b) / fragments[CENTER].height;
         fragments[BOTTOM].scaleX = clip(w-l-r) / fragments[BOTTOM].width;
-        fragments[BOTTOM].y = (h-b + fragments[BOTTOM].height*fragments[BOTTOM].scaleY / 2);
+        fragments[BOTTOM].y = (h - b + fragments[BOTTOM].height * fragments[BOTTOM].scaleY / 2.0);
     }
     void FrameTexture::setOpacity(qreal opacity)
     {

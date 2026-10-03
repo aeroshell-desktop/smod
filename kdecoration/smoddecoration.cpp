@@ -33,6 +33,8 @@
 #include <QTextStream>
 #include <QTimer>
 
+#include "dpi.h"
+
 K_PLUGIN_FACTORY_WITH_JSON(SMODDecoFactory, "smod.json", registerPlugin<SMOD::Decoration>(); registerPlugin<SMOD::Button>();)
 
 namespace SMOD
@@ -194,6 +196,8 @@ bool Decoration::init()
 
     connect(c, &KDecoration3::DecoratedWindow::captionChanged, this, &Decoration::recalculateSizes);
 
+    connect(this, &KDecoration3::Decoration::bordersChanged, this, &Decoration::recalculateBorders);
+
     connect(c, &KDecoration3::DecoratedWindow::maximizedHorizontallyChanged, this, &Decoration::recalculateSizes);
     connect(c, &KDecoration3::DecoratedWindow::maximizedVerticallyChanged, this, &Decoration::recalculateSizes);
     connect(c, &KDecoration3::DecoratedWindow::maximizedChanged, this, &Decoration::recalculateSizes);
@@ -201,6 +205,8 @@ bool Decoration::init()
 
     connect(c, &KDecoration3::DecoratedWindow::widthChanged, this, &Decoration::recalculateSizes);
     connect(c, &KDecoration3::DecoratedWindow::heightChanged, this, &Decoration::recalculateSizes);
+    connect(c, &KDecoration3::DecoratedWindow::scaleChanged, this, &Decoration::recalculateSizes);
+    connect(c, &KDecoration3::DecoratedWindow::nextScaleChanged, this, &Decoration::recalculateSizes);
 
     reconfigure();
     createButtons();
@@ -230,11 +236,9 @@ void Decoration::reconfigure()
     m_activeFontColor = wmConfig.readEntry("activeForeground", QColor(0, 0, 0, 255));
     m_inactiveFontColor = wmConfig.readEntry("inactiveForeground", QColor(20, 19, 18, 255));
 
-    recalculateBorders();
-    recalculateTitleBar();
     updateShadow(true);
     updateButtonsGeometryDelayed();
-    update();
+    recalculateSizes();
 
     // Reload smodglow
     {
@@ -490,34 +494,52 @@ void Decoration::paintSideHighlights(QPainter *painter, const QRectF &repaintReg
 {
     Q_UNUSED(repaintRegion)
 
+    qreal scale = window()->scale();
+    painter->setClipRegion(blurRegion());
+    painter->setClipping(true);
+    painter->save();
+    painter->scale(1.0 / scale, 1.0 / scale);
+
     const auto c = window();
 
     int SIDEBAR_HEIGHT = qMax(25, (int)(size().height() / 4));
     if (internalSettings()->invertTextColor() && isMaximized()) {
+        painter->restore();
         return;
     }
 
-    painter->setClipRegion(blurRegion());
-    painter->setClipping(true);
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     // TODO: add the ability to keep sidehighlights
     if (!isMaximized() && !hideInnerBorder()) {
         auto margins_left = sizingMargins().frameLeftSizing();
         auto margins_right = sizingMargins().frameRightSizing();
         QPixmap sidehighlight(":/decoration/frame/sidehighlight/" + (!c->isActive() ? QString("unfocus") : QString("focus")));
-        painter->drawPixmap(margins_left.inset, borderTop(), borderLeft() - margins_left.inset - margins_left.inset, SIDEBAR_HEIGHT, sidehighlight);
-        painter->drawPixmap(size().width() - borderRight() + margins_right.inset,
-                            borderTop(),
-                            borderRight() - margins_right.inset - margins_right.inset,
-                            SIDEBAR_HEIGHT,
+        painter->drawPixmap(margins_left.inset * scale,
+                            borderTop() * scale,
+                            std::ceil((borderLeft() - margins_left.inset - margins_left.inset) * scale),
+                            SIDEBAR_HEIGHT * scale,
+                            sidehighlight);
+        painter->drawPixmap(std::floor((size().width() - borderRight() + margins_right.inset) * scale),
+                            borderTop() * scale,
+                            std::ceil((borderRight() - margins_right.inset - margins_right.inset) * scale),
+                            SIDEBAR_HEIGHT * scale,
                             sidehighlight);
     }
+    painter->restore();
     painter->setClipping(false);
 }
 
 void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion)
 {
     Q_UNUSED(repaintRegion);
+    painter->save();
+    qreal scale = window()->scale();
+    painter->scale(1.0 / scale, 1.0 / scale);
+
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
     bool active = window()->isActive();
     QString s_prefix("focused");
     if (!active) {
@@ -561,6 +583,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                      t_m.margin_bottom,
                      isMaximized() ? (size().width() - borderLeft() - borderRight()) : (size().width() - modBorderLeft - modBorderRight),
                      isMaximized() ? borderTop() : modBorderTop,
+                     scale,
                      &p_top,
                      1.0,
                      false,
@@ -569,7 +592,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                      p_top.width() - tl_m.width - tr_m.width,
                      p_top.height() - (isMaximized() ? t_m.margin_top : 0));
 
-    top.translate(isMaximized() ? borderLeft() : modBorderLeft, 0);
+    top.translate((isMaximized() ? borderLeft() : modBorderLeft) * scale, 0);
     top.render(painter);
 
     if (!isMaximized()) // Render the rest of the decoration
@@ -588,6 +611,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                              tl_m.margin_bottom,
                              modBorderLeft,
                              modBorderTop,
+                             scale,
                              &p_top,
                              1.0,
                              false,
@@ -602,6 +626,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                               tr_m.margin_bottom,
                               modBorderRight,
                               modBorderTop,
+                              scale,
                               &p_top,
                               1.0,
                               false,
@@ -616,6 +641,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                                 bl_m.margin_bottom,
                                 modBorderLeft,
                                 modBorderBottom,
+                                scale,
                                 &p_bottom,
                                 1.0,
                                 false,
@@ -630,6 +656,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                                  br_m.margin_bottom,
                                  modBorderRight,
                                  modBorderBottom,
+                                 scale,
                                  &p_bottom,
                                  1.0,
                                  false,
@@ -638,9 +665,9 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                                  br_m.width,
                                  p_bottom.height());
         // Sides
-        FrameTexture left(l_m.margin_left, l_m.margin_right, 0, 0, modBorderLeft, size().height() - modBorderBottom - modBorderTop, &p_left);
+        FrameTexture left(l_m.margin_left, l_m.margin_right, 0, 0, modBorderLeft, size().height() - modBorderBottom - modBorderTop, scale, &p_left);
 
-        FrameTexture right(r_m.margin_left, r_m.margin_right, 0, 0, modBorderRight, size().height() - modBorderBottom - modBorderTop, &p_right);
+        FrameTexture right(r_m.margin_left, r_m.margin_right, 0, 0, modBorderRight, size().height() - modBorderBottom - modBorderTop, scale, &p_right);
 
         FrameTexture bottom(0,
                             0,
@@ -648,6 +675,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                             b_m.margin_bottom,
                             size().width() - modBorderLeft - modBorderRight,
                             modBorderBottom,
+                            scale,
                             &p_bottom,
                             1.0,
                             false,
@@ -657,12 +685,12 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                             p_bottom.height());
 
         // Move texture fragments to the appropriate locations
-        topright.translate(size().width() - modBorderRight, 0);
-        bottomleft.translate(0, size().height() - modBorderBottom);
-        bottomright.translate(size().width() - modBorderRight, size().height() - modBorderBottom);
-        left.translate(0, modBorderTop);
-        right.translate(size().width() - modBorderRight, modBorderTop);
-        bottom.translate(modBorderLeft, size().height() - modBorderBottom);
+        topright.translate((size().width() - modBorderRight) * scale, 0);
+        bottomleft.translate(0, (size().height() - modBorderBottom) * scale);
+        bottomright.translate((size().width() - modBorderRight) * scale, (size().height() - modBorderBottom) * scale);
+        left.translate(0, modBorderTop * scale);
+        right.translate((size().width() - modBorderRight) * scale, modBorderTop * scale);
+        bottom.translate(modBorderLeft * scale, (size().height() - modBorderBottom) * scale);
 
         // Render them all
         topleft.render(painter);
@@ -673,6 +701,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
         right.render(painter);
         bottom.render(painter);
     }
+    painter->restore();
 }
 
 void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
@@ -685,13 +714,16 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         painter->save();
 
         const auto c = window();
+        qreal scale = c->scale();
+        painter->scale(1.0 / scale, 1.0 / scale);
+
         int titleAlignment = internalSettings()->titleAlignment();
         bool invertText = internalSettings()->invertTextColor() && c->isMaximized();
 
-        const int left = (m_leftButtons->geometry().x() + m_leftButtons->geometry().width()) + (hideIcon() ? 3 : 5);
-        const int right = m_rightButtons->geometry().left() - (g_sizingmargins.frameRightSizing().inset) + 2;
+        const int left = ((m_leftButtons->geometry().x() + m_leftButtons->geometry().width()) + (hideIcon() ? 3 : 5));
+        const int right = (m_rightButtons->geometry().left() - (g_sizingmargins.frameRightSizing().inset) + 2);
 
-        QRect captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
+        QRectF captionRect(left, 0, right - left, borderTop() + (hideInnerBorder() ? sizingMargins().topSide().margin_bottom : 0));
         QString caption = settings()->fontMetrics().elidedText(c->caption().remove(QRegularExpression(" —.+")), Qt::ElideMiddle, captionRect.width());
 
         // TODO: force active text color if the theme requests it to match Windows 7 behavior
@@ -702,6 +734,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         painter->setPen(textColor);
 
         QLabel label(caption);
+
         QPalette palette = label.palette();
 
         if (invertText) {
@@ -723,7 +756,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 
         if (titleAlignment == InternalSettings::AlignCenterFullWidth) {
             QRect textRect = fm.boundingRect(caption);
-            textRect.moveLeft(size().width() / 2 - textRect.width() / 2);
+            textRect.moveLeft((size().width() / 2 - textRect.width() / 2));
 
             if (textRect.intersects(m_leftButtons->geometry().toRect())) {
                 titleAlignment = InternalSettings::AlignLeft;
@@ -742,9 +775,6 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
             label.setAlignment(Qt::AlignHCenter);
         }
 
-        label.setFixedWidth(captionRect.width());
-        label.setFixedHeight(captionRect.height());
-
         QPixmap glowPixmap(":/decoration/frame/glow");
 
         auto glowMargins = sizingMargins().glowSizing();
@@ -756,6 +786,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter->setRenderHint(QPainter::VerticalSubpixelPositioning, true);
 
         // replace emojis for '█'
         // fixes a BUG in which the glow is shorter than the actual text when there's emojis
@@ -777,7 +808,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
 
         // only render if the caption is not empty
         if (!caption.trimmed().isEmpty()) {
-            FrameTexture glow(l, r, t, b, glowWidth, glowHeight, &glowPixmap, opacity);
+            FrameTexture glow(l, r, t, b, glowWidth, glowHeight, scale, &glowPixmap, opacity);
 
             if (!invertText) {
                 int x = 0;
@@ -799,16 +830,25 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
                     break;
                 }
 
-                glow.translate(x, captionRect.center().y() - floor(glowHeight / 2) + 1);
+                glow.translate(x * scale, (captionRect.center().y() - floor(glowHeight / 2) + 1) * scale);
                 glow.render(painter);
             }
 
+            label.setFixedWidth(captionRect.width() * scale);
+            label.setFixedHeight(captionRect.height() * scale);
+            font.setPointSizeF(font.pointSizeF() * scale);
+            label.setFont(font);
             QPixmap text_pixmap = label.grab();
-            painter->drawPixmap(captionRect, text_pixmap);
+            captionRect.moveTo(captionRect.x() * scale, captionRect.y() * scale);
+            captionRect.setWidth(captionRect.width() * scale);
+            captionRect.setHeight(captionRect.height() * scale);
+            // painter->fillRect(captionRect, Qt::red);
+            captionRect = ALIGN(captionRect, scale);
+            painter->drawPixmap(captionRect, text_pixmap, text_pixmap.rect().toRectF());
 
             if (invertText) {
                 painter->setOpacity(0.7);
-                painter->drawPixmap(captionRect, text_pixmap);
+                painter->drawPixmap(captionRect, text_pixmap, text_pixmap.rect().toRectF());
                 painter->setOpacity(1.0);
             }
         }
@@ -829,8 +869,10 @@ std::shared_ptr<KDecoration3::DecorationShadow> Decoration::createShadow(bool ac
 {
     ShadowSizing sizing = sizingMargins().shadowSizing();
 
-    QMargins margins(sizing.margin_left, sizing.margin_top, sizing.margin_right, sizing.margin_bottom);
-    QMargins padding(sizing.padding_left, sizing.padding_top, sizing.padding_right, sizing.padding_bottom);
+    qreal scale = window()->scale();
+    qreal dpiOffset = scale != 1.0 ? KDecoration3::pixelSize(scale) / 2.0 : 0.0;
+    QMarginsF margins(sizing.margin_left, sizing.margin_top, sizing.margin_right, sizing.margin_bottom);
+    QMarginsF padding(sizing.padding_left - dpiOffset, sizing.padding_top - dpiOffset, sizing.padding_right - dpiOffset, sizing.padding_bottom - dpiOffset);
 
     QString texturePath(":/decoration/frame/shadow/");
     QString variant("normal");
@@ -839,11 +881,11 @@ std::shared_ptr<KDecoration3::DecorationShadow> Decoration::createShadow(bool ac
     }
 
     QImage texture = QImage(texturePath + variant);
-    QRect innerShadowRect = texture.rect() - margins;
+    QRectF innerShadowRect = texture.rect().toRectF() - margins;
 
     auto shadow = std::make_shared<KDecoration3::DecorationShadow>();
     shadow->setPadding(padding);
-    shadow->setInnerShadowRect(innerShadowRect);
+    shadow->setInnerShadowRect(KDecoration3::snapToPixelGrid(innerShadowRect, scale));
     shadow->setShadow(texture);
 
     return shadow;
