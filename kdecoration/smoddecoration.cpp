@@ -438,6 +438,7 @@ void Decoration::updateButtonsGeometry()
         if (!m_leftButtons->buttons().isEmpty()) {
             for (QPointer<KDecoration3::DecorationButton> button : m_leftButtons->buttons()) {
                 static_cast<Button *>(button.data())->reconfigure();
+                static_cast<Button *>(button.data())->setEnabled(!hideTitleBar());
             }
         }
     }
@@ -458,6 +459,7 @@ void Decoration::updateButtonsGeometry()
         if (!m_rightButtons->buttons().isEmpty()) {
             for (QPointer<KDecoration3::DecorationButton> button : m_rightButtons->buttons()) {
                 static_cast<Button *>(button.data())->reconfigure();
+                static_cast<Button *>(button.data())->setEnabled(!hideTitleBar());
             }
         }
     }
