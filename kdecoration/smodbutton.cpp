@@ -172,7 +172,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
     }
     auto deco = qobject_cast<Decoration *>(decoration());
     const auto c = deco->window();
-    qreal scale = c->scale();
+    qreal scale = c->nextScale();
     int titlebarHeight = deco->titlebarHeight() * scale;
 
     painter->save();
@@ -258,7 +258,7 @@ void Button::paint(QPainter *painter, const QRectF &repaintRegion)
             QString t = textureName;
             QString g = glyphName;
 
-            qDebug() << textureName << m_currentGlyphName;
+            // qDebug() << textureName << m_currentGlyphName;
 
             if ((m_currentTextureName != t || m_currentGlyphName != g || m_posInList != m_prevPos) || m_forcePixmapReload) {
                 m_currentTextureName = t;
@@ -560,7 +560,7 @@ void Button::loadPixmaps()
     }
 
     QString texturePath(":/decoration/button/");
-    qDebug() << m_currentTextureName << decoration()->window()->isActive();
+    // qDebug() << m_currentTextureName << decoration()->window()->isActive();
     if (!decoration()->window()->isActive()) {
         texturePath += QStringLiteral("unfocused/");
     } else {

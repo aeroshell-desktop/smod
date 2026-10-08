@@ -255,6 +255,8 @@ void Decoration::recalculateBorders()
     const auto c = window();
     auto s = settings();
 
+    auto scale = c->nextScale();
+
     // left, right and bottom borders
     int left = isMaximized() ? 0 : sizingMargins().frameLeftSizing().width;
     int right = isMaximized() ? 0 : sizingMargins().frameRightSizing().width;
@@ -284,10 +286,10 @@ void Decoration::recalculateBorders()
         FrameMargins b_m = sizingMargins().bottomSide();
 
         if (hideInnerBorder()) {
-            left = left < l_m.margin_right ? 0 : left - l_m.margin_right;
-            right = right < r_m.margin_left ? 0 : right - r_m.margin_left;
-            top = top < t_m.margin_bottom ? 0 : top - t_m.margin_bottom;
-            bottom = bottom < b_m.margin_top ? 0 : bottom - b_m.margin_top;
+            left = left < l_m.margin_right ? 0 : ALIGN(left - l_m.margin_right, scale);
+            right = right < r_m.margin_left ? 0 : ALIGN(right - r_m.margin_left, scale);
+            top = top < t_m.margin_bottom ? 0 : ALIGN(top - t_m.margin_bottom, scale);
+            bottom = bottom < b_m.margin_top ? 0 : ALIGN(bottom - b_m.margin_top, scale);
         }
     }
 
@@ -482,8 +484,14 @@ void Decoration::updateBlur()
     auto margins = sizingMargins().commonSizing();
     const int radius = isMaximized() ? 0 : margins.corner_radius + 1;
 
+    auto scale = window()->nextScale();
+    QRectF r = rect();
+
+    if (scale != 1.0 && !isMaximized()) {
+        r = r.marginsRemoved(QMarginsF(1.0 / scale, 1.0 / scale, 1.0 / scale, 1.0 / scale));
+    }
     QPainterPath path;
-    path.addRoundedRect(rect(), radius, radius);
+    path.addRoundedRect(ALIGN(r, window()->nextScale()), radius, radius);
 
     setBlurRegion(QRegion(path.toFillPolygon().toPolygon()));
 }
@@ -499,7 +507,7 @@ void Decoration::paintSideHighlights(QPainter *painter, const QRectF &repaintReg
 {
     Q_UNUSED(repaintRegion)
 
-    qreal scale = window()->scale();
+    qreal scale = window()->nextScale();
     painter->setClipRegion(blurRegion());
     painter->setClipping(true);
     painter->save();
@@ -540,8 +548,11 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
 {
     Q_UNUSED(repaintRegion);
     painter->save();
-    qreal scale = window()->scale();
+    qreal scale = window()->nextScale();
     painter->scale(1.0 / scale, 1.0 / scale);
+
+    double w = ALIGN(size().width(), scale);
+    double h = ALIGN(size().height(), scale);
 
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -586,7 +597,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                      0,
                      isMaximized() ? 0 : t_m.margin_top,
                      t_m.margin_bottom,
-                     isMaximized() ? (size().width() - borderLeft() - borderRight()) : (size().width() - modBorderLeft - modBorderRight),
+                     isMaximized() ? (w - borderLeft() - borderRight()) : (w - modBorderLeft - modBorderRight),
                      isMaximized() ? borderTop() : modBorderTop,
                      scale,
                      &p_top,
@@ -670,15 +681,15 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                                  br_m.width,
                                  p_bottom.height());
         // Sides
-        FrameTexture left(l_m.margin_left, l_m.margin_right, 0, 0, modBorderLeft, size().height() - modBorderBottom - modBorderTop, scale, &p_left);
+        FrameTexture left(l_m.margin_left, l_m.margin_right, 0, 0, modBorderLeft, h - modBorderBottom - modBorderTop, scale, &p_left);
 
-        FrameTexture right(r_m.margin_left, r_m.margin_right, 0, 0, modBorderRight, size().height() - modBorderBottom - modBorderTop, scale, &p_right);
+        FrameTexture right(r_m.margin_left, r_m.margin_right, 0, 0, modBorderRight, (h - modBorderBottom - modBorderTop), scale, &p_right);
 
         FrameTexture bottom(0,
                             0,
                             b_m.margin_top,
                             b_m.margin_bottom,
-                            size().width() - modBorderLeft - modBorderRight,
+                            w - modBorderLeft - modBorderRight,
                             modBorderBottom,
                             scale,
                             &p_bottom,
@@ -690,12 +701,19 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                             p_bottom.height());
 
         // Move texture fragments to the appropriate locations
-        bottomleft.translate(0, std::ceil((size().height() - modBorderBottom) * scale));
-        left.translate(0, std::ceil(modBorderTop * scale));
-        topright.translate(std::ceil((size().width() - modBorderRight) * scale), 0);
-        right.translate(std::ceil((size().width() - modBorderRight) * scale), std::ceil(modBorderTop * scale));
-        bottomright.translate(std::ceil((size().width() - modBorderRight) * scale), std::ceil((size().height() - modBorderBottom) * scale));
-        bottom.translate(std::ceil(modBorderLeft * scale), std::ceil((size().height() - modBorderBottom) * scale));
+        left.translate(0, std::round(modBorderTop * scale));
+        topright.translate(std::round((w - modBorderRight) * scale), 0);
+        right.translate(std::round((w - modBorderRight) * scale), std::round(modBorderTop * scale));
+
+        double bl_y = (h - modBorderBottom);
+        double br_y = (h - modBorderBottom);
+        double b_y = (h - modBorderBottom);
+        bl_y = ROUND(bl_y, scale);
+        br_y = ROUND(br_y, scale);
+        b_y = ROUND(b_y, scale);
+        bottomleft.translate(0, bl_y);
+        bottomright.translate(std::round((w - modBorderRight) * scale), br_y);
+        bottom.translate(std::round(modBorderLeft * scale), b_y);
 
         // Render them all
         topleft.render(painter);
@@ -719,7 +737,7 @@ void Decoration::paintTitleBar(QPainter *painter, const QRectF &repaintRegion)
         painter->save();
 
         const auto c = window();
-        qreal scale = c->scale();
+        qreal scale = c->nextScale();
         painter->scale(1.0 / scale, 1.0 / scale);
 
         int titleAlignment = internalSettings()->titleAlignment();
@@ -874,10 +892,14 @@ std::shared_ptr<KDecoration3::DecorationShadow> Decoration::createShadow(bool ac
 {
     ShadowSizing sizing = sizingMargins().shadowSizing();
 
-    qreal scale = window()->scale();
-    // qreal dpiOffset = scale != 1.0 ? KDecoration3::pixelSize(scale) / 2.0 : 0.0;
+    qreal scale = window()->nextScale();
+    qreal dpiOffset = scale != 1.0 ? KDecoration3::pixelSize(scale) * 0.25 : 0.0;
     QMarginsF margins(sizing.margin_left, sizing.margin_top, sizing.margin_right, sizing.margin_bottom);
-    QMarginsF padding(sizing.padding_left, sizing.padding_top, sizing.padding_right, sizing.padding_bottom);
+    QMarginsF padding(sizing.padding_left, sizing.padding_top, sizing.padding_right, sizing.padding_bottom - dpiOffset);
+
+    if (hideInnerBorder() && window()->nextScale() != 1.0) {
+        padding -= QMarginsF(0, 0, 1.0, 1.0);
+    }
 
     QString texturePath(":/decoration/frame/shadow/");
     QString variant("normal");
@@ -890,7 +912,7 @@ std::shared_ptr<KDecoration3::DecorationShadow> Decoration::createShadow(bool ac
 
     auto shadow = std::make_shared<KDecoration3::DecorationShadow>();
     shadow->setPadding(padding);
-    shadow->setInnerShadowRect(KDecoration3::snapToPixelGrid(innerShadowRect, scale));
+    shadow->setInnerShadowRect((innerShadowRect));
     shadow->setShadow(texture);
 
     return shadow;
@@ -908,17 +930,15 @@ void Decoration::updateShadow(bool reconfigured)
         return;
     }
 
+    if (!g_smod_shadow) {
+        g_smod_shadow = createShadow(true);
+    }
+    if (!g_smod_shadow_unfocus) {
+        g_smod_shadow_unfocus = createShadow(false);
+    }
     if (window()->isActive()) {
-        if (!g_smod_shadow) {
-            g_smod_shadow = createShadow(true);
-        }
-
         setShadow(g_smod_shadow);
     } else {
-        if (!g_smod_shadow_unfocus) {
-            g_smod_shadow_unfocus = createShadow(false);
-        }
-
         setShadow(g_smod_shadow_unfocus);
     }
 }
