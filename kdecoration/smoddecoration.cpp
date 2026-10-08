@@ -324,8 +324,11 @@ void Decoration::recalculateTitleBar()
 
     const bool maximized = isMaximized();
     const int pos = maximized ? 0 : s->smallSpacing() * 2;
-    const QRect rect(pos, pos, maximized ? c->width() : c->width() - 2 * s->smallSpacing() * 2, maximized ? borderTop() : borderTop() - s->smallSpacing() * 2);
+    QRect rect(pos, pos, maximized ? c->width() : c->width() - 2 * s->smallSpacing() * 2, maximized ? borderTop() : borderTop() - s->smallSpacing() * 2);
 
+    if (hideTitleBar()) {
+        rect.setY(pos + borderTop());
+    }
     setTitleBar(rect);
 }
 
