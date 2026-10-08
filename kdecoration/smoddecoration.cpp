@@ -592,7 +592,7 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                      p_top.width() - tl_m.width - tr_m.width,
                      p_top.height() - (isMaximized() ? t_m.margin_top : 0));
 
-    top.translate((isMaximized() ? borderLeft() : modBorderLeft) * scale, 0);
+    top.translate(std::round((isMaximized() ? borderLeft() : modBorderLeft) * scale), 0);
     top.render(painter);
 
     if (!isMaximized()) // Render the rest of the decoration
@@ -685,11 +685,11 @@ void Decoration::paintOuterBorder(QPainter *painter, const QRectF &repaintRegion
                             p_bottom.height());
 
         // Move texture fragments to the appropriate locations
-        bottomleft.translate(0, (size().height() - modBorderBottom) * scale);
-        left.translate(0, modBorderTop * scale);
+        bottomleft.translate(0, std::ceil((size().height() - modBorderBottom) * scale));
+        left.translate(0, std::ceil(modBorderTop * scale));
         topright.translate(std::ceil((size().width() - modBorderRight) * scale), 0);
-        right.translate(std::ceil((size().width() - modBorderRight) * scale), modBorderTop * scale);
-        bottomright.translate(std::ceil((size().width() - modBorderRight) * scale), (size().height() - modBorderBottom) * scale);
+        right.translate(std::ceil((size().width() - modBorderRight) * scale), std::ceil(modBorderTop * scale));
+        bottomright.translate(std::ceil((size().width() - modBorderRight) * scale), std::ceil((size().height() - modBorderBottom) * scale));
         bottom.translate(std::ceil(modBorderLeft * scale), std::ceil((size().height() - modBorderBottom) * scale));
 
         // Render them all
@@ -870,9 +870,9 @@ std::shared_ptr<KDecoration3::DecorationShadow> Decoration::createShadow(bool ac
     ShadowSizing sizing = sizingMargins().shadowSizing();
 
     qreal scale = window()->scale();
-    qreal dpiOffset = scale != 1.0 ? KDecoration3::pixelSize(scale) / 2.0 : 0.0;
+    // qreal dpiOffset = scale != 1.0 ? KDecoration3::pixelSize(scale) / 2.0 : 0.0;
     QMarginsF margins(sizing.margin_left, sizing.margin_top, sizing.margin_right, sizing.margin_bottom);
-    QMarginsF padding(sizing.padding_left - dpiOffset, sizing.padding_top - dpiOffset, sizing.padding_right, sizing.padding_bottom);
+    QMarginsF padding(sizing.padding_left, sizing.padding_top, sizing.padding_right, sizing.padding_bottom);
 
     QString texturePath(":/decoration/frame/shadow/");
     QString variant("normal");
