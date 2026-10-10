@@ -550,10 +550,17 @@ void Button::loadPixmaps()
         m_forcePixmapReload = false;
     }
 
-    m_glyph = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/normal" + m_dpiScale);
-    m_glyphHover = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/hover" + m_dpiScale);
-    m_glyphActive = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/active" + m_dpiScale);
-    m_glyphDisabled = QPixmap(":/decoration/glyphs/" + m_currentGlyphName + "/disabled" + m_dpiScale);
+    auto tryLoadGlyph = [&](QPixmap &p, QString path) {
+        p = QPixmap(path + m_dpiScale);
+        if (p.isNull()) {
+            p = QPixmap(path);
+        }
+    };
+
+    tryLoadGlyph(m_glyph, ":/decoration/glyphs/" + m_currentGlyphName + "/normal");
+    tryLoadGlyph(m_glyphHover, ":/decoration/glyphs/" + m_currentGlyphName + "/hover");
+    tryLoadGlyph(m_glyphActive, ":/decoration/glyphs/" + m_currentGlyphName + "/active");
+    tryLoadGlyph(m_glyphDisabled, ":/decoration/glyphs/" + m_currentGlyphName + "/disabled");
 
     if (m_dpiScale == "@2x") {
         m_dpiScale = "@1.5x";
@@ -567,9 +574,9 @@ void Button::loadPixmaps()
         texturePath += QStringLiteral("focused/");
     }
 
-    m_normal = QPixmap(texturePath + m_currentTextureName + "/normal" + m_dpiScale);
-    m_hover = QPixmap(texturePath + m_currentTextureName + "/hover" + m_dpiScale);
-    m_active = QPixmap(texturePath + m_currentTextureName + "/active" + m_dpiScale);
+    tryLoadGlyph(m_normal, texturePath + m_currentTextureName + "/normal");
+    tryLoadGlyph(m_hover, texturePath + m_currentTextureName + "/hover");
+    tryLoadGlyph(m_active, texturePath + m_currentTextureName + "/active");
 
     QList<QPixmap> pixmapsToMod{m_normal, m_hover, m_active};
 
